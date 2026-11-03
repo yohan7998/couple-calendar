@@ -999,11 +999,115 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+  
+    /* KakaoTalk In-App Browser Guide Banner */
+    .kakao-inapp-banner {
+      background: #FEE500;
+      color: #191919;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 10px 16px 4px 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      font-size: 13px;
+    }
+    .kakao-banner-content {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .kakao-banner-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+    .kakao-banner-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+      color: #191919;
+    }
+    .kakao-banner-text p {
+      margin: 0;
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: #372A00;
+    }
+    .kakao-banner-close {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #705A00;
+      padding: 0 0 0 8px;
+    }
+
+    /* Sync Status Card in Settings */
+    .sync-status-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+    .sync-status-card.connected {
+      border-color: #A3E635;
+      background: #F7FEE7;
+    }
+    .sync-status-card.local {
+      border-color: #FCD34D;
+      background: #FFFBEB;
+    }
+    .sync-status-card.error {
+      border-color: #F87171;
+      background: #FEF2F2;
+    }
+    .sync-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .sync-card-badge {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sync-card-details {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .sync-card-details code {
+      background: rgba(0,0,0,0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
   </style>
 </head>
 <body>
 
   <div class="app-container">
+    <!-- KakaoTalk In-App Browser Guide Banner -->
+    <div id="kakao-inapp-banner" class="kakao-inapp-banner" style="display: none;">
+      <div class="kakao-banner-content">
+        <span class="kakao-banner-icon">💬</span>
+        <div class="kakao-banner-text">
+          <strong>카카오톡 브라우저에서 열렸습니다</strong>
+          <p>홈 화면 추가 및 영구 보관을 위해 우측 하단 <strong>[···]</strong> 버튼을 누르고 <strong>[Safari / 기본 브라우저로 열기]</strong>를 선택해주세요!</p>
+        </div>
+      </div>
+      <button type="button" class="kakao-banner-close" onclick="dismissKakaoBanner()">✕</button>
+    </div>
+
     <!-- In-App Notification Toast Banner -->
     <div id="new-note-toast" class="new-note-toast" onclick="onToastBannerClick()">
       <span class="toast-bell">💌</span>
@@ -1311,17 +1415,63 @@
         <small style="color: var(--text-muted); font-size: 11px;">술을 마실 때마다 이 티켓에서 1장씩 차감됩니다.</small>
       </div>
 
-      <div class="form-group" style="margin-top: 16px;">
-        <label class="form-label">🔒 GitHub 2인 동기화 (영구 무료 무인프라)</label>
+      <!-- Live Sync Status Card -->
+      <div class="sync-status-card local" id="sync-status-card" style="margin-top: 16px;">
+        <div class="sync-card-header">
+          <span class="sync-card-badge" id="card-status-label">🟡 로컬 모드 (단독 사용 중)</span>
+          <button type="button" class="btn-mini" onclick="syncWithGist(true, () => showToast('동기화 완료! 🟢'))">🔄 새로고침</button>
+        </div>
+        <div class="sync-card-details" id="card-status-details">
+          동기화 상태를 확인하고 있습니다...
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="form-label" style="margin: 0;">🔒 GitHub 2인 실시간 동기화</label>
+          <a href="https://github.com/settings/tokens/new?scopes=gist&description=Couple-Calendar-Sync" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: underline;">
+            🔗 토큰 1초 발급 바로가기
+          </a>
+        </div>
         <input type="password" class="form-input" id="setting-token" placeholder="GitHub Personal Access Token (PAT)" style="margin-bottom: 8px;">
-        <input type="text" class="form-input" id="setting-gist-id" placeholder="GitHub Gist ID (예: 8f3c4...)">
-        <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;">
-          토큰이 없어도 브라우저에 자동 저장되며, GitHub Gist ID를 등록하면 부부 스마트폰 간에 실시간 동기화됩니다.
+        <input type="text" class="form-input" id="setting-gist-id" placeholder="GitHub Gist ID (예: 4ec0b134...)" style="margin-bottom: 8px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-submit" style="background: #2563EB; font-size: 12.5px; flex: 1;" onclick="autoCreateGist()">
+            ⚡ Gist 원클릭 자동 생성
+          </button>
+          <button type="button" class="btn-submit" style="background: #27AE60; font-size: 12.5px; flex: 1;" onclick="testAndSaveSync()">
+            동기화 저장 및 확인 🔄
+          </button>
+        </div>
+        <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 6px;">
+          토큰만 입력하고 [Gist 원클릭 자동 생성]을 누르면 Secret Gist가 자동으로 생성되어 즉시 연동됩니다.
         </small>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-top: 14px;">
-        <button type="button" class="btn-submit" style="background: #27AE60;" onclick="testAndSaveSync()">동기화 저장 및 확인 🔄</button>
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-color);">
+        <label class="form-label">💌 배우자(아내) 초대 & 동기화 공유</label>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+          <button type="button" class="btn-submit" style="background: #FFE885; color: #5C4B00; font-weight: 700;" onclick="copyWifeInviteLink()">
+            📱 카카오톡 초대 링크 복사 (원클릭 자동 연동)
+          </button>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-submit" style="background: var(--bg-cream); color: var(--text-main); border: 1px solid var(--border-color); font-size: 12px; flex: 1;" onclick="copySyncKeyOnly()">
+              📋 동기화 키만 복사
+            </button>
+            <button type="button" class="btn-submit" style="background: var(--bg-cream); color: var(--text-main); border: 1px solid var(--border-color); font-size: 12px; flex: 1;" onclick="toggleManualKeyBox()">
+              🔑 수동 키 입력
+            </button>
+          </div>
+        </div>
+        <div id="manual-key-box" style="display: none; margin-top: 10px; background: var(--bg-cream); padding: 10px; border-radius: 10px; border: 1px dashed var(--border-color);">
+          <input type="text" class="form-input" id="setting-manual-key" placeholder="전달받은 동기화 키(SyncKey)를 붙여넣으세요" style="margin-bottom: 6px; font-size: 12px;">
+          <button type="button" class="btn-submit" style="background: var(--primary); font-size: 12px;" onclick="applyManualSyncKey()">
+            키 적용하여 동기화 연결
+          </button>
+        </div>
+        <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 6px;">
+          아내가 초대 링크를 터치하면 토큰과 Gist가 자동으로 설정되어 즉시 부부 캘린더가 공유됩니다!
+        </small>
       </div>
 
       <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-color);">
@@ -1336,16 +1486,6 @@
         </div>
         <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 6px;">
           알림을 켜두시면 주니/용이의 새 쪽지가 도착했을 때 맑은 챠임벨과 함께 즉시 알려드립니다.
-        </small>
-      </div>
-
-      <div style="margin-top: 20px; padding-top: 14px; border-top: 1px dashed var(--border-color);">
-        <label class="form-label">💌 용이(아내) 스마트폰으로 초대하기 (원클릭 자동 동기화)</label>
-        <button type="button" class="btn-submit" style="background: #FFE885; color: #5C4B00;" onclick="copyWifeInviteLink()">
-          카카오톡 초대 링크 복사 📱
-        </button>
-        <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 6px;">
-          링크를 아내에게 카카오톡으로 보내면, 아내 폰에서 링크 터치 시 토큰과 동기화가 자동으로 완료됩니다!
         </small>
       </div>
     </div>
@@ -1365,7 +1505,7 @@
 
     // Global State
     let AppState = {
-      version: '1.1.0',
+      version: '1.2.0',
       lastUpdated: new Date().toISOString(),
       couple: {
         user1: { name: '주니', nickname: '주니', avatar: '🐻' },
@@ -1376,6 +1516,7 @@
       drinks: [],
       schedules: [],
       notes: [],
+      deletedIds: [],
       sync: {
         githubToken: '',
         gistId: '',
@@ -1430,7 +1571,8 @@
     // INIT
     window.addEventListener('DOMContentLoaded', () => {
       loadStateFromLocal();
-      checkUrlHashInvite();
+      checkKakaoBrowser();
+      checkUrlInvite();
       renderAll();
       updateNotifButtonUI();
       if (AppState.sync.githubToken && AppState.sync.gistId) {
@@ -1438,12 +1580,12 @@
       }
     });
 
-    // Auto-polling for real-time notes (every 30 seconds)
+    // Auto-polling for real-time notes & calendar sync (every 20 seconds)
     setInterval(() => {
       if (AppState.sync.githubToken && AppState.sync.gistId) {
         syncWithGist(true);
       }
-    }, 30000);
+    }, 20000);
 
     // Refresh when returning to tab
     document.addEventListener('visibilitychange', () => {
@@ -1930,29 +2072,43 @@
       openModal('day-detail-modal');
     }
 
+    function recordDeletedId(id) {
+      if (!id) return;
+      if (!AppState.deletedIds) AppState.deletedIds = [];
+      if (!AppState.deletedIds.includes(id)) {
+        AppState.deletedIds.push(id);
+        if (AppState.deletedIds.length > 300) AppState.deletedIds.shift();
+      }
+    }
+
     function deleteDrink(id) {
+      recordDeletedId(id);
       AppState.drinks = AppState.drinks.filter(d => d.id !== id);
       saveStateLocal();
       renderAll();
       openDayDetail(selectedDate);
-      syncWithGist();
+      syncWithGist(false);
       showToast("음주 기록이 삭제되고 티켓이 복구되었습니다 🎫");
     }
 
     function deleteSchedule(id) {
+      recordDeletedId(id);
       AppState.schedules = AppState.schedules.filter(s => s.id !== id);
       saveStateLocal();
       renderAll();
       openDayDetail(selectedDate);
-      syncWithGist();
+      syncWithGist(false);
+      showToast("일정이 삭제되었습니다.");
     }
 
     function deleteNote(id) {
+      recordDeletedId(id);
       AppState.notes = AppState.notes.filter(n => n.id !== id);
       saveStateLocal();
       renderAll();
       openDayDetail(selectedDate);
-      syncWithGist();
+      syncWithGist(false);
+      showToast("쪽지가 삭제되었습니다.");
     }
 
     function openRecordDrinkForDay() {
@@ -2064,13 +2220,95 @@
       syncWithGist();
     }
 
-    // 8. SETTINGS & GIST SYNC
+    // 8. SETTINGS & GIST SYNC ENGINE
     function openSettingsModal() {
       playCutePop();
       document.getElementById('setting-quota').value = AppState.couple.monthlyDrinkQuota || 8;
       document.getElementById('setting-token').value = AppState.sync.githubToken || '';
       document.getElementById('setting-gist-id').value = AppState.sync.gistId || '';
+      updateSyncCardUI();
       openModal('settings-modal');
+    }
+
+    function updateSyncCardUI() {
+      const token = AppState.sync.githubToken;
+      const gistId = AppState.sync.gistId;
+      const card = document.getElementById('sync-status-card');
+      const label = document.getElementById('card-status-label');
+      const details = document.getElementById('card-status-details');
+      if (!card || !label || !details) return;
+
+      if (token && gistId) {
+        card.className = 'sync-status-card connected';
+        label.innerHTML = '🟢 부부 실시간 동기화 연결됨';
+        const maskedToken = token.length > 8 ? token.substring(0, 4) + '••••' + token.slice(-4) : '••••';
+        const lastTime = AppState.sync.lastSynced ? new Date(AppState.sync.lastSynced).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '방금';
+        details.innerHTML = `
+          <div><strong>Gist ID:</strong> <a href="https://gist.github.com/${gistId}" target="_blank" style="color:var(--primary);text-decoration:underline;">${gistId.substring(0, 8)}...</a></div>
+          <div><strong>토큰:</strong> <code>${maskedToken}</code></div>
+          <div><strong>동기화 항목:</strong> 일정 ${(AppState.schedules||[]).length}개 · 음주 ${(AppState.drinks||[]).length}개 · 쪽지 ${(AppState.notes||[]).length}개</div>
+          <div><strong>마지막 동기화:</strong> ${lastTime}</div>
+        `;
+      } else {
+        card.className = 'sync-status-card local';
+        label.innerHTML = '🟡 로컬 모드 (단독 사용 중)';
+        details.innerHTML = `
+          <div>아직 상대방과 동기화되지 않고 이 기기에만 저장되고 있습니다.</div>
+          <div style="margin-top:4px;color:var(--text-muted);">토큰을 입력하고 <strong>[Gist 원클릭 자동 생성]</strong>을 누르거나, 배우자에게 받은 <strong>초대 링크</strong>를 열어주세요.</div>
+        `;
+      }
+    }
+
+    async function autoCreateGist() {
+      const tokenInput = document.getElementById('setting-token').value.trim();
+      if (!tokenInput) {
+        alert("먼저 GitHub 토큰(PAT)을 입력해주세요!\n아래 [GitHub 토큰 발급 바로가기] 링크에서 바로 발급받으실 수 있습니다.");
+        return;
+      }
+      showToast("GitHub Gist 자동 생성 중...");
+      try {
+        const payload = {
+          description: "Couple-Calendar Sync Data (달콤살벌 캘린더)",
+          public: false,
+          files: {
+            [GIST_FILENAME]: {
+              content: JSON.stringify({
+                version: AppState.version,
+                lastUpdated: new Date().toISOString(),
+                couple: AppState.couple,
+                drinks: AppState.drinks,
+                schedules: AppState.schedules,
+                notes: AppState.notes,
+                deletedIds: AppState.deletedIds || []
+              }, null, 2)
+            }
+          }
+        };
+        const res = await fetch('https://api.github.com/gists', {
+          method: 'POST',
+          headers: {
+            'Authorization': `token ${tokenInput}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          if (res.status === 401) throw new Error("토큰이 유효하지 않습니다.");
+          if (res.status === 403) throw new Error("토큰에 'gist' 권한이 체크되어 있는지 확인해주세요.");
+          throw new Error(`생성 실패 (${res.status})`);
+        }
+        const createdGist = await res.json();
+        AppState.sync.githubToken = tokenInput;
+        AppState.sync.gistId = createdGist.id;
+        document.getElementById('setting-gist-id').value = createdGist.id;
+        saveStateLocal();
+        updateSyncCardUI();
+        showToast("🎉 Secret Gist가 성공적으로 생성되어 연동되었습니다!");
+        syncWithGist(true);
+      } catch (err) {
+        alert("Gist 자동 생성 실패: " + err.message);
+      }
     }
 
     function testAndSaveSync() {
@@ -2083,6 +2321,7 @@
       AppState.sync.gistId = gistId;
       saveStateLocal();
       renderAll();
+      updateSyncCardUI();
 
       if (!token || !gistId) {
         showToast("로컬 설정이 저장되었습니다 (Gist 연동 없음)");
@@ -2097,6 +2336,108 @@
       });
     }
 
+    // Bidirectional 2-Way Merge Engine (Zero Data Loss)
+    function mergeStates(local, remote) {
+      if (!remote || typeof remote !== 'object') return local;
+
+      const deletedIds = new Set([
+        ...(Array.isArray(local.deletedIds) ? local.deletedIds : []),
+        ...(Array.isArray(remote.deletedIds) ? remote.deletedIds : [])
+      ]);
+
+      // Check if remote has real user items to filter initial demo seeds
+      const remoteHasRealDrinks = Array.isArray(remote.drinks) && remote.drinks.some(d => d.id !== 'd-1');
+      const remoteHasRealSchedules = Array.isArray(remote.schedules) && remote.schedules.some(s => s.id !== 's-1');
+      const remoteHasRealNotes = Array.isArray(remote.notes) && remote.notes.some(n => n.id !== 'n-1' && n.id !== 'n-2');
+
+      // 1. Merge Drinks by ID
+      const drinkMap = new Map();
+      if (Array.isArray(remote.drinks)) {
+        remote.drinks.forEach(d => {
+          if (d && d.id && !deletedIds.has(d.id)) drinkMap.set(d.id, d);
+        });
+      }
+      if (Array.isArray(local.drinks)) {
+        local.drinks.forEach(d => {
+          if (remoteHasRealDrinks && d.id === 'd-1') return; // discard demo seed
+          if (d && d.id && !deletedIds.has(d.id)) drinkMap.set(d.id, d);
+        });
+      }
+      const mergedDrinks = Array.from(drinkMap.values()).sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+
+      // 2. Merge Schedules by ID
+      const schedMap = new Map();
+      if (Array.isArray(remote.schedules)) {
+        remote.schedules.forEach(s => {
+          if (s && s.id && !deletedIds.has(s.id)) schedMap.set(s.id, s);
+        });
+      }
+      if (Array.isArray(local.schedules)) {
+        local.schedules.forEach(s => {
+          if (remoteHasRealSchedules && s.id === 's-1') return; // discard demo seed
+          if (s && s.id && !deletedIds.has(s.id)) schedMap.set(s.id, s);
+        });
+      }
+      const mergedSchedules = Array.from(schedMap.values()).sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+
+      // 3. Merge Notes by ID (preserve reactions & completion)
+      const noteMap = new Map();
+      if (Array.isArray(remote.notes)) {
+        remote.notes.forEach(n => {
+          if (n && n.id && !deletedIds.has(n.id)) noteMap.set(n.id, n);
+        });
+      }
+      if (Array.isArray(local.notes)) {
+        local.notes.forEach(n => {
+          if (remoteHasRealNotes && (n.id === 'n-1' || n.id === 'n-2')) return; // discard demo seed
+          if (n && n.id && !deletedIds.has(n.id)) {
+            if (noteMap.has(n.id)) {
+              const r = noteMap.get(n.id);
+              noteMap.set(n.id, {
+                ...r,
+                ...n,
+                reactions: Math.max(r.reactions || 0, n.reactions || 0),
+                isDone: r.isDone || n.isDone,
+                isGranted: r.isGranted || n.isGranted
+              });
+            } else {
+              noteMap.set(n.id, n);
+            }
+          }
+        });
+      }
+      const mergedNotes = Array.from(noteMap.values()).sort((a,b) => (a.createdAt || a.date || '').localeCompare(b.createdAt || b.date || ''));
+
+      // 4. Merge couple profile & quota
+      const mergedCouple = {
+        user1: { ...(remote.couple?.user1 || {}), ...(local.couple?.user1 || {}) },
+        user2: { ...(remote.couple?.user2 || {}), ...(local.couple?.user2 || {}) },
+        anniversary: local.couple?.anniversary || remote.couple?.anniversary || '2020-05-20',
+        monthlyDrinkQuota: local.couple?.monthlyDrinkQuota || remote.couple?.monthlyDrinkQuota || 8
+      };
+
+      // 5. Always preserve local credentials
+      const mergedSync = {
+        githubToken: local.sync?.githubToken || remote.sync?.githubToken || '',
+        gistId: local.sync?.gistId || remote.sync?.gistId || '',
+        lastSynced: new Date().toISOString()
+      };
+
+      return {
+        version: '1.2.0',
+        lastUpdated: new Date().toISOString(),
+        couple: mergedCouple,
+        drinks: mergedDrinks,
+        schedules: mergedSchedules,
+        notes: mergedNotes,
+        deletedIds: Array.from(deletedIds).slice(-300),
+        sync: mergedSync
+      };
+    }
+
+    let isSyncing = false;
+    let pendingSyncPush = false;
+
     async function syncWithGist(isPull = false, onSuccess = null) {
       const token = AppState.sync.githubToken;
       const gistId = AppState.sync.gistId;
@@ -2106,46 +2447,74 @@
         return;
       }
 
+      if (isSyncing) {
+        if (!isPull) pendingSyncPush = true;
+        return;
+      }
+
+      isSyncing = true;
       updateSyncBadge('syncing', '동기화 중...');
 
       try {
-        if (isPull) {
-          // GET
-          const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-            headers: {
-              'Authorization': `token ${token}`,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            const file = data.files[GIST_FILENAME];
-            if (file && file.content) {
-              const remoteState = JSON.parse(file.content);
-              // Merge remote if remote has later timestamp
-              if (new Date(remoteState.lastUpdated) > new Date(AppState.lastUpdated)) {
-                checkNewNotesReceived(AppState.notes, remoteState.notes);
-                AppState = Object.assign(AppState, remoteState);
-                saveStateLocal();
-                renderAll();
-              }
-            }
-            updateSyncBadge('synced', '동기화됨');
-            if (onSuccess) onSuccess();
-          } else {
-            throw new Error(`GET failed: ${res.status}`);
+        // ALWAYS Pull latest remote first (Pull-before-Push transactional merge)
+        const getRes = await fetch(`https://api.github.com/gists/${gistId}`, {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
           }
-        } else {
-          // PATCH
+        });
+
+        if (!getRes.ok) {
+          if (getRes.status === 401 || getRes.status === 403) {
+            throw new Error("GitHub 토큰 인증 실패 (gist 권한 필요)");
+          } else if (getRes.status === 404) {
+            throw new Error("Gist ID를 찾을 수 없습니다.");
+          }
+          throw new Error(`Gist 통신 오류 (${getRes.status})`);
+        }
+
+        const gistData = await getRes.json();
+        const file = gistData.files && gistData.files[GIST_FILENAME];
+        let remoteState = null;
+        if (file && file.content) {
+          try {
+            remoteState = JSON.parse(file.content);
+          } catch (e) {
+            console.warn("Remote JSON parse error:", e);
+          }
+        }
+
+        const previousNotes = [...(AppState.notes || [])];
+
+        // Merge remote into local
+        if (remoteState) {
+          AppState = mergeStates(AppState, remoteState);
+          saveStateLocal();
+          checkNewNotesReceived(previousNotes, AppState.notes);
+          renderAll();
+          updateSyncCardUI();
+        }
+
+        // If PUSH requested or remote was empty:
+        if (!isPull) {
           const payload = {
-            description: "Couple-Calendar Sync Data",
+            description: "Couple-Calendar Sync Data (달콤살벌 캘린더)",
             files: {
               [GIST_FILENAME]: {
-                content: JSON.stringify(AppState, null, 2)
+                content: JSON.stringify({
+                  version: AppState.version,
+                  lastUpdated: AppState.lastUpdated,
+                  couple: AppState.couple,
+                  drinks: AppState.drinks,
+                  schedules: AppState.schedules,
+                  notes: AppState.notes,
+                  deletedIds: AppState.deletedIds || []
+                }, null, 2)
               }
             }
           };
-          const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+
+          const patchRes = await fetch(`https://api.github.com/gists/${gistId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `token ${token}`,
@@ -2154,42 +2523,61 @@
             },
             body: JSON.stringify(payload)
           });
-          if (res.ok) {
-            updateSyncBadge('synced', '동기화됨');
-            if (onSuccess) onSuccess();
-          } else {
-            throw new Error(`PATCH failed: ${res.status}`);
+
+          if (!patchRes.ok) {
+            throw new Error(`PATCH 실패 (${patchRes.status})`);
           }
         }
+
+        AppState.sync.lastSynced = new Date().toISOString();
+        saveStateLocal();
+        updateSyncBadge('synced', '동기화됨 🟢');
+        updateSyncCardUI();
+        if (onSuccess) onSuccess();
+
       } catch (err) {
         console.warn("Gist sync error:", err);
-        updateSyncBadge('error', '동기화 실패');
+        updateSyncBadge('error', '동기화 오류 ⚠️');
+      } finally {
+        isSyncing = false;
+        if (pendingSyncPush) {
+          pendingSyncPush = false;
+          syncWithGist(false);
+        }
       }
     }
 
     function updateSyncBadge(status, text) {
       const badge = document.getElementById('sync-status-badge');
-      badge.className = `sync-status-badge ${status}`;
-      document.getElementById('sync-text').textContent = text;
+      if (badge) {
+        badge.className = `sync-status-badge ${status}`;
+        document.getElementById('sync-text').textContent = text;
+      }
     }
 
     // 9. ONE-CLICK WIFE ONBOARDING INVITE LINK
-    function copyWifeInviteLink() {
+    function getInviteUrl() {
       const token = AppState.sync.githubToken;
       const gistId = AppState.sync.gistId;
+      if (!token || !gistId) return null;
+      const syncObj = { token, gistId, quota: AppState.couple.monthlyDrinkQuota || 8 };
+      const syncKey = btoa(encodeURIComponent(JSON.stringify(syncObj)));
+      let baseUri = window.location.origin + window.location.pathname;
+      if (!baseUri || baseUri.startsWith('file://')) {
+        baseUri = 'https://yohan7998.github.io/couple-calendar/';
+      }
+      return `${baseUri}?syncKey=${syncKey}#syncKey=${syncKey}`;
+    }
 
-      if (!token || !gistId) {
-        alert("먼저 GitHub 토큰과 Gist ID를 등록한 후 초대 링크를 만들 수 있어요!");
+    function copyWifeInviteLink() {
+      const inviteUrl = getInviteUrl();
+      if (!inviteUrl) {
+        alert("먼저 GitHub 토큰과 Gist ID를 등록한 후 초대 링크를 만들 수 있어요!\n위 [Gist 원클릭 자동 생성]을 눌러보세요.");
         return;
       }
-
-      const syncObj = { token, gistId, quota: AppState.couple.monthlyDrinkQuota };
-      const syncKey = btoa(encodeURIComponent(JSON.stringify(syncObj)));
-      const baseUri = window.location.origin + window.location.pathname;
-      const inviteUrl = `${baseUri}#syncKey=${syncKey}`;
-
-      const kakaoMsg = `여보~ 우리 부부 전용 캘린더 초대장이야! 🐻❤️🐰\n이 링크만 누르면 바로 우리 둘이 공유돼 💖:\n${inviteUrl}`;
-
+      const kakaoMsg = `여보~ 우리 부부 전용 달콤살벌 캘린더 초대장이야! 🐻❤️🐰
+이 링크만 누르면 바로 우리 둘이 공유돼 💖:
+${inviteUrl}`;
       navigator.clipboard.writeText(kakaoMsg).then(() => {
         showToast("카카오톡 초대 문구가 복사되었습니다! 💌");
       }).catch(() => {
@@ -2197,25 +2585,105 @@
       });
     }
 
-    function checkUrlHashInvite() {
-      const hash = window.location.hash;
-      if (hash && hash.includes('syncKey=')) {
+    function copySyncKeyOnly() {
+      const token = AppState.sync.githubToken;
+      const gistId = AppState.sync.gistId;
+      if (!token || !gistId) {
+        alert("등록된 동기화 정보가 없습니다.");
+        return;
+      }
+      const syncObj = { token, gistId, quota: AppState.couple.monthlyDrinkQuota || 8 };
+      const syncKey = btoa(encodeURIComponent(JSON.stringify(syncObj)));
+      navigator.clipboard.writeText(syncKey).then(() => {
+        showToast("동기화 키(SyncKey)가 복사되었습니다! 📋");
+      }).catch(() => {
+        prompt("동기화 키:", syncKey);
+      });
+    }
+
+    function toggleManualKeyBox() {
+      const box = document.getElementById('manual-key-box');
+      if (box) {
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    function applyManualSyncKey() {
+      const input = document.getElementById('setting-manual-key').value.trim();
+      if (!input) {
+        alert("동기화 키를 입력해주세요!");
+        return;
+      }
+      try {
+        const decoded = decodeURIComponent(atob(input));
+        const syncObj = JSON.parse(decoded);
+        if (syncObj.token && syncObj.gistId) {
+          AppState.sync.githubToken = syncObj.token;
+          AppState.sync.gistId = syncObj.gistId;
+          if (syncObj.quota) AppState.couple.monthlyDrinkQuota = syncObj.quota;
+          saveStateLocal();
+          document.getElementById('setting-token').value = syncObj.token;
+          document.getElementById('setting-gist-id').value = syncObj.gistId;
+          updateSyncCardUI();
+          showToast("동기화 키가 등록되었습니다! 💖");
+          syncWithGist(true, () => showToast("부부 캘린더 동기화 완료! 🟢"));
+        } else {
+          alert("유효하지 않은 동기화 키입니다.");
+        }
+      } catch (e) {
+        alert("동기화 키 해석 실패: 키 형식을 다시 확인해주세요.");
+      }
+    }
+
+    function checkKakaoBrowser() {
+      const ua = navigator.userAgent || '';
+      if (ua.includes('KAKAOTALK') && !sessionStorage.getItem('dismiss_kakao_banner')) {
+        const banner = document.getElementById('kakao-inapp-banner');
+        if (banner) banner.style.display = 'flex';
+      }
+    }
+
+    function dismissKakaoBanner() {
+      const banner = document.getElementById('kakao-inapp-banner');
+      if (banner) banner.style.display = 'none';
+      sessionStorage.setItem('dismiss_kakao_banner', '1');
+    }
+
+    function checkUrlInvite() {
+      let syncKey = null;
+
+      // 1. Check query parameter ?syncKey=
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('syncKey')) {
+        syncKey = urlParams.get('syncKey');
+      }
+
+      // 2. Check hash #syncKey=
+      if (!syncKey && window.location.hash.includes('syncKey=')) {
+        syncKey = window.location.hash.split('syncKey=')[1].split('&')[0];
+      }
+
+      if (syncKey) {
         try {
-          const key = hash.split('syncKey=')[1];
-          const decoded = decodeURIComponent(atob(key));
+          const decoded = decodeURIComponent(atob(syncKey));
           const syncObj = JSON.parse(decoded);
           if (syncObj.token && syncObj.gistId) {
             AppState.sync.githubToken = syncObj.token;
             AppState.sync.gistId = syncObj.gistId;
             if (syncObj.quota) AppState.couple.monthlyDrinkQuota = syncObj.quota;
             saveStateLocal();
-            // clean hash
-            window.history.replaceState(null, null, window.location.pathname);
-            showToast("부부 캘린더에 성공적으로 연결되었습니다! 💖");
-            syncWithGist(true);
+            
+            // Clean URL smoothly
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+
+            showToast("💖 부부 캘린더 동기화 연결 완료!");
+            syncWithGist(true, () => {
+              showToast("🎉 배우자와 실시간 연동되었습니다!");
+            });
           }
         } catch (e) {
-          console.error("Hash invite parsing failed", e);
+          console.error("Invite parse error", e);
         }
       }
     }
