@@ -1,6 +1,6 @@
 ---
 title: 달콤살벌 캘린더 활성 계획서 및 설계 정본 색인 (SSOT Registry)
-version: v1.5
+version: v1.7
 status: active
 created: 2026-11-02
 updated: 2026-11-03
@@ -18,10 +18,12 @@ tags:
 
 ---
 
-## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v1.5)
+## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v1.7)
 
 | 구분 | 문서명 (버전 및 일자) | 상태 | 핵심 내용 및 역할 | 연계 구현 산출물 |
 | :---: | :--- | :---: | :--- | :--- |
+| **버전 이력 & CHANGELOG** | [[Couple-Calendar_버전기록_CHANGELOG]] | `ACTIVE` | • v1.0.0부터 v1.7.0까지의 전체 기획, 설계, 버그픽스 및 기술 의사결정 누적 기록<br/>• 포아송 수축 왜곡 규명 및 실측 0.0px 대칭성 검증표 수록 | `달콤살벌캘린더_검수뷰어_v1.7.html`<br/>`index.html` |
+| **실측 0.0px 좌우대칭 개편** | [[Couple-Calendar_버전기록_CHANGELOG#v170-2026-11-03--실측-00px-좌우대칭-완결--포아송-왜곡-제거]] | `ACTIVE` | • OpenCV seamlessClone 포아송 블렌딩 수축 왜곡(397px➔14px) 원천 규명<br/>• Direct Alpha-Masking 엔진 전면 개편으로 수평/수직 편차 0.0px & 면적 100% 일치<br/>• 8대 모노그램 전 에디션 1024/512/192px 일괄 재생성 & 캐시 무효화 (`?v=20261103e`) | `icons_curated/`<br/>`달콤살벌캘린더_정제아이콘_스위트.zip` |
 | **중앙 태양 및 보색 베리에이션** | [[Couple-Calendar_아이콘구도개편및컬러베리에이션_상세보고서_v1.5_2026-11-03]] | `ACTIVE` | • 동그라미 메달리온 중앙 상단 태양 문양 재배치 (대칭 균형 구도)<br/>• 하얀 배경에 검은색 보색, 미드나이트 블랙/골드, 플래티넘 음각 4대 에디션<br/>• 1024/512/192px 멀티스케일 및 인터랙티브 웹 갤러리 구축 | `icons_curated/`<br/>`icon-512.png`<br/>`index.html` |
 | **최신 쪽지 알림 카드 사양** | [[Couple-Calendar_최신쪽지알림카드_상세사양서_v1.3_2026-11-03]] | `ACTIVE` | • 캘린더 메인 화면에 배우자의 최신 미확인 쪽지 알림 카드 렌더링<br/>• 1-클릭 역할 전환 칩 (`🐻주니 ⇄ 🐰용이`) 및 빠른 답장/리액션<br/>• 신규 쪽지 수신 시 펄스 뱃지 및 은은한 핑크 글로우 애니메이션 | `index.html`<br/>E2E 테스트 스위트 |
 | **부부 실루엣 3D 양각 치환** | [[Couple-Calendar_아이콘인물교체_상세보고서_v1.4_2026-11-03]] | `ACTIVE` | • 1번 이미지의 범용 인물을 2번 이미지 실제 부부 실루엣으로 100% 치환<br/>• 동일한 샴페인 골드 브러시드 새틴 양각 릴리프 및 조명 렌더링<br/>• 1024/512/192px 멀티스케일 및 단일 HTML 헤더/파비콘 동기화 | `icon-512.png`<br/>`icon-192.png`<br/>`index.html` |
@@ -33,6 +35,7 @@ tags:
 
 ## 2. 이전 버전 아카이브 (Superseded Plans)
 
+- `v1.6`: 모노그램 우측 하단 곡선 1차 대칭 시도 (포아송 블렌딩 수축 오차로 대체됨)
 - `v1.2`: [[Couple-Calendar_아이콘개정_상세계획서_v1.2_2026-11-03]] (중앙 메달리온 1.48배 확대 초기안)
 - `v1.0`: [[Couple-Calendar_상세설계사양서_v1.0_2026-11-02]] (초기 단일 쪽지함 및 기본 설계)
 - `v1.0`: [[Couple-Calendar_원자적구현계획서_v1.0_2026-11-02]] (초기 WBS)
@@ -48,4 +51,4 @@ tags:
 - 📥 **단일 HTML 직접 다운로드 URL**: [https://raw.githubusercontent.com/yohan7998/couple-calendar/main/index.html](https://raw.githubusercontent.com/yohan7998/couple-calendar/main/index.html)
 - 🧪 **E2E 검증 테스트 스위트**: [`tests/test_couple_calendar_e2e.py`](file:///Users/yohan/Library/CloudStorage/OneDrive-개인/02.Obsidian_Business/Ob_Business/apps/couple-calendar/tests/test_couple_calendar_e2e.py) (10개 단위 테스트 전원 통과)
 - 📦 **아이콘 스위트 압축팩**: [`/Users/yohan/Downloads/달콤살벌캘린더_정제아이콘_스위트.zip`](file:///Users/yohan/Downloads/달콤살벌캘린더_정제아이콘_스위트.zip)
-- 🎨 **아이콘 인터랙티브 웹 갤러리**: [`/Users/yohan/Downloads/달콤살벌캘린더_정제아이콘_스위트/아이콘_디자인_갤러리.html`](file:///Users/yohan/Downloads/달콤살벌캘린더_정제아이콘_스위트/아이콘_디자인_갤러리.html)
+- 👁️ **전체 버전 및 검수 통합 뷰어**: [`/Users/yohan/Downloads/달콤살벌캘린더_검수뷰어_v1.7.html`](file:///Users/yohan/Downloads/달콤살벌캘린더_검수뷰어_v1.7.html)
