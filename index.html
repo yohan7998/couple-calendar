@@ -135,6 +135,19 @@
     .brand-title-row {
       display: flex;
       align-items: center;
+      gap: 6px;
+    }
+
+    .app-version-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(255, 77, 106, 0.08);
+      border: 1px solid rgba(255, 77, 106, 0.2);
+      border-radius: 6px;
+      padding: 1px 5px;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
     }
 
     .app-name {
@@ -1453,6 +1466,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
+            <span class="app-version-badge" title="현재 정본 버전: v1.6.0 (2026-11-03)">v1.6</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -1837,11 +1851,20 @@
         <div style="background: var(--bg-cream); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 12px; line-height: 1.5; color: var(--text-main); display: flex; gap: 10px; align-items: center;">
           <img src="apple-touch-icon.png?v=20261103d" style="width: 48px; height: 48px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;" alt="새 아이콘">
           <div>
-            <strong>✨ 새로운 샴페인 골드 크림 아이콘 적용됨</strong>
+            <strong>✨ 새로운 샴페인 골드 크림 아이콘 적용됨 (v1.6.0)</strong>
             <p style="margin: 3px 0 0 0; color: var(--text-muted); font-size: 11px;">
               기존에 설치된 홈 화면 바로가기가 여전히 블랙 아이콘으로 보일 경우, 기존 바로가기를 삭제하신 후 Safari/Chrome에서 <strong>[공유] ➔ [홈 화면에 추가]</strong>를 다시 진행하시면 즉시 새로운 아이콘으로 변경됩니다.
             </p>
           </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v1.6.0</span>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
+          최근 갱신: 2026-11-03 (배경 모노그램 완벽 대칭화 & 3D 샴페인 골드 에디션)
         </div>
       </div>
   <!-- Toast Element -->
@@ -1858,7 +1881,7 @@
 
     // Global State
     let AppState = {
-      version: '1.2.0',
+      version: '1.6.0',
       lastUpdated: new Date().toISOString(),
       couple: {
         user1: { name: '주니', nickname: '주니', avatar: '🐻' },
