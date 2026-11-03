@@ -18,11 +18,11 @@
   <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png?v=20261103e">
 
   <!-- Android & Standard Favicons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261103e">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=20261103e">
-  <link rel="icon" type="image/png" sizes="32x32" href="apple-touch-icon.png?v=20261103e">
-  <link rel="shortcut icon" href="apple-touch-icon.png?v=20261103e">
-  <link rel="manifest" href="manifest.json?v=20261103e">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261103f">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=20261103f">
+  <link rel="icon" type="image/png" sizes="32x32" href="apple-touch-icon.png?v=20261103f">
+  <link rel="shortcut icon" href="apple-touch-icon.png?v=20261103f">
+  <link rel="manifest" href="manifest.json?v=20261103f">
 
   <!-- Google Cute Webfonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1844,25 +1844,34 @@
         </small>
       </div>
 
-<div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-color);">
-        <label class="form-label">📱 모바일 단축아이콘(홈 화면 아이콘) 갱신 안내</label>
-        <div style="background: var(--bg-cream); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 12px; line-height: 1.5; color: var(--text-main); display: flex; gap: 10px; align-items: center;">
-          <img src="apple-touch-icon.png?v=20261103e" style="width: 48px; height: 48px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;" alt="새 아이콘">
-          <div>
-            <strong>✨ 정밀 0.0px 좌우대칭 아이콘 적용됨 (v1.7.0)</strong>
-            <p style="margin: 3px 0 0 0; color: var(--text-muted); font-size: 11px;">
-              기존에 설치된 홈 화면 바로가기가 여전히 블랙 아이콘으로 보일 경우, 기존 바로가기를 삭제하신 후 Safari/Chrome에서 <strong>[공유] ➔ [홈 화면에 추가]</strong>를 다시 진행하시면 즉시 새로운 아이콘으로 변경됩니다.
-            </p>
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-color);">
+        <label class="form-label">📱 앱 설치 및 홈 화면 아이콘 안내</label>
+        <div style="background: var(--bg-cream); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 12px; line-height: 1.5; color: var(--text-main); display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <img src="apple-touch-icon.png?v=20261103f" style="width: 48px; height: 48px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;" alt="새 아이콘">
+            <div>
+              <strong>✨ 샴페인 골드 크림 정품 아이콘 & PWA 엔진 (v1.7.2)</strong>
+              <p style="margin: 3px 0 0 0; color: var(--text-muted); font-size: 11px;">
+                오프라인 캐시 및 홈 화면 독립 앱 실행(PWA Service Worker)을 완벽 지원합니다.
+              </p>
+            </div>
+          </div>
+          <button type="button" class="btn-submit" style="background: var(--primary); font-size: 13px; width: 100%;" onclick="installPwaApp()">
+            📲 홈 화면에 앱 설치하기
+          </button>
+          <div style="background: #fff; border-radius: 8px; padding: 8px; border: 1px solid #ffe3e3; font-size: 11px; color: #b73e3e; line-height: 1.4;">
+            ⚠️ <strong>'앱을 열 수 없음' 알림이 뜨는 경우:</strong><br/>
+            이전에 설치된 구버전 앱 정보가 휴대폰에 남아있을 때 발생합니다. 휴대폰 <strong>[설정] ➔ [애플리케이션] ➔ [달콤살벌 캘린더] ➔ [삭제]</strong> 후 다시 설치하시면 즉시 해결됩니다.
           </div>
         </div>
       </div>
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v1.7.0</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v1.7.2</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
-          최근 갱신: 2026-11-03 (실측 0.0px 좌우대칭 완결 & 포아송 왜곡 제거)
+          최근 갱신: 2026-11-03 (PWA Service Worker 완비 & WebAPK 충돌 방지 규격화)
         </div>
       </div>
     </div>
@@ -1882,7 +1891,7 @@
 
     // Global State
     let AppState = {
-      version: '1.7.0',
+      version: '1.7.2',
       lastUpdated: new Date().toISOString(),
       couple: {
         user1: { name: '주니', nickname: '주니', avatar: '🐻' },
@@ -3292,6 +3301,45 @@ ${inviteUrl}`;
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // PWA Service Worker Registration & Installation Handling
+    let deferredPwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPwaPrompt = e;
+      console.log('[PWA] beforeinstallprompt captured');
+    });
+
+    function installPwaApp() {
+      if (deferredPwaPrompt) {
+        deferredPwaPrompt.prompt();
+        deferredPwaPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            showToast('🎉 달콤살벌 캘린더 앱 설치를 시작합니다!');
+          }
+          deferredPwaPrompt = null;
+        });
+      } else {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+          alert('📱 아이폰(Safari): 하단 공유 버튼(네모+화살표) ➔ [홈 화면에 추가]를 눌러주세요.');
+        } else {
+          alert('📱 안드로이드(Chrome): 우측 상단 점 3개 메뉴(⋮) ➔ [홈 화면에 추가] 또는 [앱 설치]를 눌러주세요.\n\n⚠️ 만약 "앱을 열 수 없음" 알림이 뜬다면:\n휴대폰 [설정] ➔ [애플리케이션]에서 기존 "달콤살벌 캘린더" 앱을 완전히 [삭제]하신 후 다시 시도해주세요.');
+        }
+      }
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => {
+            console.log('[PWA] Service Worker registered:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('[PWA] Service Worker registration failed:', err);
+          });
+      });
     }
   </script>
 </body>

@@ -151,6 +151,36 @@ class TestCoupleCalendarHTML(unittest.TestCase):
         self.assertIn("quickReplyLatestNote", self.content)
         self.assertIn("toggleMyRole", self.content)
 
+    def test_pwa_and_service_worker_readiness(self):
+        """Verify PWA Service Worker, Manifest specification, and installation readiness."""
+        manifest_path = os.path.join(BASE_DIR, "manifest.json")
+        sw_path = os.path.join(BASE_DIR, "sw.js")
+        
+        # Check files exist
+        self.assertTrue(os.path.exists(manifest_path), "manifest.json must exist")
+        self.assertTrue(os.path.exists(sw_path), "sw.js must exist")
+        
+        # Check manifest.json contents
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+        self.assertEqual(manifest.get("display"), "standalone")
+        self.assertIn("start_url", manifest)
+        self.assertIn("scope", manifest)
+        self.assertIn("id", manifest)
+        self.assertTrue(len(manifest.get("icons", [])) >= 2, "Must contain at least 2 icons (192, 512)")
+        
+        # Check sw.js contents
+        with open(sw_path, "r", encoding="utf-8") as f:
+            sw_code = f.read()
+        self.assertIn("addEventListener('install'", sw_code)
+        self.assertIn("addEventListener('activate'", sw_code)
+        self.assertIn("addEventListener('fetch'", sw_code)
+        
+        # Check index.html integration
+        self.assertIn("serviceWorker.register('./sw.js')", self.content)
+        self.assertIn("rel=\"manifest\"", self.content)
+        self.assertIn("installPwaApp()", self.content)
+
 if __name__ == "__main__":
     unittest.main()
 
