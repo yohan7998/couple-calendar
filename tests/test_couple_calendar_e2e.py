@@ -143,6 +143,14 @@ class TestCoupleCalendarHTML(unittest.TestCase):
         self.assertIn("syncKey", self.content)
         self.assertIn("localStorage", self.content)
 
+    def test_spouse_latest_note_alert_card(self):
+        """Verify spouse latest note alert card component, role toggling, and quick actions."""
+        self.assertIn("id=\"latest-note-alert-card\"", self.content)
+        self.assertIn("renderLatestNoteAlertCard", self.content)
+        self.assertIn("quickReactLatestNote", self.content)
+        self.assertIn("quickReplyLatestNote", self.content)
+        self.assertIn("toggleMyRole", self.content)
+
 if __name__ == "__main__":
     unittest.main()
 
