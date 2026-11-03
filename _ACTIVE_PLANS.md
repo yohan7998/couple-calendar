@@ -1,6 +1,6 @@
 ---
 title: 달콤살벌 캘린더 활성 계획서 및 설계 정본 색인 (SSOT Registry)
-version: v1.7.2
+version: v1.8.0
 status: active
 created: 2026-11-02
 updated: 2026-11-03
@@ -18,11 +18,12 @@ tags:
 
 ---
 
-## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v1.7.2)
+## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v1.8.0)
 
 | 구분 | 문서명 (버전 및 일자) | 상태 | 핵심 내용 및 역할 | 연계 구현 산출물 |
 | :---: | :--- | :---: | :--- | :--- |
-| **버전 이력 & CHANGELOG** | [[Couple-Calendar_버전기록_CHANGELOG]] | `ACTIVE` | • v1.0.0부터 v1.7.2까지의 전체 기획, 설계, 버그픽스 및 기술 의사결정 누적 기록<br/>• PWA Service Worker 완비 & '앱을 열 수 없음' 원천 해결 기록 수록 | `index.html`<br/>`sw.js`<br/>`manifest.json` |
+| **버전 이력 & CHANGELOG** | [[Couple-Calendar_버전기록_CHANGELOG]] | `ACTIVE` | • v1.0.0부터 v1.8.0까지의 전체 기획, 설계, 버그픽스 및 기술 의사결정 누적 기록<br/>• 쪽지 개인화 수신함 1순위 정렬 & 하트 1인 1회 단일 반응 기록 수록 | `index.html`<br/>`sw.js`<br/>`manifest.json` |
+| **쪽지 개인화 & 하트 단일 반응** | [[Couple-Calendar_쪽지개인화및하트단일반응_상세설계사양서_v1.8_2026-11-03]] | `ACTIVE` | • 메인 화면 상대방 쪽지만 엄격 필터링 (내가 쓴 글 배제)<br/>• 쪽지함 내 프로필(`myRole`) 기준 `[📬 나에게 온 쪽지]` 1순위 자동 열림<br/>• 하트 반응 1인 1회 제한 및 토글 지원 (`likedBy` 배열 연동) | `index.html`<br/>E2E 테스트 스위트 |
 | **PWA Service Worker & 설치 안정화** | [[Couple-Calendar_버전기록_CHANGELOG#v172-2026-11-03--pwa-service-worker-완비--안드로이드-앱을-열-수-없음-원천-해결]] | `ACTIVE` | • `sw.js` 신설 (Network-First 캐시 & 완벽한 오프라인/설치 지원)<br/>• `manifest.json` 규격 정비 (`id`, `scope` 명시 & 쿼리스트링 제거)<br/>• 설정 모달 내 1-클릭 PWA 설치 버튼 & 안드로이드 이전 버전 충돌 해결 팁 탑재 | `sw.js`<br/>`manifest.json`<br/>`index.html` |
 | **모바일 레이아웃 & 로고 복원** | [[Couple-Calendar_버전기록_CHANGELOG#v171-2026-11-03--모바일-레이아웃-붕괴-긴급-복구--base64-로고-독립-렌더링-복원]] | `ACTIVE` | • Body flex row 형제 분할 버그 원천 차단 (안내 블록 모달 내부 수납)<br/>• 3D 샴페인 골드 중앙태양 로고 Base64 인라인 임베딩으로 오프라인 완전 자가완결성 보장 | `index.html`<br/>`Couple-Calendar.html` |
 | **실측 0.0px 좌우대칭 개편** | [[Couple-Calendar_버전기록_CHANGELOG#v170-2026-11-03--실측-00px-좌우대칭-완결--포아송-왜곡-제거]] | `ACTIVE` | • OpenCV seamlessClone 포아송 블렌딩 수축 왜곡(397px➔14px) 원천 규명<br/>• Direct Alpha-Masking 엔진 전면 개편으로 수평/수직 편차 0.0px & 면적 100% 일치<br/>• 8대 모노그램 전 에디션 1024/512/192px 일괄 재생성 & 캐시 무효화 (`?v=20261103e`) | `icons_curated/`<br/>`달콤살벌캘린더_정제아이콘_스위트.zip` |

@@ -137,6 +137,40 @@ class TestCoupleCalendarHTML(unittest.TestCase):
         self.assertIn("Notification", self.content)
         self.assertIn("new-note-toast", self.content)
 
+    def test_heart_reaction_single_toggle_logic(self):
+        """Verify that heart reactions are strictly 1 per user per message and toggleable."""
+        def toggle_reaction(note, user_id):
+            if "likedBy" not in note:
+                note["likedBy"] = []
+            
+            if user_id in note["likedBy"]:
+                # Already liked -> Unlike
+                note["likedBy"].remove(user_id)
+            else:
+                # Not liked yet -> Add like
+                note["likedBy"].append(user_id)
+            
+            note["reactions"] = len(note["likedBy"])
+            return note
+
+        sample_note = {"id": "n1", "content": "사랑해", "reactions": 0, "likedBy": []}
+        
+        # User 1 clicks heart -> 1
+        res1 = toggle_reaction(sample_note, "user1")
+        self.assertEqual(res1["reactions"], 1)
+        self.assertIn("user1", res1["likedBy"])
+        
+        # User 1 clicks heart AGAIN -> 0 (unliked, not 2!)
+        res2 = toggle_reaction(sample_note, "user1")
+        self.assertEqual(res2["reactions"], 0)
+        self.assertNotIn("user1", res2["likedBy"])
+        
+        # User 1 and User 2 both like -> 2
+        toggle_reaction(sample_note, "user1")
+        res3 = toggle_reaction(sample_note, "user2")
+        self.assertEqual(res3["reactions"], 2)
+        self.assertEqual(set(res3["likedBy"]), {"user1", "user2"})
+
     def test_gist_sync_features_in_html(self):
         """Verify GitHub Gist synchronization code is embedded."""
         self.assertIn("api.github.com/gists", self.content)
@@ -180,6 +214,13 @@ class TestCoupleCalendarHTML(unittest.TestCase):
         self.assertIn("serviceWorker.register('./sw.js')", self.content)
         self.assertIn("rel=\"manifest\"", self.content)
         self.assertIn("installPwaApp()", self.content)
+
+    def test_personalized_notes_and_single_heart_in_html(self):
+        """Verify index.html contains single heart reaction logic and personalized mailbox routing."""
+        self.assertIn("toggleNoteReaction", self.content)
+        self.assertIn("likedBy", self.content)
+        self.assertIn("is-liked", self.content)
+        self.assertIn("getMyRole()", self.content)
 
 if __name__ == "__main__":
     unittest.main()

@@ -766,7 +766,14 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      transition: transform 0.15s;
+      transition: all 0.15s;
+    }
+
+    .heart-reaction-btn.is-liked {
+      background: #FFE3E8;
+      border-color: #FFA8BA;
+      color: #D62851;
+      box-shadow: 0 2px 8px rgba(255, 112, 143, 0.2);
     }
 
     .heart-reaction-btn:active {
@@ -1343,6 +1350,14 @@
       background: #FFF5F5;
     }
 
+    .btn-note-action.react-btn.is-liked {
+      background: #FFE3E8;
+      border-color: #FFA8BA;
+      color: #D62851;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(214, 40, 81, 0.2);
+    }
+
     .btn-note-action.react-btn:active {
       transform: scale(0.94);
     }
@@ -1466,7 +1481,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="현재 정본 버전: v1.7.0 (2026-11-03)">v1.7</span>
+            <span class="app-version-badge" title="현재 정본 버전: v1.8.0 (2026-11-03)">v1.8</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -1850,7 +1865,7 @@
           <div style="display: flex; gap: 10px; align-items: center;">
             <img src="apple-touch-icon.png?v=20261103f" style="width: 48px; height: 48px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-shrink: 0;" alt="새 아이콘">
             <div>
-              <strong>✨ 샴페인 골드 크림 정품 아이콘 & PWA 엔진 (v1.7.2)</strong>
+              <strong>✨ 샴페인 골드 크림 정품 아이콘 & PWA 엔진 (v1.8.0)</strong>
               <p style="margin: 3px 0 0 0; color: var(--text-muted); font-size: 11px;">
                 오프라인 캐시 및 홈 화면 독립 앱 실행(PWA Service Worker)을 완벽 지원합니다.
               </p>
@@ -1868,10 +1883,10 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v1.7.2</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v1.8.0</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
-          최근 갱신: 2026-11-03 (PWA Service Worker 완비 & WebAPK 충돌 방지 규격화)
+          최근 갱신: 2026-11-03 (쪽지 개인화 수신함 1순위 정렬 & 하트 1인 1회 단일 반응)
         </div>
       </div>
     </div>
@@ -1891,7 +1906,7 @@
 
     // Global State
     let AppState = {
-      version: '1.7.2',
+      version: '1.8.0',
       lastUpdated: new Date().toISOString(),
       couple: {
         user1: { name: '주니', nickname: '주니', avatar: '🐻' },
@@ -2295,6 +2310,7 @@
       localStorage.setItem('couple_my_role', role);
       updateRoleUI();
       renderLatestNoteAlertCard();
+      renderNotes();
     }
 
     function toggleMyRole() {
@@ -2303,7 +2319,10 @@
       const nextRole = current === 'user1' ? 'user2' : 'user1';
       setMyRole(nextRole);
       const name = nextRole === 'user1' ? '주니 🐻' : '용이 🐰';
-      showToast(`내 프로필이 [${name}]으로 전환되었습니다 ✨`);
+      showToast(`내 프로필: [${name}] (나에게 온 쪽지가 메인에 표시됩니다) ✨`);
+      currentNotesSubtab = nextRole === 'user1' ? 'yongi-to-juni' : 'juni-to-yongi';
+      switchNotesSubtab(currentNotesSubtab);
+      renderAll();
     }
 
     function updateRoleUI() {
@@ -2385,6 +2404,9 @@
       const typeInfo = typeLabels[latestNote.type] || { label: '💌 쪽지', cls: 'love' };
       const timeStr = formatRelativeTime(latestNote.createdAt || latestNote.date);
 
+      const isLiked = Array.isArray(latestNote.likedBy) && latestNote.likedBy.includes(myRole);
+      const heartCount = (Array.isArray(latestNote.likedBy) ? latestNote.likedBy.length : (latestNote.reactions || 0));
+
       container.innerHTML = `
         <div class="note-alert-inner ${isNew ? 'is-new' : ''}" onclick="onAlertCardClick('${latestNote.id}')">
           <div class="note-alert-header">
@@ -2403,8 +2425,8 @@
             <div class="note-alert-content">${escapeHtml(latestNote.content)}</div>
           </div>
           <div class="note-alert-actions" onclick="event.stopPropagation()">
-            <button type="button" class="btn-note-action react-btn" onclick="quickReactLatestNote('${latestNote.id}')">
-              ❤️ <span class="react-count">${latestNote.reactions || 1}</span> 고마워요
+            <button type="button" class="btn-note-action react-btn ${isLiked ? 'is-liked' : ''}" onclick="toggleNoteReaction('${latestNote.id}')" title="${isLiked ? '하트 취소' : '하트 보내기'}">
+              ${isLiked ? '❤️' : '🤍'} <span class="react-count">${heartCount}</span> ${isLiked ? '고마워요 (완료)' : '고마워요'}
             </button>
             <button type="button" class="btn-note-action reply-btn" onclick="quickReplyLatestNote()">
               ✍️ 바로 답장
@@ -2417,18 +2439,41 @@
       `;
     }
 
-    function quickReactLatestNote(id) {
+    function toggleNoteReaction(id) {
       const note = (AppState.notes || []).find(n => n.id === id);
-      if (note) {
-        note.reactions = (note.reactions || 1) + 1;
-        playCutePop();
-        showToast("❤️ 쪽지에 사랑을 전했습니다!");
-        markLatestNoteAsRead(id);
-        saveStateLocal();
-        renderNotes();
-        renderLatestNoteAlertCard();
-        syncWithGist(false);
+      if (!note) return;
+
+      const myRole = getMyRole();
+      if (!Array.isArray(note.likedBy)) {
+        note.likedBy = [];
+        if (note.reactions && note.reactions > 0) {
+          const spouseRole = myRole === 'user1' ? 'user2' : 'user1';
+          note.likedBy.push(spouseRole);
+        }
       }
+
+      const alreadyLiked = note.likedBy.includes(myRole);
+      if (alreadyLiked) {
+        note.likedBy = note.likedBy.filter(u => u !== myRole);
+        note.reactions = note.likedBy.length;
+        playCutePop();
+        showToast("하트를 취소했습니다 🤍");
+      } else {
+        note.likedBy.push(myRole);
+        note.reactions = note.likedBy.length;
+        playCutePop();
+        showToast("❤️ 메시지에 하트를 전했습니다! 💕");
+        markLatestNoteAsRead(id);
+      }
+
+      saveStateLocal();
+      renderLatestNoteAlertCard();
+      renderNotes();
+      syncWithGist(false);
+    }
+
+    function quickReactLatestNote(id) {
+      toggleNoteReaction(id);
     }
 
     function quickReplyLatestNote() {
@@ -2440,9 +2485,10 @@
 
     function goToSpouseMailbox() {
       playCutePop();
-      switchView('notes');
       const myRole = getMyRole();
       const targetSubtab = myRole === 'user1' ? 'yongi-to-juni' : 'juni-to-yongi';
+      currentNotesSubtab = targetSubtab;
+      switchView('notes');
       switchNotesSubtab(targetSubtab);
     }
 
@@ -2472,48 +2518,88 @@
       const notesJuniToYongi = AppState.notes.filter(n => n.author === 'user1');
       const notesYongiToJuni = AppState.notes.filter(n => n.author === 'user2');
 
-      document.getElementById('count-juni-to-yongi').textContent = `(${notesJuniToYongi.length})`;
-      document.getElementById('count-yongi-to-juni').textContent = `(${notesYongiToJuni.length})`;
+      const myRole = getMyRole();
+      const isJuni = myRole === 'user1';
+      const myName = isJuni ? '주니' : '용이';
+      const spouseName = isJuni ? '용이' : '주니';
+      const myAvatar = isJuni ? '🐻' : '🐰';
+      const spouseAvatar = isJuni ? '🐰' : '🐻';
+
+      // Dynamic subtab labels and order based on user role
+      const btnJuni = document.getElementById('subtab-juni-to-yongi');
+      const btnYongi = document.getElementById('subtab-yongi-to-juni');
+
+      if (btnJuni && btnYongi) {
+        if (isJuni) {
+          btnYongi.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName}) <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
+          btnJuni.innerHTML = `📤 내가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
+          btnYongi.style.order = '1';
+          btnJuni.style.order = '2';
+        } else {
+          btnJuni.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName}) <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
+          btnYongi.innerHTML = `📤 내가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
+          btnJuni.style.order = '1';
+          btnYongi.style.order = '2';
+        }
+      }
+
       document.getElementById('notes-badge').textContent = AppState.notes.length > 0 ? `(${AppState.notes.length})` : '';
 
       // Render Juni -> Yongi
       if (notesJuniToYongi.length === 0) {
+        const emptyMsg = isJuni ? '아직 내가 용이에게 보낸 쪽지가 없어요.<br/>달콤살벌한 사랑의 쪽지를 남겨보세요!' : '아직 주니가 보낸 쪽지가 없어요.';
         listJuni.innerHTML = `
           <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <div style="font-size: 38px; margin-bottom: 8px;">🐻💌</div>
-            <p style="font-size: 14px;">아직 주니가 용이에게 보낸 쪽지가 없어요.<br/>달콤살벌한 사랑의 쪽지를 남겨보세요!</p>
+            <p style="font-size: 14px;">${emptyMsg}</p>
           </div>
         `;
       } else {
-        renderNoteCardList(listJuni, notesJuniToYongi, '🐻 주니 ➔ 🐰 용이');
+        renderNoteCardList(listJuni, notesJuniToYongi, isJuni ? '📤 내가 용이에게 보낸 쪽지' : '📬 주니가 나에게 보낸 쪽지');
       }
 
       // Render Yongi -> Juni
       if (notesYongiToJuni.length === 0) {
+        const emptyMsg = isJuni ? '아직 용이가 보낸 쪽지가 없어요.' : '아직 내가 주니에게 보낸 쪽지가 없어요.<br/>주니에게 전하고 싶은 말을 남겨보세요!';
         listYongi.innerHTML = `
           <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <div style="font-size: 38px; margin-bottom: 8px;">🐰💌</div>
-            <p style="font-size: 14px;">아직 용이가 주니에게 보낸 쪽지가 없어요.<br/>주니에게 전하고 싶은 말을 남겨보세요!</p>
+            <p style="font-size: 14px;">${emptyMsg}</p>
           </div>
         `;
       } else {
-        renderNoteCardList(listYongi, notesYongiToJuni, '🐰 용이 ➔ 🐻 주니');
+        renderNoteCardList(listYongi, notesYongiToJuni, isJuni ? '📬 용이가 나에게 보낸 쪽지' : '📤 내가 주니에게 보낸 쪽지');
       }
     }
 
     function renderNoteCardList(container, notesList, directionLabel) {
       const colors = ['', 'pink', 'green', 'purple'];
+      const myRole = getMyRole();
+
       notesList.slice().reverse().forEach((note, idx) => {
         const card = document.createElement('div');
         card.className = `note-card ${colors[idx % colors.length]}`;
         let grantBtnHtml = '';
         if (note.type === 'ticket-request' && !note.isGranted) {
-          grantBtnHtml = `
-            <button class="grant-ticket-btn" onclick="grantBonusTicket('${note.id}')">
-              허가 +1장 🎫
-            </button>
-          `;
+          const canGrant = note.author !== myRole;
+          if (canGrant) {
+            grantBtnHtml = `
+              <button class="grant-ticket-btn" onclick="grantBonusTicket('${note.id}')">
+                허가 +1장 🎫
+              </button>
+            `;
+          } else {
+            grantBtnHtml = `
+              <span style="font-size: 11px; color: var(--text-muted); background: #FFF; padding: 4px 8px; border-radius: 12px; border: 1px solid var(--border-color);">
+                ⏳ 승인 대기중
+              </span>
+            `;
+          }
         }
+
+        const isLiked = Array.isArray(note.likedBy) && note.likedBy.includes(myRole);
+        const heartCount = (Array.isArray(note.likedBy) ? note.likedBy.length : (note.reactions || 0));
+
         card.innerHTML = `
           <div class="note-header">
             <span class="note-author-tag">${directionLabel}</span>
@@ -2521,8 +2607,8 @@
           </div>
           <div class="note-content">${escapeHtml(note.content)}</div>
           <div class="note-footer">
-            <button class="heart-reaction-btn" onclick="reactToNote('${note.id}')">
-              💖 <span>${note.reactions || 0}</span>
+            <button class="heart-reaction-btn ${isLiked ? 'is-liked' : ''}" onclick="toggleNoteReaction('${note.id}')" title="${isLiked ? '하트 취소' : '하트 보내기'}">
+              ${isLiked ? '💖' : '🤍'} <span>${heartCount}</span>
             </button>
             ${grantBtnHtml}
           </div>
@@ -2532,14 +2618,7 @@
     }
 
     function reactToNote(id) {
-      const note = AppState.notes.find(n => n.id === id);
-      if (note) {
-        note.reactions = (note.reactions || 0) + 1;
-        playCutePop();
-        saveStateLocal();
-        renderNotes();
-        syncWithGist();
-      }
+      toggleNoteReaction(id);
     }
 
     function grantBonusTicket(id) {
@@ -2622,15 +2701,23 @@
       // Notes
       const nList = document.getElementById('day-notes-list');
       const notes = AppState.notes.filter(n => n.date === dateStr);
+      const myRole = getMyRole();
       if (notes.length === 0) {
         nList.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 4px 0;">남겨진 쪽지가 없어요 💌</div>';
       } else {
-        nList.innerHTML = notes.map(n => `
-          <div class="item-pill">
-            <span>💌 ${escapeHtml(n.content)}</span>
-            <button class="icon-btn" onclick="deleteNote('${n.id}')" style="font-size: 14px;">🗑️</button>
-          </div>
-        `).join('');
+        nList.innerHTML = notes.map(n => {
+          const isReceived = n.author !== myRole;
+          const tag = isReceived ? '📬 받은 쪽지' : '📤 보낸 쪽지';
+          return `
+            <div class="item-pill" style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span style="font-size:10px; color:var(--primary); font-weight:700; margin-right:4px;">${tag}</span>
+                <span>💌 ${escapeHtml(n.content)}</span>
+              </div>
+              <button class="icon-btn" onclick="deleteNote('${n.id}')" style="font-size: 14px;">🗑️</button>
+            </div>
+          `;
+        }).join('');
       }
 
       openModal('day-detail-modal');
@@ -2696,7 +2783,8 @@
       document.getElementById('record-date').value = date || formatDate(new Date());
       setRecordType(type);
       if (type === 'note') {
-        selectNoteAuthor(currentNotesSubtab === 'yongi-to-juni' ? 'user2' : 'user1');
+        const myRole = getMyRole();
+        selectNoteAuthor(myRole);
       }
       openModal('quick-record-modal');
     }
@@ -3269,11 +3357,16 @@ ${inviteUrl}`;
         item.classList.remove('active');
       });
       if (viewName === 'calendar') { document.getElementById('nav-cal').classList.add('active'); renderLatestNoteAlertCard(); }
-      if (viewName === 'notes') document.getElementById('nav-notes').classList.add('active');
-      if (viewName === 'stats') document.getElementById('nav-stats').classList.add('active');
-
-      if (viewName === 'notes') renderNotes();
-      if (viewName === 'stats') renderStats();
+      if (viewName === 'notes') {
+        document.getElementById('nav-notes').classList.add('active');
+        const myRole = getMyRole();
+        const defaultInbox = myRole === 'user1' ? 'yongi-to-juni' : 'juni-to-yongi';
+        switchNotesSubtab(defaultInbox);
+      }
+      if (viewName === 'stats') {
+        document.getElementById('nav-stats').classList.add('active');
+        renderStats();
+      }
     }
 
     function renderAll() {
