@@ -222,6 +222,34 @@ class TestCoupleCalendarHTML(unittest.TestCase):
         self.assertIn("is-liked", self.content)
         self.assertIn("getMyRole()", self.content)
 
+    def test_drink_ticket_banner_moved_to_stats_view(self):
+        """Verify #drink-ticket-banner is moved inside stats-view and NOT in calendar-view or main header."""
+        stats_view_match = re.search(r'<div[^>]*id=["\']stats-view["\'][^>]*>(.*?)</div>\s*<!-- END STATS VIEW', self.content, re.DOTALL)
+        self.assertTrue(stats_view_match, "stats-view must exist with closing marker")
+        stats_content = stats_view_match.group(1)
+        self.assertIn('id="drink-ticket-banner"', stats_content, "drink-ticket-banner must be inside stats-view")
+
+    def test_ledger_view_and_navigation_present(self):
+        """Verify ledger-view tab and navigation buttons exist."""
+        self.assertIn('id="ledger-view"', self.content)
+        self.assertIn("switchView('ledger')", self.content)
+        self.assertIn("가계부", self.content)
+
+    def test_period_schedule_inputs_present(self):
+        """Verify period schedule fields (start/end date, memo, note bridge) are present."""
+        self.assertIn('id="schedule-start-date"', self.content)
+        self.assertIn('id="schedule-end-date"', self.content)
+        self.assertIn('id="schedule-memo"', self.content)
+        self.assertIn('id="schedule-share-note"', self.content)
+
+    def test_excel_integration_and_chart_libraries(self):
+        """Verify SheetJS, Chart.js, and Excel upload/download UI exist."""
+        self.assertIn("xlsx.full.min.js", self.content)
+        self.assertIn("chart.js", self.content)
+        self.assertIn("exportLedgerToExcel", self.content)
+        self.assertIn("handleExcelFileUpload", self.content)
+
+
 if __name__ == "__main__":
     unittest.main()
 

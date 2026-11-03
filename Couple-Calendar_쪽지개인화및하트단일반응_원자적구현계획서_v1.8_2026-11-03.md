@@ -40,3 +40,4 @@ tags:
 - [ ] E2E 전체 테스트 실행 및 ALL PASS 확인 (GREEN)
 - [ ] Downloads 사본 및 옵시디언 vault 동기화
 - [ ] GitHub Pages 커밋 & 푸시 후 실서버 배포 검증
+

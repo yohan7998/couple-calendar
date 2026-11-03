@@ -30,6 +30,11 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Core Libraries: SheetJS (Excel Parser/Export) & Chart.js (Visual Analytics) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+
   <style>
     :root {
       --bg-cream: #FFF7F6;
@@ -1448,6 +1453,391 @@
       opacity: 0.8;
     }
 
+    /* ========================================================
+       LEDGER & RESPONSIVE ANALYTICS STYLES (v2.0)
+       ======================================================== */
+    .ledger-summary-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1.5px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+
+    .ledger-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .ledger-month-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .ledger-budget-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .ledger-kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ledger-kpi-box {
+      background: var(--bg-cream);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .ledger-kpi-box .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .ledger-kpi-box .kpi-value {
+      font-size: 15px;
+      font-weight: 800;
+      display: block;
+      word-break: break-all;
+    }
+
+    .ledger-kpi-box.expense .kpi-value { color: var(--primary-dark); }
+    .ledger-kpi-box.income .kpi-value { color: #2563EB; }
+    .ledger-kpi-box.remain .kpi-value { color: #059669; }
+
+    .ledger-progress-section {
+      background: var(--bg-cream);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .payer-ratio-track {
+      height: 12px;
+      background: #F3ECE8;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .payer-fill {
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+
+    .payer-fill.juni { background: #FF708F; }
+    .payer-fill.yongi { background: #FFB385; }
+
+    /* Actions Toolbar */
+    .ledger-actions-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .btn-action-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #FFF;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(255, 112, 143, 0.3);
+      transition: transform 0.15s ease;
+    }
+
+    .btn-action-secondary {
+      background: #FFFFFF;
+      color: var(--text-main);
+      border: 1.5px solid var(--border-color);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+
+    .btn-action-primary:active, .btn-action-secondary:active {
+      transform: scale(0.96);
+    }
+
+    /* Filter Bar */
+    .ledger-filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .filter-chip-group {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .filter-chip {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .filter-chip.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+
+    .ledger-search-box {
+      margin-bottom: 14px;
+    }
+
+    /* Transaction List Items */
+    .ledger-tx-list-wrap {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .ledger-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .ledger-tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ledger-item-card {
+      background: var(--bg-cream);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .ledger-item-card:active {
+      transform: scale(0.98);
+      background: #FFF0E6;
+    }
+
+    .tx-item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tx-item-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: #FFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    .tx-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tx-item-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .tx-item-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .payer-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .payer-badge.juni { background: #FFE4EA; color: #E64C6D; }
+    .payer-badge.yongi { background: #FFF0E6; color: #E06D30; }
+    .payer-badge.together { background: #E8F5E9; color: #2E7D32; }
+
+    .tx-item-right {
+      text-align: right;
+    }
+
+    .tx-item-amount {
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .tx-item-amount.expense { color: var(--primary-dark); }
+    .tx-item-amount.income { color: #2563EB; }
+
+    /* Web Desktop Data Grid (768px+) */
+    .ledger-web-grid-card {
+      display: none; /* hidden on small mobile */
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .web-grid-table-container {
+      overflow-x: auto;
+      max-height: 480px;
+      margin-top: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+
+    .web-grid-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .web-grid-table th {
+      background: var(--bg-cream);
+      padding: 10px 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      position: sticky;
+      top: 0;
+      border-bottom: 1.5px solid var(--border-color);
+      z-index: 10;
+    }
+
+    .web-grid-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #F3ECE8;
+      color: var(--text-main);
+    }
+
+    .web-grid-table tr:hover td {
+      background: #FFF7F6;
+    }
+
+    /* Period Schedule Ranges on Calendar */
+    .cal-day.period-start {
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+      background: #FFE8EE !important;
+    }
+
+    .cal-day.period-mid {
+      border-radius: 0 !important;
+      background: #FFF0F4 !important;
+    }
+
+    .cal-day.period-end {
+      border-top-right-radius: 16px;
+      border-bottom-right-radius: 16px;
+      background: #FFE8EE !important;
+    }
+
+    .badge-period-bar {
+      display: block;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    /* Web Desktop 768px+ Breakpoint */
+    @media (min-width: 768px) {
+      .app-container {
+        max-width: 980px !important;
+        margin: 20px auto;
+        border-radius: 28px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+      }
+
+      .bottom-nav {
+        max-width: 980px !important;
+        border-bottom-left-radius: 28px;
+        border-bottom-right-radius: 28px;
+      }
+
+      .ledger-responsive-layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .ledger-web-grid-card {
+        display: block !important;
+      }
+    }
+
+
   </style>
 </head>
 <body>
@@ -1500,36 +1890,12 @@
       </div>
     </header>
 
-    <!-- Drink Ticket Banner -->
-    <section id="drink-ticket-banner">
-      <div class="ticket-header">
-        <div class="ticket-title">
-          <span>🎫 이번 달 음주 티켓</span>
-        </div>
-        <span class="ticket-quota-badge" id="monthly-quota-badge">목표: 8장</span>
-      </div>
-
-      <div class="ticket-counter-display">
-        <span class="ticket-count" id="remaining-ticket-count">8</span>
-        <span class="ticket-unit">장 남음</span>
-        <span class="ticket-subtext" id="ticket-usage-subtext">(총 8장 중 0회 사용)</span>
-      </div>
-
-      <div class="drink-progress-track">
-        <div class="drink-progress-fill" id="drink-progress-fill"></div>
-      </div>
-
-      <div class="ticket-status-pill status-plenty" id="ticket-status-pill">
-        <span id="status-icon">🍺</span>
-        <span id="status-message">아직 티켓이 여유로워요! 즐겁게 한잔 🍻</span>
-      </div>
-    </section>
-
     <!-- Navigation Tabs -->
     <div class="view-tabs">
-      <button class="tab-btn active" onclick="switchView('calendar')">📅 달력</button>
-      <button class="tab-btn" onclick="switchView('notes')">💌 쪽지함 <span id="notes-badge"></span></button>
-      <button class="tab-btn" onclick="switchView('stats')">📊 음주 통계</button>
+      <button class="tab-btn active" id="tab-btn-calendar" onclick="switchView('calendar')">📅 달력</button>
+      <button class="tab-btn" id="tab-btn-ledger" onclick="switchView('ledger')">💰 가계부</button>
+      <button class="tab-btn" id="tab-btn-notes" onclick="switchView('notes')">💌 쪽지함 <span id="notes-badge"></span></button>
+      <button class="tab-btn" id="tab-btn-stats" onclick="switchView('stats')">📊 통계</button>
     </div>
 
     <!-- VIEW 1: CALENDAR -->
@@ -1554,7 +1920,119 @@
       </div>
     </div>
 
-    <!-- VIEW 2: NOTES (쪽지함 - 주니->용이, 용이->주니 2분할) -->
+    <!-- VIEW 2: LEDGER (가계부 - 생활비 처리현황) -->
+    <div class="tab-view" id="ledger-view">
+      <!-- Ledger KPI Summary -->
+      <section class="ledger-summary-card">
+        <div class="ledger-header-row">
+          <div>
+            <span class="ledger-month-title" id="ledger-month-title">2026년 11월 생활비</span>
+            <div class="ledger-budget-info" id="ledger-budget-info">예산 2,500,000원 기준</div>
+          </div>
+          <button class="btn-mini" onclick="openBudgetSettingModal()" title="예산 설정">⚙️ 예산 설정</button>
+        </div>
+
+        <div class="ledger-kpi-grid">
+          <div class="ledger-kpi-box expense">
+            <span class="kpi-label">총 지출 💸</span>
+            <span class="kpi-value" id="ledger-total-expense">0원</span>
+          </div>
+          <div class="ledger-kpi-box income">
+            <span class="kpi-label">총 수입 💰</span>
+            <span class="kpi-value" id="ledger-total-income">0원</span>
+          </div>
+          <div class="ledger-kpi-box remain">
+            <span class="kpi-label">남은 예산 ✨</span>
+            <span class="kpi-value" id="ledger-remain-budget">0원</span>
+          </div>
+        </div>
+
+        <!-- Budget & Payer Progress -->
+        <div class="ledger-progress-section">
+          <div class="progress-labels">
+            <span>예산 소진율</span>
+            <span id="ledger-budget-rate">0%</span>
+          </div>
+          <div class="drink-progress-track">
+            <div class="drink-progress-fill" id="ledger-budget-fill" style="width: 0%; background: linear-gradient(90deg, #FF9EAA, #FF708F);"></div>
+          </div>
+
+          <div class="payer-ratio-bar-wrap" style="margin-top: 12px;">
+            <div class="progress-labels">
+              <span>주니 vs 용이 지출 분담</span>
+              <span id="payer-ratio-text">주니 50% : 용이 50%</span>
+            </div>
+            <div class="payer-ratio-track" id="payer-ratio-track">
+              <div class="payer-fill juni" id="payer-fill-juni" style="width: 50%;"></div>
+              <div class="payer-fill yongi" id="payer-fill-yongi" style="width: 50%;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ledger Action Toolbar -->
+      <div class="ledger-actions-toolbar">
+        <button class="btn-action-primary" onclick="openAddTransactionModal()">
+          <span>➕ 내역 등록</span>
+        </button>
+        <button class="btn-action-secondary" onclick="triggerExcelFileInput()">
+          <span>📂 엑셀 올리기</span>
+        </button>
+        <button class="btn-action-secondary" onclick="exportLedgerToExcel()">
+          <span>📥 엑셀 받기</span>
+        </button>
+        <button class="btn-action-secondary" onclick="openSharedSheetModal()">
+          <span>🔄 공유시트</span>
+        </button>
+        <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelFileUpload(event)">
+      </div>
+
+      <!-- Ledger Filter Bar -->
+      <div class="ledger-filter-bar">
+        <div class="filter-chip-group">
+          <button class="filter-chip active" id="filter-type-all" onclick="setLedgerTypeFilter('all')">전체</button>
+          <button class="filter-chip" id="filter-type-expense" onclick="setLedgerTypeFilter('expense')">지출</button>
+          <button class="filter-chip" id="filter-type-income" onclick="setLedgerTypeFilter('income')">수입</button>
+        </div>
+        <div class="filter-chip-group">
+          <button class="filter-chip active" id="filter-payer-all" onclick="setLedgerPayerFilter('all')">모두</button>
+          <button class="filter-chip" id="filter-payer-juni" onclick="setLedgerPayerFilter('juni')">🐻주니</button>
+          <button class="filter-chip" id="filter-payer-yongi" onclick="setLedgerPayerFilter('yongi')">🐰용이</button>
+          <button class="filter-chip" id="filter-payer-together" onclick="setLedgerPayerFilter('together')">🥂공동</button>
+        </div>
+      </div>
+
+      <div class="ledger-search-box">
+        <input type="text" class="form-input" id="ledger-search-input" placeholder="🔍 사용처, 카테고리, 메모 검색..." oninput="handleLedgerSearch(event)">
+      </div>
+
+      <!-- Web Desktop Split View Container -->
+      <div class="ledger-responsive-layout">
+        <!-- Mobile/Compact Transaction List -->
+        <div class="ledger-tx-list-wrap">
+          <div class="ledger-list-header">
+            <span>최근 내역 (<span id="ledger-tx-count">0</span>건)</span>
+            <span class="text-muted" style="font-size: 12px;">클릭하여 수정/삭제</span>
+          </div>
+          <div class="ledger-tx-list" id="ledger-tx-list">
+            <!-- Transactions rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Web Desktop Dedicated Data Grid -->
+        <div class="ledger-web-grid-card" id="ledger-web-grid-card">
+          <div class="web-grid-header">
+            <span style="font-weight: 800; font-size: 15px;">📊 엑셀 일괄 데이터 그리드 (웹 대화면)</span>
+            <span style="font-size: 12px; color: var(--text-muted);">실시간 정렬 및 빠른 확인</span>
+          </div>
+          <div class="web-grid-table-container" id="web-grid-table-container">
+            <!-- Spreadsheet Table rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: NOTES (쪽지함 - 주니->용이, 용이->주니 2분할) -->
     <div class="tab-view" id="notes-view">
       <!-- 2 Mailboxes Subtabs -->
       <div class="notes-subtabs">
@@ -1586,9 +2064,57 @@
       </div>
     </div>
 
-    <!-- VIEW 3: STATS (통계) -->
+    <!-- VIEW 4: STATS (통계 - 음주 티켓 이전 & 가계부 시각화 분석) -->
     <div class="tab-view" id="stats-view">
+      <!-- Relocated Drink Ticket Banner (통계 탭 내부 상단으로 이전) -->
+      <section id="drink-ticket-banner" class="drink-ticket-banner">
+        <div class="ticket-header">
+          <div class="ticket-title">
+            <span>🎫 이번 달 음주 티켓</span>
+          </div>
+          <span class="ticket-quota-badge" id="monthly-quota-badge">목표: 8장</span>
+        </div>
+
+        <div class="ticket-counter-display">
+          <span class="ticket-count" id="remaining-ticket-count">8</span>
+          <span class="ticket-unit">장 남음</span>
+          <span class="ticket-subtext" id="ticket-usage-subtext">(총 8장 중 0회 사용)</span>
+        </div>
+
+        <div class="drink-progress-track">
+          <div class="drink-progress-fill" id="drink-progress-fill"></div>
+        </div>
+
+        <div class="ticket-status-pill status-plenty" id="ticket-status-pill">
+          <span id="status-icon">🍺</span>
+          <span id="status-message">아직 티켓이 여유로워요! 즐겁게 한잔 🍻</span>
+        </div>
+      </section>
+
+      <!-- Ledger Analytics Cards -->
       <div class="stats-card">
+        <div class="stats-title">💰 생활비 지출 분석 리포트</div>
+        
+        <!-- Category Doughnut Chart -->
+        <div class="chart-container-box" style="margin-top: 14px;">
+          <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px;">🏷️ 카테고리별 지출 비중</div>
+          <div style="position: relative; height: 220px; display: flex; justify-content: center;">
+            <canvas id="chart-category-doughnut"></canvas>
+          </div>
+          <div id="category-legend-list" class="category-legend-list"></div>
+        </div>
+
+        <!-- Monthly Trend Chart -->
+        <div class="chart-container-box" style="margin-top: 20px;">
+          <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px;">📈 최근 월별 지출 추이</div>
+          <div style="position: relative; height: 180px;">
+            <canvas id="chart-monthly-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drink Report Card -->
+      <div class="stats-card" style="margin-top: 16px;">
         <div class="stats-title">📊 이번 달 음주 리포트</div>
         <div class="stats-grid">
           <div class="stat-box">
@@ -1622,6 +2148,7 @@
         </div>
       </div>
     </div>
+    <!-- END STATS VIEW -->
 
     <!-- Floating Action Button -->
     <button class="fab-btn" onclick="openQuickRecordModal()" title="기록하기">➕</button>
@@ -1632,6 +2159,10 @@
         <span class="nav-icon">📅</span>
         <span>달력</span>
       </button>
+      <button class="nav-item" id="nav-ledger" onclick="switchView('ledger')">
+        <span class="nav-icon">💰</span>
+        <span>가계부</span>
+      </button>
       <button class="nav-item" id="nav-notes" onclick="switchView('notes')">
         <span class="nav-icon">💌</span>
         <span>쪽지함</span>
@@ -1640,11 +2171,12 @@
         <span class="nav-icon">📊</span>
         <span>통계</span>
       </button>
-      <button class="nav-item" onclick="openSettingsModal()">
+      <button class="nav-item" id="nav-settings" onclick="openSettingsModal()">
         <span class="nav-icon">⚙️</span>
         <span>설정</span>
       </button>
     </nav>
+
   </div>
 
   <!-- MODAL 1: Day Details & Quick Action -->
@@ -1739,7 +2271,31 @@
               <option value="personal">💼 개인 일정</option>
             </select>
           </div>
+          <div class="form-group">
+            <label class="form-label">📅 일정 기간 (시작일 ~ 종료일)</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">시작일</span>
+                <input type="date" class="form-input" id="schedule-start-date">
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">종료일</span>
+                <input type="date" class="form-input" id="schedule-end-date">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📝 상세 메모 (약속 장소, 준비물 등)</label>
+            <textarea class="form-input" id="schedule-memo" rows="2" placeholder="예: 숙소 예약번호 #1234, 돗자리 챙기기"></textarea>
+          </div>
+          <div class="form-group" style="margin-top: 4px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--primary-dark);">
+              <input type="checkbox" id="schedule-share-note" checked style="accent-color: var(--primary); width: 16px; height: 16px;">
+              <span>💌 등록 시 배우자에게 쪽지로도 함께 전달하기</span>
+            </label>
+          </div>
         </div>
+
 
         <!-- NOTE FIELDS -->
         <div id="note-fields" style="display: none;">
@@ -1883,30 +2439,329 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v1.8.0</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.0.0</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
-          최근 갱신: 2026-11-03 (쪽지 개인화 수신함 1순위 정렬 & 하트 1인 1회 단일 반응)
+          최근 갱신: 2026-11-04 (가족 일정 및 가계부·생활비 관리 통합 대개편)
         </div>
       </div>
     </div>
   </div>
+
+  <!-- MODAL 4: Ledger Transaction Create/Edit -->
+  <div class="modal-overlay" id="transaction-modal" onclick="closeModalOnBg(event, 'transaction-modal')">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        <span id="tx-modal-title">💰 생활비 내역 등록</span>
+        <button class="icon-btn" onclick="closeModal('transaction-modal')">✕</button>
+      </div>
+      <form id="tx-form" onsubmit="saveTransaction(event)">
+        <input type="hidden" id="tx-id">
+        <div class="type-selector" style="margin-bottom: 12px; display:flex; gap:8px;">
+          <button type="button" class="tab-btn active" id="tx-type-expense" onclick="setTxType('expense')" style="flex:1;">💸 지출</button>
+          <button type="button" class="tab-btn" id="tx-type-income" onclick="setTxType('income')" style="flex:1;">💰 수입</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">일자</label>
+          <input type="date" class="form-input" id="tx-date" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">금액 (원)</label>
+          <input type="number" class="form-input" id="tx-amount" placeholder="0" min="1" required style="font-size: 18px; font-weight: 700;">
+          <div class="quick-amount-chips" style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-mini" onclick="addTxAmount(10000)">+1만</button>
+            <button type="button" class="btn-mini" onclick="addTxAmount(50000)">+5만</button>
+            <button type="button" class="btn-mini" onclick="addTxAmount(100000)">+10만</button>
+            <button type="button" class="btn-mini" onclick="addTxAmount(500000)">+50만</button>
+            <button type="button" class="btn-mini" onclick="clearTxAmount()">초기화</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">카테고리</label>
+          <select class="form-select" id="tx-category" required>
+            <option value="식비">🍚 식비 (외식/배달)</option>
+            <option value="장보기">🛒 장보기 (마트/생필품)</option>
+            <option value="카페/간식">☕ 카페 / 간식</option>
+            <option value="주거/통신">🏠 주거 / 관리비 / 통신</option>
+            <option value="교통">🚗 교통 / 주유 / 대중교통</option>
+            <option value="생활용품">🧼 생활 / 잡화</option>
+            <option value="문화/여가">🎬 문화 / 여가 / 여행</option>
+            <option value="의료/건강">💊 병원 / 약국 / 건강</option>
+            <option value="급여/수입">💵 급여 / 상여 / 수입</option>
+            <option value="기타">✨ 기타 생활비</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">누가 결제/처리했나요?</label>
+          <div class="drinker-selector">
+            <div class="selector-chip active" id="tx-payer-juni" onclick="selectTxPayer('juni')">🐻 주니</div>
+            <div class="selector-chip" id="tx-payer-yongi" onclick="selectTxPayer('yongi')">🐰 용이</div>
+            <div class="selector-chip" id="tx-payer-together" onclick="selectTxPayer('together')">🥂 공동/통장</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">결제 수단</label>
+          <select class="form-select" id="tx-payment-method">
+            <option value="카드">💳 신용/체크카드</option>
+            <option value="계좌이체">🏦 계좌이체/송금</option>
+            <option value="현금">💵 현금</option>
+            <option value="지역화폐/페이">📱 페이/지역화폐</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">사용처 / 메모</label>
+          <input type="text" class="form-input" id="tx-memo" placeholder="예: 이마트 쓱배송 (과일, 우유)">
+        </div>
+
+        <div style="display:flex; gap: 8px; margin-top: 14px;">
+          <button type="button" class="btn-submit" id="btn-delete-tx" style="background: #FEE2E2; color: #DC2626; display:none; flex: 1;" onclick="deleteCurrentTransaction()">🗑️ 삭제</button>
+          <button type="submit" class="btn-submit" style="flex: 2;">💾 저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Budget Setting -->
+  <div class="modal-overlay" id="budget-modal" onclick="closeModalOnBg(event, 'budget-modal')">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        <span>⚙️ 월간 생활비 예산 설정</span>
+        <button class="icon-btn" onclick="closeModal('budget-modal')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎯 월 목표 생활비 예산</label>
+        <input type="number" class="form-input" id="setting-monthly-budget" min="100000" step="50000" value="2500000" style="font-size: 17px; font-weight:700;">
+        <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">설정된 예산을 바탕으로 소진율과 잔여 생활비가 자동 계산됩니다.</small>
+      </div>
+      <button type="button" class="btn-submit" style="margin-top: 12px;" onclick="saveMonthlyBudget()">💾 예산 저장</button>
+    </div>
+  </div>
+
+  <!-- MODAL 6: Shared Sheet Integration -->
+  <div class="modal-overlay" id="shared-sheet-modal" onclick="closeModalOnBg(event, 'shared-sheet-modal')">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        <span>🔄 공유 엑셀 / 구글 시트 연동</span>
+        <button class="icon-btn" onclick="closeModal('shared-sheet-modal')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">구글 스프레드시트 웹 게시 CSV 링크 또는 공개 엑셀 URL</label>
+        <input type="url" class="form-input" id="setting-sheet-url" placeholder="https://docs.google.com/.../pub?output=csv">
+        <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">
+          💡 구글 시트 메뉴 [파일] ➔ [공유] ➔ [웹에 게시]에서 쉼표로 구분된 값(.csv) 형식 링크를 붙여넣으시면 1초 만에 실시간 가져오기가 가능합니다.
+        </small>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button type="button" class="btn-submit" style="background:var(--bg-cream); color:var(--text-main); border:1px solid var(--border-color); flex:1;" onclick="saveSharedSheetUrl()">💾 링크만 저장</button>
+        <button type="button" class="btn-submit" style="background:#2563EB; flex:1;" onclick="syncSharedSpreadsheet()">🔄 지금 가져오기</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Toast Element -->
   <div class="toast" id="toast">알림</div>
 
   <script>
     /**
-     * Couple-Calendar (SweetSync Calendar) Engine
-     * Zero-Dependency Standalone Architecture
+     * Couple-Calendar (SweetSync Calendar) Engine v2.0
+     * Zero-Backend Embedded Architecture
      */
+
+    // --- Module 1: PeriodScheduleEngine ---
+    window.PeriodScheduleEngine = (function() {
+      function isDateInSchedule(dateStr, schedule) {
+        if (!schedule) return false;
+        if (schedule.date === dateStr) return true;
+        if (schedule.startDate && schedule.endDate) {
+          return dateStr >= schedule.startDate && dateStr <= schedule.endDate;
+        }
+        return false;
+      }
+      function getSchedulePosition(dateStr, schedule) {
+        if (!schedule.startDate || !schedule.endDate || schedule.startDate === schedule.endDate) return 'single';
+        if (schedule.startDate === dateStr) return 'start';
+        if (schedule.endDate === dateStr) return 'end';
+        return 'middle';
+      }
+      function createScheduleNote(schedule, authorRole) {
+        if (!schedule.sharedAsNote || !schedule.memo) return null;
+        return {
+          id: 'n-' + Date.now(),
+          date: schedule.startDate || schedule.date,
+          author: authorRole,
+          target: authorRole === 'user1' ? 'user2' : 'user1',
+          type: 'announcement',
+          content: `📅 [일정 공유: ${schedule.title}]\n기간: ${schedule.startDate || schedule.date} ~ ${schedule.endDate || schedule.date}\n📝 ${schedule.memo}`,
+          reactions: 1,
+          likedBy: [authorRole],
+          isDone: false,
+          isGranted: false,
+          createdAt: new Date().toISOString()
+        };
+      }
+      function getSchedulesForDay(dateStr, schedulesList) {
+        return (schedulesList || []).filter(s => isDateInSchedule(dateStr, s));
+      }
+      return { isDateInSchedule, getSchedulePosition, createScheduleNote, getSchedulesForDay };
+    })();
+
+    // --- Module 2: ExcelLedgerEngine ---
+    window.ExcelLedgerEngine = (function() {
+      function normalizeHeaders(header) {
+        const h = (header || '').trim();
+        if (/날짜|일자|date|거래일/i.test(h)) return 'date';
+        if (/분류|category|항목|카테고리/i.test(h)) return 'category';
+        if (/구분|type|유형|수입|지출/i.test(h)) return 'type';
+        if (/금액|amount|지출액|수입액/i.test(h)) return 'amount';
+        if (/결제자|payer|사용자|작성자/i.test(h)) return 'payer';
+        if (/메모|적요|내용|memo|usage|사용처/i.test(h)) return 'memo';
+        return header;
+      }
+      function parseAmount(value) {
+        if (value == null || value === '') return 0;
+        if (typeof value === 'number') return Math.abs(value);
+        let str = String(value).trim();
+        str = str.replace(/[,\\s$원₩]/g, '');
+        const num = parseFloat(str);
+        return !isNaN(num) ? Math.abs(num) : 0;
+      }
+      function normalizePayer(payer) {
+        if (!payer) return 'together';
+        const p = String(payer).trim().toLowerCase();
+        if (/주니|juni|곰돌|남편|user1/i.test(p)) return 'juni';
+        if (/용이|yongi|토끼|아내|user2/i.test(p)) return 'yongi';
+        if (/공동|함께|together|부부/i.test(p)) return 'together';
+        return 'together';
+      }
+      function parseCsvString(csvText) {
+        if (!csvText) return [];
+        const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length < 2) return [];
+        const rawHeaders = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim());
+        const headers = rawHeaders.map(h => normalizeHeaders(h));
+        const transactions = [];
+        for (let i = 1; i < lines.length; i++) {
+          const rawValues = lines[i].split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+          const rowObj = {};
+          headers.forEach((h, idx) => { rowObj[h] = rawValues[idx] || ''; });
+          const dateStr = (rowObj.date || '').replace(/\./g, '-').replace(/\//g, '-').trim();
+          const typeStr = /수입|income/i.test(rowObj.type) ? 'income' : 'expense';
+          const amountVal = parseAmount(rowObj.amount);
+          const categoryVal = rowObj.category || (typeStr === 'income' ? '급여/수입' : '기타');
+          const payerVal = normalizePayer(rowObj.payer);
+          const memoVal = rowObj.memo || '';
+          if (dateStr && amountVal > 0) {
+            transactions.push({
+              id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+              date: dateStr,
+              type: typeStr,
+              category: categoryVal,
+              amount: amountVal,
+              payer: payerVal,
+              paymentMethod: '카드',
+              memo: memoVal,
+              createdAt: new Date().toISOString()
+            });
+          }
+        }
+        return transactions;
+      }
+      function parseExcelWorkbook(workbook) {
+        if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) return [];
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        if (!worksheet || !window.XLSX) return [];
+        const csvData = XLSX.utils.sheet_to_csv(worksheet);
+        return parseCsvString(csvData);
+      }
+      function exportToExcelData(transactions) {
+        const headers = ['일자', '구분', '카테고리', '금액', '결제자', '결제수단', '내용/메모'];
+        const rows = [headers];
+        (transactions || []).forEach(tx => {
+          rows.push([
+            tx.date || '',
+            tx.type === 'income' ? '수입' : '지출',
+            tx.category || '',
+            tx.amount || 0,
+            tx.payer === 'juni' ? '주니' : tx.payer === 'yongi' ? '용이' : '공동',
+            tx.paymentMethod || '카드',
+            tx.memo || ''
+          ]);
+        });
+        return rows;
+      }
+      async function fetchSharedCsv(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP status: ${res.status}`);
+        const text = await res.text();
+        return parseCsvString(text);
+      }
+      return { normalizeHeaders, parseAmount, normalizePayer, parseCsvString, parseExcelWorkbook, exportToExcelData, fetchSharedCsv };
+    })();
+
+    // --- Module 3: LedgerStatsEngine ---
+    window.LedgerStatsEngine = (function() {
+      function calculateMonthlySummary(transactions, targetMonth, budget = 2500000) {
+        const monthStr = String(targetMonth);
+        const monthTxs = (transactions || []).filter(t => t.date && t.date.startsWith(monthStr));
+        const totalExpense = monthTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const totalIncome = monthTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+        const remainBudget = budget - totalExpense;
+        const budgetUsedRate = budget > 0 ? Math.round((totalExpense / budget) * 100) : 0;
+        const dailyAverageExpense = totalExpense > 0 ? Math.round(totalExpense / 30) : 0;
+        return { totalExpense, totalIncome, remainBudget, budgetUsedRate, dailyAverageExpense, count: monthTxs.length };
+      }
+      function calculatePayerDistribution(transactions, targetMonth) {
+        const monthStr = String(targetMonth);
+        const monthTxs = (transactions || []).filter(t => t.date && t.date.startsWith(monthStr) && t.type === 'expense');
+        const dist = { juni: 0, yongi: 0, together: 0 };
+        monthTxs.forEach(t => {
+          const p = (t.payer === 'yonji' ? 'yongi' : t.payer) || 'together';
+          if (dist.hasOwnProperty(p)) dist[p] += t.amount;
+          else dist.together += t.amount;
+        });
+        const total = dist.juni + dist.yongi + dist.together;
+        return {
+          juni: dist.juni,
+          yongi: dist.yongi,
+          together: dist.together,
+          juniPercent: total > 0 ? Math.round((dist.juni / total) * 100) : 0,
+          yongiPercent: total > 0 ? Math.round((dist.yongi / total) * 100) : 0,
+          togetherPercent: total > 0 ? Math.round((dist.together / total) * 100) : 0
+        };
+      }
+      function calculateCategorySummary(transactions, targetMonth) {
+        const monthStr = String(targetMonth);
+        const monthTxs = (transactions || []).filter(t => t.date && t.date.startsWith(monthStr) && t.type === 'expense');
+        const totals = {};
+        monthTxs.forEach(t => {
+          const c = t.category || '기타';
+          totals[c] = (totals[c] || 0) + t.amount;
+        });
+        return Object.entries(totals)
+          .map(([category, amount]) => ({ category, amount }))
+          .sort((a, b) => b.amount - a.amount);
+      }
+      return { calculateMonthlySummary, calculatePayerDistribution, calculateCategorySummary };
+    })();
+
 
     const STORAGE_KEY = 'couple_calendar_state_v1';
     const GIST_FILENAME = 'couple_calendar_data.json';
 
     // Global State
     let AppState = {
-      version: '1.8.0',
+      version: '2.0.0',
       lastUpdated: new Date().toISOString(),
       couple: {
         user1: { name: '주니', nickname: '주니', avatar: '🐻' },
@@ -1917,6 +2772,11 @@
       drinks: [],
       schedules: [],
       notes: [],
+      ledger: {
+        monthlyBudget: 2500000,
+        sharedSpreadsheetUrl: '',
+        transactions: []
+      },
       deletedIds: [],
       sync: {
         githubToken: '',
@@ -1932,6 +2792,17 @@
     let currentDrinker = 'together';
     let currentDrinkType = 'beer';
     let currentNoteAuthor = 'user1';
+
+    // Ledger UI Global State
+    let ledgerFilterType = 'all';
+    let ledgerFilterPayer = 'all';
+    let ledgerSearchQuery = '';
+    let currentEditingTxId = null;
+    let currentTxType = 'expense';
+    let currentTxPayer = 'juni';
+    let categoryChartInstance = null;
+    let trendChartInstance = null;
+
 
     // Helper: Format Date YYYY-MM-DD
     function formatDate(d) {
@@ -2002,6 +2873,13 @@
         try {
           const parsed = JSON.parse(saved);
           AppState = Object.assign(AppState, parsed);
+          // Migration guarantee for v2.0
+          if (!AppState.ledger) {
+            AppState.ledger = { monthlyBudget: 2500000, sharedSpreadsheetUrl: '', transactions: [] };
+          }
+          if (!Array.isArray(AppState.ledger.transactions)) {
+            AppState.ledger.transactions = [];
+          }
         } catch (e) {
           console.error("Local parse error", e);
         }
@@ -2022,14 +2900,35 @@
         { id: 'd-1', date: today, drinker: 'together', amount: '기분 좋은 한잔', memo: '소소한 행복 치맥 데이트 🍗' }
       ];
       AppState.schedules = [
-        { id: 's-1', date: today, title: '저녁 맛있는 외식 💖', category: 'date' }
+        {
+          id: 's-1',
+          date: today,
+          startDate: today,
+          endDate: today,
+          isPeriod: false,
+          title: '저녁 맛있는 외식 💖',
+          category: 'date',
+          memo: '예약 시간 19:00, 역 앞 파스타 맛집',
+          sharedAsNote: true,
+          createdAt: new Date().toISOString()
+        }
       ];
       AppState.notes = [
-        { id: 'n-1', date: today, author: 'user1', target: 'user2', type: 'love', content: '용이야 오늘 하루도 정말 고생 많았어! 맛있는 저녁 먹자 💖', reactions: 2, isDone: false, createdAt: new Date(Date.now() - 3600000).toISOString() },
-        { id: 'n-2', date: today, author: 'user2', target: 'user1', type: 'health', content: '주니야 비타민 챙겨먹었어? 이따 조심해서 퇴근해! 🐻❤️🐰', reactions: 1, isDone: false, createdAt: new Date().toISOString() }
+        { id: 'n-1', date: today, author: 'user1', target: 'user2', type: 'love', content: '용이야 오늘 하루도 정말 고생 많았어! 맛있는 저녁 먹자 💖', reactions: 2, likedBy: ['user1', 'user2'], isDone: false, createdAt: new Date(Date.now() - 3600000).toISOString() },
+        { id: 'n-2', date: today, author: 'user2', target: 'user1', type: 'health', content: '주니야 비타민 챙겨먹었어? 이따 조심해서 퇴근해! 🐻❤️🐰', reactions: 1, likedBy: ['user1'], isDone: false, createdAt: new Date().toISOString() }
       ];
+      AppState.ledger = {
+        monthlyBudget: 2500000,
+        sharedSpreadsheetUrl: '',
+        transactions: [
+          { id: 'tx-1', date: today, type: 'expense', category: '장보기', amount: 56400, payer: 'juni', paymentMethod: '카드', memo: '이마트 장보기 (우유, 계란, 샤인머스캣)', createdAt: new Date(Date.now() - 7200000).toISOString() },
+          { id: 'tx-2', date: today, type: 'expense', category: '카페/간식', amount: 11000, payer: 'yongi', paymentMethod: '카드', memo: '스타벅스 커피 & 베이글 ☕', createdAt: new Date(Date.now() - 3600000).toISOString() },
+          { id: 'tx-3', date: today, type: 'income', category: '급여/수입', amount: 3200000, payer: 'juni', paymentMethod: '계좌이체', memo: '11월 급여 입금 💵', createdAt: new Date(Date.now() - 86400000).toISOString() }
+        ]
+      };
       saveStateLocal();
     }
+
 
     // 2. DRINK TICKET QUOTA & CALCULATION LOGIC
     function computeDrinkTicketStats(year, month) {
@@ -2112,9 +3011,25 @@
         if (dateStr === selectedDate) cls += ' selected';
         dayDiv.className = cls;
 
+        // Collect schedules matching dateStr (supports period ranges)
+        const daySchedules = AppState.schedules.filter(s => {
+          if (s.date === dateStr) return true;
+          if (s.startDate && s.endDate) {
+            return dateStr >= s.startDate && dateStr <= s.endDate;
+          }
+          return false;
+        });
+
+        const activePeriod = AppState.schedules.find(s => s.isPeriod && s.startDate && s.endDate && dateStr >= s.startDate && dateStr <= s.endDate);
+        if (activePeriod) {
+          if (dateStr === activePeriod.startDate) cls += ' period-start';
+          else if (dateStr === activePeriod.endDate) cls += ' period-end';
+          else cls += ' period-mid';
+        }
+        dayDiv.className = cls;
+
         // Collect Badges for this day
         const dayDrinks = AppState.drinks.filter(d => d.date === dateStr);
-        const daySchedules = AppState.schedules.filter(s => s.date === dateStr);
         const dayNotes = AppState.notes.filter(n => n.date === dateStr);
 
         let badgesHtml = '<div class="day-badges">';
@@ -2128,11 +3043,16 @@
           `;
         }
         if (daySchedules.length > 0) {
-          badgesHtml += `<span class="badge-schedule-dot" title="일정"></span>`;
+          if (activePeriod) {
+            badgesHtml += `<span class="badge-period-bar" title="${escapeHtml(activePeriod.title)}"></span>`;
+          } else {
+            badgesHtml += `<span class="badge-schedule-dot" title="일정"></span>`;
+          }
         }
         if (dayNotes.length > 0) {
           badgesHtml += `<span class="badge-note" title="쪽지">💌</span>`;
         }
+
         badgesHtml += '</div>';
 
         dayDiv.innerHTML = `<span class="day-num">${day}</span>${badgesHtml}`;
@@ -2684,19 +3604,33 @@
         `).join('');
       }
 
-      // Schedules
+      // Schedules (matching dateStr or within period range)
       const sList = document.getElementById('day-schedules-list');
-      const schedules = AppState.schedules.filter(s => s.date === dateStr);
+      const schedules = AppState.schedules.filter(s => {
+        if (s.date === dateStr) return true;
+        if (s.startDate && s.endDate) {
+          return dateStr >= s.startDate && dateStr <= s.endDate;
+        }
+        return false;
+      });
+
       if (schedules.length === 0) {
         sList.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 4px 0;">등록된 일정이 없어요 ✨</div>';
       } else {
         sList.innerHTML = schedules.map(s => `
-          <div class="item-pill">
-            <span>📅 ${escapeHtml(s.title)}</span>
-            <button class="icon-btn" onclick="deleteSchedule('${s.id}')" style="font-size: 14px;">🗑️</button>
+          <div class="item-pill" style="flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 12px;">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+              <span>📅 <b>${escapeHtml(s.title)}</b> ${s.isPeriod ? `<span style="font-size:11px; color:var(--primary-dark); font-weight:700; margin-left:4px;">[${s.startDate} ~ ${s.endDate}]</span>` : ''}</span>
+              <div style="display:flex; gap:6px;">
+                ${s.memo ? `<button type="button" class="btn-mini" onclick="forwardScheduleMemoAsNote('${s.id}')" title="쪽지로 전달">💌 쪽지 전달</button>` : ''}
+                <button type="button" class="icon-btn" onclick="deleteSchedule('${s.id}')" style="font-size: 14px;">🗑️</button>
+              </div>
+            </div>
+            ${s.memo ? `<div style="font-size: 11.5px; color: var(--text-sub); background: #FFF; padding: 5px 8px; border-radius: 8px; width: 100%; border: 1px dashed var(--border-color);">📝 ${escapeHtml(s.memo)}</div>` : ''}
           </div>
         `).join('');
       }
+
 
       // Notes
       const nList = document.getElementById('day-notes-list');
@@ -2777,10 +3711,41 @@
       openQuickRecordModal('note', selectedDate);
     }
 
+    function forwardScheduleMemoAsNote(scheduleId) {
+      const schedule = AppState.schedules.find(s => s.id === scheduleId);
+      if (!schedule) return;
+      const myRole = getMyRole();
+      const targetRole = myRole === 'user1' ? 'user2' : 'user1';
+      AppState.notes.push({
+        id: 'n-' + Date.now(),
+        date: formatDate(new Date()),
+        author: myRole,
+        target: targetRole,
+        type: 'announcement',
+        content: `📅 [일정 메모 공유: ${schedule.title}]\n기간: ${schedule.startDate || schedule.date} ~ ${schedule.endDate || schedule.date}\n📝 ${schedule.memo}`,
+        reactions: 1,
+        likedBy: [myRole],
+        isDone: false,
+        isGranted: false,
+        createdAt: new Date().toISOString()
+      });
+      playCutePop();
+      saveStateLocal();
+      renderAll();
+      syncWithGist(false);
+      showToast("배우자에게 일정 메모 쪽지가 전송되었습니다 💌✨");
+    }
+
     // 7. RECORD SUBMIT
     function openQuickRecordModal(type = 'drink', date = null) {
       playCutePop();
-      document.getElementById('record-date').value = date || formatDate(new Date());
+      const targetDate = date || formatDate(new Date());
+      document.getElementById('record-date').value = targetDate;
+      const startEl = document.getElementById('schedule-start-date');
+      const endEl = document.getElementById('schedule-end-date');
+      if (startEl) startEl.value = targetDate;
+      if (endEl) endEl.value = targetDate;
+
       setRecordType(type);
       if (type === 'note') {
         const myRole = getMyRole();
@@ -2836,15 +3801,47 @@
       } else if (activeRecordType === 'schedule') {
         const title = document.getElementById('schedule-title').value;
         const category = document.getElementById('schedule-category').value;
+        const startDate = document.getElementById('schedule-start-date').value || date;
+        const endDate = document.getElementById('schedule-end-date').value || startDate;
+        const memo = document.getElementById('schedule-memo').value || '';
+        const shareAsNote = document.getElementById('schedule-share-note').checked;
         if (!title) return;
-        AppState.schedules.push({
+
+        const newSchedule = {
           id: 's-' + Date.now(),
-          date,
-          title,
-          category,
-          createdAt: new Date().toISOString()
-        });
-        showToast("일정이 달력에 등록되었습니다 📅✨");
+          date: startDate,
+          startDate: startDate,
+          endDate: endDate,
+          isPeriod: startDate !== endDate,
+          title: title,
+          category: category,
+          memo: memo,
+          sharedAsNote: shareAsNote,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        AppState.schedules.push(newSchedule);
+
+        if (shareAsNote && memo) {
+          const myRole = getMyRole();
+          const targetRole = myRole === 'user1' ? 'user2' : 'user1';
+          AppState.notes.push({
+            id: 'n-' + Date.now(),
+            date: startDate,
+            author: myRole,
+            target: targetRole,
+            type: 'announcement',
+            content: `📅 [일정 등록 공유: ${title}]\n기간: ${startDate} ~ ${endDate}\n📝 ${memo}`,
+            reactions: 1,
+            likedBy: [myRole],
+            isDone: false,
+            isGranted: false,
+            createdAt: new Date().toISOString()
+          });
+          showToast("일정 등록 및 배우자에게 쪽지가 전달되었습니다 📅💌");
+        } else {
+          showToast("일정이 달력에 등록되었습니다 📅✨");
+        }
       } else if (activeRecordType === 'note') {
         const content = document.getElementById('note-content').value;
         const type = document.getElementById('note-type').value;
@@ -2857,6 +3854,7 @@
           type,
           content,
           reactions: 1,
+          likedBy: [currentNoteAuthor],
           isDone: false,
           isGranted: false,
           createdAt: new Date().toISOString()
@@ -2871,6 +3869,7 @@
       renderAll();
       syncWithGist();
     }
+
 
     // 8. SETTINGS & GIST SYNC ENGINE
     function openSettingsModal() {
@@ -3060,7 +4059,38 @@
       }
       const mergedNotes = Array.from(noteMap.values()).sort((a,b) => (a.createdAt || a.date || '').localeCompare(b.createdAt || b.date || ''));
 
-      // 4. Merge couple profile & quota
+      // 4. Merge Ledger Transactions by ID
+      const txMap = new Map();
+      const remoteHasRealTxs = Array.isArray(remote.ledger?.transactions) && remote.ledger.transactions.some(t => t.id !== 'tx-1' && t.id !== 'tx-2');
+      if (Array.isArray(remote.ledger?.transactions)) {
+        remote.ledger.transactions.forEach(t => {
+          if (t && t.id && !deletedIds.has(t.id)) txMap.set(t.id, t);
+        });
+      }
+      if (Array.isArray(local.ledger?.transactions)) {
+        local.ledger.transactions.forEach(t => {
+          if (remoteHasRealTxs && (t.id === 'tx-1' || t.id === 'tx-2')) return; // discard demo seed
+          if (t && t.id && !deletedIds.has(t.id)) {
+            if (txMap.has(t.id)) {
+              const r = txMap.get(t.id);
+              const localTime = new Date(t.updatedAt || t.createdAt || 0).getTime();
+              const remoteTime = new Date(r.updatedAt || r.createdAt || 0).getTime();
+              if (localTime >= remoteTime) txMap.set(t.id, t);
+            } else {
+              txMap.set(t.id, t);
+            }
+          }
+        });
+      }
+      const mergedTransactions = Array.from(txMap.values()).sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+
+      const mergedLedger = {
+        monthlyBudget: local.ledger?.monthlyBudget || remote.ledger?.monthlyBudget || 2500000,
+        sharedSpreadsheetUrl: local.ledger?.sharedSpreadsheetUrl || remote.ledger?.sharedSpreadsheetUrl || '',
+        transactions: mergedTransactions
+      };
+
+      // 5. Merge couple profile & quota
       const mergedCouple = {
         user1: { ...(remote.couple?.user1 || {}), ...(local.couple?.user1 || {}) },
         user2: { ...(remote.couple?.user2 || {}), ...(local.couple?.user2 || {}) },
@@ -3068,7 +4098,7 @@
         monthlyDrinkQuota: local.couple?.monthlyDrinkQuota || remote.couple?.monthlyDrinkQuota || 8
       };
 
-      // 5. Always preserve local credentials
+      // 6. Always preserve local credentials
       const mergedSync = {
         githubToken: local.sync?.githubToken || remote.sync?.githubToken || '',
         gistId: local.sync?.gistId || remote.sync?.gistId || '',
@@ -3076,16 +4106,18 @@
       };
 
       return {
-        version: '1.2.0',
+        version: '2.0.0',
         lastUpdated: new Date().toISOString(),
         couple: mergedCouple,
         drinks: mergedDrinks,
         schedules: mergedSchedules,
         notes: mergedNotes,
+        ledger: mergedLedger,
         deletedIds: Array.from(deletedIds).slice(-300),
         sync: mergedSync
       };
     }
+
 
     let isSyncing = false;
     let pendingSyncPush = false;
@@ -3160,7 +4192,9 @@
                   drinks: AppState.drinks,
                   schedules: AppState.schedules,
                   notes: AppState.notes,
+                  ledger: AppState.ledger,
                   deletedIds: AppState.deletedIds || []
+
                 }, null, 2)
               }
             }
@@ -3344,28 +4378,608 @@ ${inviteUrl}`;
       }
     }
 
+    // ========================================================
+    // 8. LEDGER (가계부 / 생활비 처리현황) ENGINE
+    // ========================================================
+    function setTxType(type) {
+      currentTxType = type;
+      document.getElementById('tx-type-expense').classList.toggle('active', type === 'expense');
+      document.getElementById('tx-type-income').classList.toggle('active', type === 'income');
+      playCutePop();
+    }
+
+    function selectTxPayer(payer) {
+      currentTxPayer = payer;
+      ['juni', 'yongi', 'together'].forEach(p => {
+        const el = document.getElementById(`tx-payer-${p}`);
+        if (el) el.classList.toggle('active', p === payer);
+      });
+      playCutePop();
+    }
+
+    function addTxAmount(delta) {
+      const el = document.getElementById('tx-amount');
+      const cur = parseInt(el.value || '0', 10);
+      el.value = cur + delta;
+      playCutePop();
+    }
+
+    function clearTxAmount() {
+      document.getElementById('tx-amount').value = '';
+      playCutePop();
+    }
+
+    function openAddTransactionModal(editTxId = null) {
+      currentEditingTxId = editTxId;
+      playCutePop();
+      const form = document.getElementById('tx-form');
+      form.reset();
+
+      if (editTxId) {
+        const tx = (AppState.ledger.transactions || []).find(t => t.id === editTxId);
+        if (tx) {
+          document.getElementById('tx-modal-title').textContent = '✏️ 생활비 내역 수정';
+          document.getElementById('tx-id').value = tx.id;
+          document.getElementById('tx-date').value = tx.date;
+          document.getElementById('tx-amount').value = tx.amount;
+          document.getElementById('tx-category').value = tx.category || '기타';
+          document.getElementById('tx-payment-method').value = tx.paymentMethod || '카드';
+          document.getElementById('tx-memo').value = tx.memo || '';
+          setTxType(tx.type || 'expense');
+          selectTxPayer(tx.payer || 'juni');
+          document.getElementById('btn-delete-tx').style.display = 'block';
+        }
+      } else {
+        document.getElementById('tx-modal-title').textContent = '💰 생활비 내역 등록';
+        document.getElementById('tx-id').value = '';
+        document.getElementById('tx-date').value = selectedDate || formatDate(new Date());
+        setTxType('expense');
+        const myRole = getMyRole();
+        selectTxPayer(myRole === 'user1' ? 'juni' : 'yongi');
+        document.getElementById('btn-delete-tx').style.display = 'none';
+      }
+      openModal('transaction-modal');
+    }
+
+    function saveTransaction(e) {
+      e.preventDefault();
+      const id = document.getElementById('tx-id').value;
+      const date = document.getElementById('tx-date').value;
+      const amount = parseFloat(document.getElementById('tx-amount').value || '0');
+      const category = document.getElementById('tx-category').value;
+      const paymentMethod = document.getElementById('tx-payment-method').value;
+      const memo = document.getElementById('tx-memo').value.trim();
+
+      if (!date || isNaN(amount) || amount <= 0) {
+        alert("일자와 올바른 금액을 입력해주세요!");
+        return;
+      }
+
+      if (!AppState.ledger) AppState.ledger = { monthlyBudget: 2500000, sharedSpreadsheetUrl: '', transactions: [] };
+      if (!Array.isArray(AppState.ledger.transactions)) AppState.ledger.transactions = [];
+
+      if (id) {
+        const idx = AppState.ledger.transactions.findIndex(t => t.id === id);
+        if (idx !== -1) {
+          AppState.ledger.transactions[idx] = {
+            ...AppState.ledger.transactions[idx],
+            date,
+            type: currentTxType,
+            category,
+            amount,
+            payer: currentTxPayer,
+            paymentMethod,
+            memo,
+            updatedAt: new Date().toISOString()
+          };
+          showToast("내역이 수정되었습니다 ✏️✨");
+        }
+      } else {
+        const newTx = {
+          id: 'tx-' + Date.now(),
+          date,
+          type: currentTxType,
+          category,
+          amount,
+          payer: currentTxPayer,
+          paymentMethod,
+          memo,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        AppState.ledger.transactions.unshift(newTx);
+        showToast("생활비 내역이 등록되었습니다 💰💖");
+      }
+
+      playCutePop();
+      saveStateLocal();
+      closeModal('transaction-modal');
+      renderLedgerView();
+      renderStats();
+      syncWithGist(false);
+    }
+
+    function deleteCurrentTransaction() {
+      if (!currentEditingTxId) return;
+      if (!confirm("이 생활비 내역을 정말 삭제하시겠습니까?")) return;
+      recordDeletedId(currentEditingTxId);
+      AppState.ledger.transactions = (AppState.ledger.transactions || []).filter(t => t.id !== currentEditingTxId);
+      saveStateLocal();
+      closeModal('transaction-modal');
+      renderLedgerView();
+      renderStats();
+      syncWithGist(false);
+      showToast("내역이 삭제되었습니다 🗑️");
+    }
+
+    function setLedgerTypeFilter(type) {
+      ledgerFilterType = type;
+      ['all', 'expense', 'income'].forEach(t => {
+        const el = document.getElementById(`filter-type-${t}`);
+        if (el) el.classList.toggle('active', t === type);
+      });
+      playCutePop();
+      renderLedgerView();
+    }
+
+    function setLedgerPayerFilter(payer) {
+      ledgerFilterPayer = payer;
+      ['all', 'juni', 'yongi', 'together'].forEach(p => {
+        const el = document.getElementById(`filter-payer-${p}`);
+        if (el) el.classList.toggle('active', p === payer);
+      });
+      playCutePop();
+      renderLedgerView();
+    }
+
+    function handleLedgerSearch(e) {
+      ledgerSearchQuery = (e.target.value || '').trim().toLowerCase();
+      renderLedgerView();
+    }
+
+    function openBudgetSettingModal() {
+      const budget = (AppState.ledger && AppState.ledger.monthlyBudget) || 2500000;
+      document.getElementById('setting-monthly-budget').value = budget;
+      openModal('budget-modal');
+    }
+
+    function saveMonthlyBudget() {
+      const val = parseInt(document.getElementById('setting-monthly-budget').value, 10);
+      if (isNaN(val) || val <= 0) {
+        alert("올바른 예산 금액을 입력해주세요.");
+        return;
+      }
+      if (!AppState.ledger) AppState.ledger = {};
+      AppState.ledger.monthlyBudget = val;
+      saveStateLocal();
+      closeModal('budget-modal');
+      renderLedgerView();
+      renderStats();
+      syncWithGist(false);
+      showToast("생활비 예산이 설정되었습니다 🎯");
+    }
+
+    function openSharedSheetModal() {
+      const url = (AppState.ledger && AppState.ledger.sharedSpreadsheetUrl) || '';
+      document.getElementById('setting-sheet-url').value = url;
+      openModal('shared-sheet-modal');
+    }
+
+    function saveSharedSheetUrl() {
+      const url = document.getElementById('setting-sheet-url').value.trim();
+      if (!AppState.ledger) AppState.ledger = {};
+      AppState.ledger.sharedSpreadsheetUrl = url;
+      saveStateLocal();
+      closeModal('shared-sheet-modal');
+      syncWithGist(false);
+      showToast("공유 시트 링크가 저장되었습니다 💾");
+    }
+
+    async function syncSharedSpreadsheet() {
+      const url = document.getElementById('setting-sheet-url').value.trim() || (AppState.ledger && AppState.ledger.sharedSpreadsheetUrl);
+      if (!url) {
+        alert("공유 시트 CSV 링크를 먼저 입력해주세요.");
+        return;
+      }
+      showToast("공유 시트에서 데이터를 불러오는 중... ⏳");
+      try {
+        const txs = await window.ExcelLedgerEngine.fetchSharedCsv(url);
+        if (txs.length === 0) {
+          alert("시트에서 유효한 내역을 찾을 수 없습니다. URL 권한(웹에 게시)을 확인해주세요.");
+          return;
+        }
+        if (!AppState.ledger.transactions) AppState.ledger.transactions = [];
+        txs.forEach(t => AppState.ledger.transactions.push(t));
+        saveStateLocal();
+        closeModal('shared-sheet-modal');
+        renderLedgerView();
+        renderStats();
+        syncWithGist(false);
+        showToast(`🎉 ${txs.length}건의 내역을 공유 시트에서 성공적으로 가져왔습니다!`);
+      } catch (err) {
+        alert(`공유 시트 가져오기 실패: ${err.message}\n구글 시트의 [파일] ➔ [공유] ➔ [웹에 게시] CSV 링크인지 확인해주세요.`);
+      }
+    }
+
+    function triggerExcelFileInput() {
+      const input = document.getElementById('excel-file-input');
+      if (input) input.click();
+    }
+
+    function handleExcelFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      const isCsv = file.name.endsWith('.csv');
+
+      reader.onload = function(e) {
+        try {
+          let parsedTxs = [];
+          if (isCsv) {
+            const text = e.target.result;
+            parsedTxs = window.ExcelLedgerEngine.parseCsvString(text);
+          } else {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            parsedTxs = window.ExcelLedgerEngine.parseExcelWorkbook(workbook);
+          }
+
+          if (parsedTxs.length === 0) {
+            alert("엑셀 파일에서 유효한 거래 내역(날짜/금액/분류)을 찾지 못했습니다.");
+            return;
+          }
+
+          if (!AppState.ledger) AppState.ledger = {};
+          if (!Array.isArray(AppState.ledger.transactions)) AppState.ledger.transactions = [];
+
+          parsedTxs.forEach(t => AppState.ledger.transactions.push(t));
+          saveStateLocal();
+          renderLedgerView();
+          renderStats();
+          syncWithGist(false);
+          showToast(`🎉 엑셀에서 ${parsedTxs.length}건의 거래 내역을 일괄 등록했습니다!`);
+        } catch (err) {
+          console.error("Excel import error:", err);
+          alert("엑셀 파싱 중 오류가 발생했습니다: " + err.message);
+        } finally {
+          event.target.value = '';
+        }
+      };
+
+      if (isCsv) {
+        reader.readAsText(file, 'utf-8');
+      } else {
+        reader.readAsArrayBuffer(file);
+      }
+    }
+
+    function exportLedgerToExcel() {
+      const txs = (AppState.ledger && AppState.ledger.transactions) || [];
+      if (txs.length === 0) {
+        alert("내보낼 가계부 내역이 없습니다.");
+        return;
+      }
+      try {
+        const rows = window.ExcelLedgerEngine.exportToExcelData(txs);
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "가계부내역");
+        const filename = `달콤살벌_가계부_${currentYear}${String(currentMonth).padStart(2,'0')}.xlsx`;
+        XLSX.writeFile(wb, filename);
+        showToast(`📥 ${filename} 다운로드가 시작되었습니다!`);
+      } catch (err) {
+        alert("엑셀 다운로드 오류: " + err.message);
+      }
+    }
+
+    const CATEGORY_ICONS = {
+      '식비': '🍚',
+      '장보기': '🛒',
+      '카페/간식': '☕',
+      '주거/통신': '🏠',
+      '교통': '🚗',
+      '생활용품': '🧼',
+      '문화/여가': '🎬',
+      '의료/건강': '💊',
+      '급여/수입': '💵',
+      '기타': '✨'
+    };
+
+    function renderLedgerView() {
+      const monthPrefix = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+      const titleEl = document.getElementById('ledger-month-title');
+      if (titleEl) titleEl.textContent = `${currentYear}년 ${currentMonth}월 생활비`;
+
+      const budget = (AppState.ledger && AppState.ledger.monthlyBudget) || 2500000;
+      const budgetInfoEl = document.getElementById('ledger-budget-info');
+      if (budgetInfoEl) budgetInfoEl.textContent = `예산 ${budget.toLocaleString()}원 기준`;
+
+      const allTxs = (AppState.ledger && AppState.ledger.transactions) || [];
+      
+      const monthlySummary = window.LedgerStatsEngine.calculateMonthlySummary(allTxs, monthPrefix, budget);
+      if (monthlySummary) {
+        const expEl = document.getElementById('ledger-total-expense');
+        const incEl = document.getElementById('ledger-total-income');
+        const remEl = document.getElementById('ledger-remain-budget');
+        const rateEl = document.getElementById('ledger-budget-rate');
+        const fillEl = document.getElementById('ledger-budget-fill');
+
+        if (expEl) expEl.textContent = `${monthlySummary.totalExpense.toLocaleString()}원`;
+        if (incEl) incEl.textContent = `${monthlySummary.totalIncome.toLocaleString()}원`;
+        if (remEl) {
+          remEl.textContent = `${monthlySummary.remainBudget.toLocaleString()}원`;
+          remEl.style.color = monthlySummary.remainBudget < 0 ? '#DC2626' : '#059669';
+        }
+        if (rateEl) rateEl.textContent = `${monthlySummary.budgetUsedRate}%`;
+        if (fillEl) fillEl.style.width = `${Math.min(100, Math.max(0, monthlySummary.budgetUsedRate))}%`;
+      }
+
+      const dist = window.LedgerStatsEngine.calculatePayerDistribution(allTxs, monthPrefix);
+      if (dist) {
+        const juniFill = document.getElementById('payer-fill-juni');
+        const yongiFill = document.getElementById('payer-fill-yongi');
+        const ratioText = document.getElementById('payer-ratio-text');
+
+        const jPct = dist.juniPercent || 0;
+        const yPct = (dist.yonjiPercent || dist.yongiPercent) || 0;
+
+        if (juniFill) juniFill.style.width = `${jPct}%`;
+        if (yongiFill) yongiFill.style.width = `${yPct}%`;
+        if (ratioText) {
+          ratioText.textContent = `주니 ${jPct}% (${(dist.juni||0).toLocaleString()}원) : 용이 ${yPct}% (${((dist.yonji||dist.yongi)||0).toLocaleString()}원)`;
+        }
+      }
+
+      let filtered = allTxs.filter(t => t.date && t.date.startsWith(monthPrefix));
+
+      if (ledgerFilterType !== 'all') {
+        filtered = filtered.filter(t => t.type === ledgerFilterType);
+      }
+      if (ledgerFilterPayer !== 'all') {
+        filtered = filtered.filter(t => t.payer === ledgerFilterPayer);
+      }
+      if (ledgerSearchQuery) {
+        filtered = filtered.filter(t => {
+          const m = (t.memo || '').toLowerCase();
+          const c = (t.category || '').toLowerCase();
+          return m.includes(ledgerSearchQuery) || c.includes(ledgerSearchQuery);
+        });
+      }
+
+      filtered.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+
+      const countEl = document.getElementById('ledger-tx-count');
+      if (countEl) countEl.textContent = filtered.length;
+
+      const listContainer = document.getElementById('ledger-tx-list');
+      if (listContainer) {
+        if (filtered.length === 0) {
+          listContainer.innerHTML = `
+            <div style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13px;">
+              등록된 생활비 내역이 없습니다 ✨<br/>
+              <span style="font-size: 11px;">[➕ 내역 등록] 또는 [📂 엑셀 올리기]를 눌러보세요!</span>
+            </div>
+          `;
+        } else {
+          listContainer.innerHTML = filtered.map(t => {
+            const icon = CATEGORY_ICONS[t.category] || '💸';
+            const isExp = t.type === 'expense';
+            const sign = isExp ? '-' : '+';
+            const payerLabel = t.payer === 'juni' ? '주니 🐻' : t.payer === 'yongi' ? '용이 🐰' : '공동 🥂';
+            const payerClass = t.payer || 'together';
+
+            return `
+              <div class="ledger-item-card" onclick="openAddTransactionModal('${t.id}')">
+                <div class="tx-item-left">
+                  <div class="tx-item-icon">${icon}</div>
+                  <div class="tx-item-info">
+                    <span class="tx-item-title">${escapeHtml(t.memo || t.category)}</span>
+                    <div class="tx-item-meta">
+                      <span>${t.date.substring(5)}</span>
+                      <span>•</span>
+                      <span>${escapeHtml(t.category)}</span>
+                      <span class="payer-badge ${payerClass}">${payerLabel}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="tx-item-right">
+                  <span class="tx-item-amount ${isExp ? 'expense' : 'income'}">${sign}${t.amount.toLocaleString()}원</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      const tableContainer = document.getElementById('web-grid-table-container');
+      if (tableContainer) {
+        if (filtered.length === 0) {
+          tableContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">조회된 내역이 없습니다.</div>';
+        } else {
+          tableContainer.innerHTML = `
+            <table class="web-grid-table">
+              <thead>
+                <tr>
+                  <th>일자</th>
+                  <th>구분</th>
+                  <th>카테고리</th>
+                  <th>사용처 / 메모</th>
+                  <th>결제자</th>
+                  <th>결제수단</th>
+                  <th style="text-align: right;">금액</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.map(t => `
+                  <tr onclick="openAddTransactionModal('${t.id}')" style="cursor: pointer;">
+                    <td>${t.date}</td>
+                    <td><span style="font-weight:700; color:${t.type === 'expense' ? 'var(--primary-dark)' : '#2563EB'}">${t.type === 'expense' ? '지출' : '수입'}</span></td>
+                    <td>${escapeHtml(t.category)}</td>
+                    <td><strong>${escapeHtml(t.memo || '-')}</strong></td>
+                    <td><span class="payer-badge ${t.payer || 'together'}">${t.payer === 'juni' ? '주니 🐻' : t.payer === 'yongi' ? '용이 🐰' : '공동 🥂'}</span></td>
+                    <td>${escapeHtml(t.paymentMethod || '카드')}</td>
+                    <td style="text-align: right; font-weight: 800; color:${t.type === 'expense' ? 'var(--primary-dark)' : '#2563EB'}">${t.type === 'expense' ? '-' : '+'}${t.amount.toLocaleString()}원</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+      }
+    }
+
+    function renderLedgerStats() {
+      const monthPrefix = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+      const allTxs = (AppState.ledger && AppState.ledger.transactions) || [];
+
+      // 1. Doughnut Chart: Category Distribution
+      const catSummary = window.LedgerStatsEngine.calculateCategorySummary(allTxs, monthPrefix);
+      const doughnutCtx = document.getElementById('chart-category-doughnut');
+
+      if (doughnutCtx && window.Chart) {
+        if (categoryChartInstance) {
+          categoryChartInstance.destroy();
+        }
+
+        const labels = catSummary.map(c => c.category);
+        const data = catSummary.map(c => c.amount);
+        const bgColors = [
+          '#FF708F', '#FFB385', '#FFE885', '#B8EBD0', '#C5E5FC',
+          '#E2D9F3', '#FF9EAA', '#F87171', '#60A5FA', '#34D399'
+        ];
+
+        categoryChartInstance = new Chart(doughnutCtx, {
+          type: 'doughnut',
+          data: {
+            labels: labels.length ? labels : ['지출 없음'],
+            datasets: [{
+              data: data.length ? data : [1],
+              backgroundColor: data.length ? bgColors.slice(0, data.length) : ['#F3ECE8'],
+              borderWidth: 2,
+              borderColor: '#FFFFFF'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    if (!data.length) return '내역 없음';
+                    const val = ctx.raw;
+                    return ` ${ctx.label}: ${val.toLocaleString()}원`;
+                  }
+                }
+              }
+            },
+            cutout: '68%'
+          }
+        });
+      }
+
+      // 2. Bar Chart: Recent Monthly Trend
+      const trendCtx = document.getElementById('chart-monthly-trend');
+      if (trendCtx && window.Chart) {
+        if (trendChartInstance) {
+          trendChartInstance.destroy();
+        }
+
+        const months = [];
+        for (let i = 2; i >= 0; i--) {
+          const d = new Date(currentYear, currentMonth - 1 - i, 1);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          months.push(`${y}-${m}`);
+        }
+
+        const monthlyExpenses = months.map(mStr => {
+          return allTxs.filter(t => t.date && t.date.startsWith(mStr) && t.type === 'expense')
+                       .reduce((sum, t) => sum + t.amount, 0);
+        });
+
+        const monthLabels = months.map(mStr => `${parseInt(mStr.split('-')[1], 10)}월`);
+
+        trendChartInstance = new Chart(trendCtx, {
+          type: 'bar',
+          data: {
+            labels: monthLabels,
+            datasets: [{
+              label: '월 지출액',
+              data: monthlyExpenses,
+              backgroundColor: '#FF708F',
+              borderRadius: 8,
+              barThickness: 24
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ` ${ctx.raw.toLocaleString()}원`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  font: { size: 10 },
+                  callback: (val) => val >= 10000 ? `${Math.round(val/10000)}만` : val
+                },
+                grid: { color: '#F3ECE8' }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { font: { size: 11, weight: 'bold' } }
+              }
+            }
+          }
+        });
+      }
+    }
+
     // VIEW SWITCHER
     function switchView(viewName) {
       playCutePop();
-      ['calendar', 'notes', 'stats'].forEach(v => {
-        document.getElementById(`${v}-view`).classList.toggle('active', v === viewName);
+      ['calendar', 'ledger', 'notes', 'stats'].forEach(v => {
+        const el = document.getElementById(`${v}-view`);
+        if (el) el.classList.toggle('active', v === viewName);
       });
       document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-        btn.classList.toggle('active', ['calendar', 'notes', 'stats'][idx] === viewName);
+        btn.classList.toggle('active', ['calendar', 'ledger', 'notes', 'stats'][idx] === viewName);
       });
       document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
       });
-      if (viewName === 'calendar') { document.getElementById('nav-cal').classList.add('active'); renderLatestNoteAlertCard(); }
+      if (viewName === 'calendar') {
+        const nav = document.getElementById('nav-cal');
+        if (nav) nav.classList.add('active');
+        renderLatestNoteAlertCard();
+      }
+      if (viewName === 'ledger') {
+        const nav = document.getElementById('nav-ledger');
+        if (nav) nav.classList.add('active');
+        renderLedgerView();
+      }
       if (viewName === 'notes') {
-        document.getElementById('nav-notes').classList.add('active');
+        const nav = document.getElementById('nav-notes');
+        if (nav) nav.classList.add('active');
         const myRole = getMyRole();
         const defaultInbox = myRole === 'user1' ? 'yongi-to-juni' : 'juni-to-yongi';
         switchNotesSubtab(defaultInbox);
       }
       if (viewName === 'stats') {
-        document.getElementById('nav-stats').classList.add('active');
+        const nav = document.getElementById('nav-stats');
+        if (nav) nav.classList.add('active');
+        renderDrinkBanner();
         renderStats();
+        renderLedgerStats();
       }
     }
 
@@ -3374,9 +4988,12 @@ ${inviteUrl}`;
       renderLatestNoteAlertCard();
       renderDrinkBanner();
       renderCalendar();
+      renderLedgerView();
       renderNotes();
       renderStats();
+      renderLedgerStats();
     }
+
 
     // MODAL UTILS
     function openModal(id) {
