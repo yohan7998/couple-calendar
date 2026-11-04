@@ -40,10 +40,13 @@
   <link rel="stylesheet" href="modules/read_status.css">
   <link rel="stylesheet" href="modules/brush_reveal.css">
   <link rel="stylesheet" href="modules/realtime_sync.css">
+  <link rel="stylesheet" href="modules/ledger_stats.css">
   <script src="modules/modern_icons.js"></script>
   <script src="modules/read_status_engine.js"></script>
   <script src="modules/brush_reveal_effect.js"></script>
   <script src="modules/realtime_sync_engine.js"></script>
+  <script src="modules/excel_ledger_engine.js"></script>
+  <script src="modules/ledger_stats_view.js"></script>
 
   <style>
     :root {
@@ -1967,7 +1970,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="현재 정본 버전: v2.4.0 (2026-11-04)">v2.4</span>
+            <span class="app-version-badge" title="현재 정본 버전: v2.5.0 (2026-11-04)">v2.5</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -2076,6 +2079,9 @@
         </button>
         <button class="btn-action-secondary" onclick="exportLedgerToExcel()">
           <span class="btn-icon-wrap" id="btn-icon-download"></span><span>엑셀 받기</span>
+        </button>
+        <button class="btn-action-secondary" onclick="downloadLedgerTemplate()" title="가계부 작성용 표준 엑셀 양식 다운로드">
+          <span>📄</span><span>양식 받기</span>
         </button>
         <button class="btn-action-secondary" onclick="openSharedSheetModal()">
           <span class="btn-icon-wrap" id="btn-icon-sync"></span><span>공유시트</span>
@@ -2213,6 +2219,9 @@
           </div>
         </div>
       </div>
+
+      <!-- v2.5 Responsive Dual Stats View (모바일 최적화 & 웹 대화면 피벗 매트릭스) -->
+      <div id="responsive-dual-stats-container" style="margin-top: 16px;"></div>
 
       <!-- Drink Report Card -->
       <div class="stats-card" style="margin-top: 16px;">
@@ -2567,7 +2576,7 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.4.0</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.5.0</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
           최근 갱신: 2026-11-04 (가족 일정 및 가계부·생활비 관리 통합 대개편)
@@ -3072,7 +3081,8 @@
     })();
 
     // --- Module 2: ExcelLedgerEngine ---
-    window.ExcelLedgerEngine = (function() {
+    if (typeof window.ExcelLedgerEngine === 'undefined') {
+      window.ExcelLedgerEngine = (function() {
       function normalizeHeaders(header) {
         const h = (header || '').trim();
         if (/날짜|일자|date|거래일/i.test(h)) return 'date';
@@ -3194,10 +3204,12 @@
         };
       }
       return { normalizeHeaders, parseAmount, normalizePayer, parseCsvString, parseExcelWorkbook, exportToExcelData, fetchSharedCsv, generateTxFingerprint, deduplicateTransactions };
-    })();
+      })();
+    }
 
     // --- Module 3: LedgerStatsEngine ---
-    window.LedgerStatsEngine = (function() {
+    if (typeof window.LedgerStatsEngine === 'undefined' || !window.LedgerStatsEngine.renderMobileStatsHtml) {
+      window.LedgerStatsEngine = (function() {
       function calculateMonthlySummary(transactions, targetMonth, budget = 2500000) {
         const monthStr = String(targetMonth);
         const monthTxs = (transactions || []).filter(t => t.date && t.date.startsWith(monthStr));
@@ -3240,7 +3252,8 @@
           .sort((a, b) => b.amount - a.amount);
       }
       return { calculateMonthlySummary, calculatePayerDistribution, calculateCategorySummary };
-    })();
+      })();
+    }
 
 
     const STORAGE_KEY = 'couple_calendar_state_v1';
@@ -5637,6 +5650,25 @@ ${inviteUrl}`;
       }
     }
 
+    function downloadLedgerTemplate() {
+      if (typeof window.ExcelLedgerEngine === 'undefined' || typeof XLSX === 'undefined') {
+        alert("엑셀 라이브러리가 로드되지 않았습니다.");
+        return;
+      }
+      try {
+        playCutePop();
+        const rows = window.ExcelLedgerEngine.generateTemplateData();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "가계부표준양식");
+        const filename = `달콤살벌캘린더_가계부작성양식.xlsx`;
+        XLSX.writeFile(wb, filename);
+        showToast(`📄 ${filename} 양식 다운로드 완료!`);
+      } catch (err) {
+        alert("양식 다운로드 오류: " + err.message);
+      }
+    }
+
     const CATEGORY_ICONS = {
       '식비': '🍚',
       '장보기': '🛒',
@@ -5907,6 +5939,15 @@ ${inviteUrl}`;
             }
           }
         });
+      }
+
+      // 3. v2.5 Responsive Dual Stats View (모바일 최적화 & 웹 대화면 피벗 매트릭스)
+      const dualContainer = document.getElementById('responsive-dual-stats-container');
+      if (dualContainer && typeof window.LedgerStatsEngine !== 'undefined') {
+        const budget = (AppState.ledger && AppState.ledger.budget) || 2500000;
+        const mobileHtml = window.LedgerStatsEngine.renderMobileStatsHtml(allTxs, monthPrefix, budget);
+        const webPivotHtml = window.LedgerStatsEngine.renderWebPivotTableHtml(allTxs, 6);
+        dualContainer.innerHTML = mobileHtml + webPivotHtml;
       }
     }
 

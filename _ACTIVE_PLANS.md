@@ -22,6 +22,7 @@ tags:
 
 | 구분 | 문서명 (버전 및 일자) | 상태 | 핵심 내용 및 역할 | 연계 구현 산출물 |
 | :---: | :--- | :---: | :--- | :--- |
+| **가계부 엑셀 연동 & 듀얼 통계 고도화** | [[Couple-Calendar_가계부엑셀통계고도화_상세설계사양서_v2.5_2026-11-04]] | `ACTIVE` | • 엑셀(XLSX/CSV) 드래그앤드롭 업로드 & 공개 구글시트/웹 링크 자동 연동<br/>• 가계부 전체 CRUD, 카테고리 태그, 고정비 자동 등록, 표준 양식 엑셀 다운로드<br/>• 모바일(터치 카드, 부부 분담률 게이지, 미니 바) vs 웹(대화면 피벗 테이블) 듀얼 통계 | `modules/excel_ledger_engine.js`<br/>`modules/ledger_stats_view.js`<br/>`modules/ledger_stats.css`<br/>`tests/test_ledger_v25.py` |
 | **실시간 초고속 듀얼 동기화** | [[Couple-Calendar_실시간초고속동기화_상세설계사양서_v2.4_2026-11-04]] | `ACTIVE` | • Gist 20초 폴링 지연 한계 극복 ➔ 0.05초(50ms) 양방향 WebSocket 실시간 푸시<br/>• 델타(Delta) 단위 실시간 스트리밍 & 트래픽 98% 절감<br/>• Firebase RTDB 실시간 계층 + GitHub Gist 영구 백업 듀얼 하이브리드 아키텍처 | `modules/realtime_sync_engine.js`<br/>`modules/realtime_sync.css`<br/>`tests/test_realtime_sync.py` |
 | **다중 세션 총괄 거버넌스 규약** | [[_MULTI_AGENT_PROTOCOL]] | `ACTIVE` | • 최고 마스터 AI(Antigravity) 총괄 지휘 및 세션 간 작업 충돌 방지<br/>• `index.html` 단일 통합 책임 & 워커 세션 파일 경계(`modules/`, `tests/`) 잠금<br/>• 실시간 작업 잠금 레지스트리(`_SESSION_LOCK.json`) 운영 및 TDD 의무화 | `_SESSION_LOCK.json`<br/>`_MULTI_AGENT_PROTOCOL.md` |
 | **안 읽은 쪽지 브러시 언베일 인터랙션** | [[Couple-Calendar_안읽은쪽지브러시언베일_상세설계사양서_v2.3_2026-11-04]] | `ACTIVE` | • 기계적 깜빡임 전면 배제 및 감성적 수채화 브러시 스위프 & 스크래치 언베일<br/>• 블러(8px) 펄 오버레이 가림막 및 원터치 붓터치 개봉 & 스파클 파티클(✨💕)<br/>• 개봉 완결 시 자동 읽음 전환 & [안읽음] 수동 재봉인 토글 지원 | `modules/brush_reveal_effect.js`<br/>`modules/brush_reveal.css`<br/>`index.html`<br/>`sw.js`<br/>`tests/test_brush_reveal.py` |
