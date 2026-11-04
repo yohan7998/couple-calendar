@@ -177,6 +177,13 @@
       padding: 1px 5px;
       line-height: 1.2;
       letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .app-version-badge:hover {
+      background: rgba(255, 77, 106, 0.12);
+      transform: scale(1.05);
     }
 
     .app-name {
@@ -4299,6 +4306,16 @@
           card.appendChild(unreadBadge);
         }
 
+        // 미개봉 배지 추가
+        let unreadBadgeHtml = '';
+        if (!isRead && isReceived) {
+          unreadBadgeHtml = `<span class="unread-unsealed-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H4"/><path d="M4 12h16"/></svg> 미개봉</span>`;
+        }
+
+        // Toggle Read Button 제거 (UI 개편)
+        let toggleReadBtnHtml = '';
+
         let grantBtnHtml = '';
         if (note.type === 'ticket-request' && !note.isGranted) {
           const canGrant = note.author !== myRole;
@@ -4364,6 +4381,7 @@
               ${grantBtnHtml}
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
+              ${unreadBadgeHtml}
               <button type="button" class="icon-btn" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="삭제" style="font-size: 13px;">🗑️</button>
             </div>
           </div>
@@ -4420,6 +4438,9 @@
                 statusArea.appendChild(label);
               }
             }
+          });
+        }
+      });
     }
 
     function reactToNote(id) {
