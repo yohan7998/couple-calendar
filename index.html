@@ -4126,12 +4126,20 @@
       const note = (AppState.notes || []).find(n => n.id === id);
       if (!note || typeof ReadStatusEngine === 'undefined') return;
 
-      const isRead = ReadStatusEngine.isNoteRead(note, myRole);
+      const isRead = (note._localRevealed === true) || (localStorage.getItem('note_revealed_' + note.id) === 'true') || ReadStatusEngine.isNoteRead(note, myRole);
       if (isRead) {
         ReadStatusEngine.markNoteAsUnread(note, myRole);
+        note._localRevealed = false;
+        try {
+          localStorage.removeItem('note_revealed_' + note.id);
+        } catch(e){}
         showToast('쪽지를 안 읽음 상태로 변경했습니다.');
       } else {
         ReadStatusEngine.markNoteAsRead(note, myRole);
+        note._localRevealed = true;
+        try {
+          localStorage.setItem('note_revealed_' + note.id, 'true');
+        } catch(e){}
         showToast('쪽지를 확인 완료했습니다! ✓');
       }
       playCutePop();
@@ -4222,9 +4230,10 @@
       notesList.slice().reverse().forEach((note, idx) => {
         const card = document.createElement('div');
         const isReceived = (note.author !== myRole);
-        const isRead = (typeof ReadStatusEngine !== 'undefined')
+        const isLocallyRevealed = (note._localRevealed === true) || (localStorage.getItem('note_revealed_' + note.id) === 'true');
+        const isRead = isLocallyRevealed || ((typeof ReadStatusEngine !== 'undefined')
           ? ReadStatusEngine.isNoteRead(note, myRole)
-          : true;
+          : true);
         const spouseRead = (typeof ReadStatusEngine !== 'undefined')
           ? ReadStatusEngine.isNoteRead(note, spouseRole)
           : false;
@@ -4321,8 +4330,16 @@
             } else {
               note.read = true;
             }
+            if (!Array.isArray(note.readBy)) note.readBy = [];
+            if (!note.readBy.includes(myRole)) note.readBy.push(myRole);
+            note._localRevealed = true;
+            try {
+              localStorage.setItem('note_revealed_' + note.id, 'true');
+            } catch(e){}
+            card._isRevealed = true;
             playCutePop();
             saveStateLocal();
+            broadcastRealtimeDelta('notes', 'update', note);
             updateNotesBadge();
             syncWithGist(false);
             card.classList.remove('unread');
@@ -5135,7 +5152,9 @@
           AppState = mergeStates(AppState, remoteState);
           saveStateLocal();
           checkNewNotesReceived(previousNotes, AppState.notes);
-          renderAll();
+          if (isPull) {
+            renderAll();
+          }
           updateSyncCardUI();
         }
 

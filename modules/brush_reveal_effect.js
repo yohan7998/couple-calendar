@@ -137,6 +137,9 @@
     const targetContainer = container ||
       (canvas.closest ? canvas.closest('.brush-reveal-container') : null) ||
       canvas.parentElement;
+    if (targetContainer) {
+      targetContainer._isRevealed = true; // 이미 개봉된 카드 마킹
+    }
 
     const noteId = canvas._noteId || (targetContainer && targetContainer._noteId);
 
@@ -225,6 +228,7 @@
     }
 
     function finishSweep() {
+      if (canvas) canvas.dataset.revealed = 'true'; // 완료 마킹
       if (ctx) {
         try {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -307,6 +311,9 @@
    */
   function attach(cardElement, note, onRevealed) {
     if (!cardElement || typeof document === 'undefined') return;
+
+    // 이미 개봉된 카드에는 캔버스 재부착 방지
+    if (cardElement._isRevealed === true) return;
 
     // 이미 언베일 캔버스가 부착되어 있다면 중복 부착 방지
     if (cardElement.querySelector('.brush-reveal-canvas')) return;
@@ -441,6 +448,7 @@
     // 원터치 탭(click) 리스너 직접 바인딩
     canvas.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (canvas.dataset.revealed === 'true' || canvas.dataset.revealing === 'true') return;
       sweepReveal(canvas, onRevealed, cardElement);
     });
 
@@ -461,6 +469,7 @@
 
     canvas.addEventListener('touchend', (e) => {
       e.stopPropagation();
+      e.preventDefault(); // 300ms 지연 가상 click 이벤트 버블링 원천 차단
       handleEnd();
     }, { passive: false });
 
@@ -530,6 +539,9 @@
     // 3. 오버레이 재구성
     const targetNote = note || (cardElement._brushRevealData && cardElement._brushRevealData.note);
     const targetCallback = onRevealed || (cardElement._brushRevealData && cardElement._brushRevealData.onRevealed);
+
+    // reset 시 개봉 상태 초기화하여 재개봉 가능하도록
+    cardElement._isRevealed = false;
 
     if (targetNote && targetCallback) {
       attach(cardElement, targetNote, targetCallback);
