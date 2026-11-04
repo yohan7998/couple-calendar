@@ -589,3 +589,34 @@
     border-left: 2px solid currentColor !important;
   }
 }
+
+/* Expense Badge in Calendar */
+.badge-expense-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin: 1px 0;
+}
+
+.badge-expense-icon {
+  font-size: 11px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
+}
+
+.badge-expense-amount {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #E11D48;
+  background: #FFE4E6;
+  border: 1px solid #FECDD3;
+  border-radius: 6px;
+  padding: 1px 3px;
+  margin-top: 1.5px;
+  white-space: nowrap;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  font-feature-settings: "tnum";
+}

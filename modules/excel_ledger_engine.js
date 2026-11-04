@@ -185,6 +185,54 @@ window.ExcelLedgerEngine = (function() {
             });
     }
 
+    /**
+     * 거래 데이터의 고유 지문(Fingerprint) 생성
+     * 동일 날짜, 금액, 유형, 카테고리, 메모의 중복 거래를 식별
+     * @param {object} tx - 트랜잭션 객체
+     * @returns {string} 고유 지문 문자열
+     */
+    function generateTxFingerprint(tx) {
+        if (!tx) return '';
+        const d = (tx.date || '').trim();
+        const a = Math.round(Number(tx.amount || 0));
+        const t = (tx.type || 'expense').trim().toLowerCase();
+        const c = (tx.category || '').trim().toLowerCase();
+        const m = (tx.memo || '').trim().toLowerCase();
+        return `${d}|${a}|${t}|${c}|${m}`;
+    }
+
+    /**
+     * 기존 거래 목록과 수신 거래 목록을 비교하여 중복을 제외하고 신규 항목만 추출 (멱등성 보장)
+     * @param {Array<object>} existingList - 기존 트랜잭션 배열
+     * @param {Array<object>} incomingList - 새로 수신된 트랜잭션 배열
+     * @returns {object} { toAdd: Array, addedCount: number, skippedCount: number, total: number }
+     */
+    function deduplicateTransactions(existingList, incomingList) {
+        const existing = Array.isArray(existingList) ? existingList : [];
+        const incoming = Array.isArray(incomingList) ? incomingList : [];
+        const seenFingerprints = new Set(existing.map(generateTxFingerprint));
+
+        const toAdd = [];
+        let skippedCount = 0;
+
+        incoming.forEach(tx => {
+            const fp = generateTxFingerprint(tx);
+            if (!seenFingerprints.has(fp)) {
+                seenFingerprints.add(fp);
+                toAdd.push(tx);
+            } else {
+                skippedCount++;
+            }
+        });
+
+        return {
+            toAdd,
+            addedCount: toAdd.length,
+            skippedCount,
+            total: incoming.length
+        };
+    }
+
     return {
         normalizeHeaders,
         parseAmount,
@@ -194,6 +242,8 @@ window.ExcelLedgerEngine = (function() {
         parseCsvString,
         parseExcelWorkbook,
         exportToExcelData,
-        fetchSharedCsv
+        fetchSharedCsv,
+        generateTxFingerprint,
+        deduplicateTransactions
     };
 })();

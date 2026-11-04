@@ -600,6 +600,37 @@
       line-height: 1;
     }
 
+    /* Expense amount badge in calendar */
+    .badge-expense-wrapper {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      margin: 1px 0;
+    }
+
+    .badge-expense-icon {
+      font-size: 11px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
+    }
+
+    .badge-expense-amount {
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #E11D48;
+      background: #FFE4E6;
+      border: 1px solid #FECDD3;
+      border-radius: 6px;
+      padding: 1px 3px;
+      margin-top: 1.5px;
+      white-space: nowrap;
+      letter-spacing: -0.5px;
+      line-height: 1;
+      font-feature-settings: "tnum";
+    }
+
     /* Notes Split Mailboxes */
     .notes-subtabs {
       display: flex;
@@ -2265,11 +2296,18 @@
         <div id="day-notes-list"></div>
       </div>
 
+      <!-- Ledger on this day -->
+      <div class="day-detail-section">
+        <div class="section-subtitle">💰 생활비 지출 내역</div>
+        <div id="day-ledger-list"></div>
+      </div>
+
       <!-- Actions -->
-      <div style="display: flex; gap: 8px; margin-top: 16px;">
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px;">
         <button class="btn-submit" style="background: #FFE885; color: #5C4B00;" onclick="openRecordDrinkForDay()">🍺 술 기록</button>
         <button class="btn-submit" style="background: #C5E5FC; color: #003C66;" onclick="openRecordScheduleForDay()">📅 일정 추가</button>
         <button class="btn-submit" style="background: #FFD4DC; color: #7A192C;" onclick="openRecordNoteForDay()">💌 쪽지 작성</button>
+        <button class="btn-submit" style="background: #E8F5E9; color: #1B5E20;" onclick="openRecordLedgerForDay()">💰 생활비 등록</button>
       </div>
     </div>
   </div>
@@ -2959,7 +2997,38 @@
         const text = await res.text();
         return parseCsvString(text);
       }
-      return { normalizeHeaders, parseAmount, normalizePayer, parseCsvString, parseExcelWorkbook, exportToExcelData, fetchSharedCsv };
+      function generateTxFingerprint(tx) {
+        if (!tx) return '';
+        const d = (tx.date || '').trim();
+        const a = Math.round(Number(tx.amount || 0));
+        const t = (tx.type || 'expense').trim().toLowerCase();
+        const c = (tx.category || '').trim().toLowerCase();
+        const m = (tx.memo || '').trim().toLowerCase();
+        return `${d}|${a}|${t}|${c}|${m}`;
+      }
+      function deduplicateTransactions(existingList, incomingList) {
+        const existing = Array.isArray(existingList) ? existingList : [];
+        const incoming = Array.isArray(incomingList) ? incomingList : [];
+        const seenFingerprints = new Set(existing.map(generateTxFingerprint));
+        const toAdd = [];
+        let skippedCount = 0;
+        incoming.forEach(tx => {
+          const fp = generateTxFingerprint(tx);
+          if (!seenFingerprints.has(fp)) {
+            seenFingerprints.add(fp);
+            toAdd.push(tx);
+          } else {
+            skippedCount++;
+          }
+        });
+        return {
+          toAdd,
+          addedCount: toAdd.length,
+          skippedCount,
+          total: incoming.length
+        };
+      }
+      return { normalizeHeaders, parseAmount, normalizePayer, parseCsvString, parseExcelWorkbook, exportToExcelData, fetchSharedCsv, generateTxFingerprint, deduplicateTransactions };
     })();
 
     // --- Module 3: LedgerStatsEngine ---
@@ -3285,6 +3354,7 @@
         // Collect Badges for this day
         const dayDrinks = AppState.drinks.filter(d => d.date === dateStr);
         const dayNotes = AppState.notes.filter(n => n.date === dateStr);
+        const dayTxs = (AppState.ledger?.transactions || []).filter(t => t.date === dateStr && t.type === 'expense');
 
         let badgesHtml = '<div class="day-badges">';
         if (dayDrinks.length > 0) {
@@ -3293,6 +3363,18 @@
             <div class="badge-drink-wrapper" title="음주 ${dayDrinks.length}회">
               <span class="badge-drink-icon">${icon}</span>
               <span class="badge-drink-count">${dayDrinks.length}회</span>
+            </div>
+          `;
+        }
+        if (dayTxs.length > 0) {
+          const dayExpenseTotal = dayTxs.reduce((sum, t) => sum + (t.amount || 0), 0);
+          const formattedAmt = dayExpenseTotal >= 10000 
+            ? (Math.round(dayExpenseTotal / 1000) / 10) + '만' 
+            : dayExpenseTotal.toLocaleString() + '원';
+          badgesHtml += `
+            <div class="badge-expense-wrapper" title="지출 ${dayTxs.length}건: 총 ${dayExpenseTotal.toLocaleString()}원">
+              <span class="badge-expense-icon">💰</span>
+              <span class="badge-expense-amount">${formattedAmt}</span>
             </div>
           `;
         }
@@ -3908,6 +3990,33 @@
         }).join('');
       }
 
+      // Ledger on this day
+      const lList = document.getElementById('day-ledger-list');
+      if (lList) {
+        const txs = (AppState.ledger?.transactions || []).filter(t => t.date === dateStr);
+        if (txs.length === 0) {
+          lList.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 4px 0;">기록된 생활비가 없어요 ✨</div>';
+        } else {
+          lList.innerHTML = txs.map(t => {
+            const isExpense = t.type === 'expense';
+            const payerName = t.payer === 'juni' ? '주니' : t.payer === 'yongi' ? '용이' : '공동';
+            const payerClass = t.payer || 'together';
+            return `
+              <div class="item-pill" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span class="payer-badge ${payerClass}" style="font-size:10px; padding:2px 6px; border-radius:4px; margin-right:4px;">${payerName}</span>
+                  <span style="font-weight:700; color:${isExpense ? 'var(--color-expense, #E11D48)' : 'var(--color-income, #2563EB)'};">
+                    ${isExpense ? '-' : '+'}${Number(t.amount || 0).toLocaleString()}원
+                  </span>
+                  <span style="font-size:11.5px; color:var(--text-secondary); margin-left:4px;">[${escapeHtml(t.category || '기타')}] ${t.memo ? escapeHtml(t.memo) : ''}</span>
+                </div>
+                <button class="icon-btn" onclick="deleteTransactionFromDayDetail('${t.id}')" style="font-size: 14px;">🗑️</button>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
       openModal('day-detail-modal');
     }
 
@@ -3948,6 +4057,22 @@
       openDayDetail(selectedDate);
       syncWithGist(false);
       showToast("쪽지가 삭제되었습니다.");
+    }
+
+    function deleteTransactionFromDayDetail(id) {
+      if (!confirm("이 생활비 내역을 삭제하시겠습니까?")) return;
+      recordDeletedId(id);
+      AppState.ledger.transactions = (AppState.ledger.transactions || []).filter(t => t.id !== id);
+      saveStateLocal();
+      renderAll();
+      openDayDetail(selectedDate);
+      syncWithGist(false);
+      showToast("생활비 내역이 삭제되었습니다 🗑️");
+    }
+
+    function openRecordLedgerForDay() {
+      closeModal('day-detail-modal');
+      openAddTransactionModal();
     }
 
     function openRecordDrinkForDay() {
@@ -4829,6 +4954,15 @@ ${inviteUrl}`;
       showToast("공유 시트 링크가 저장되었습니다 💾");
     }
 
+    function ingestTransactionsWithDeduplication(incomingTxs) {
+      if (!AppState.ledger) AppState.ledger = { monthlyBudget: 2500000, sharedSpreadsheetUrl: '', transactions: [] };
+      if (!Array.isArray(AppState.ledger.transactions)) AppState.ledger.transactions = [];
+
+      const result = window.ExcelLedgerEngine.deduplicateTransactions(AppState.ledger.transactions, incomingTxs);
+      result.toAdd.forEach(t => AppState.ledger.transactions.push(t));
+      return result;
+    }
+
     async function syncSharedSpreadsheet() {
       const url = document.getElementById('setting-sheet-url').value.trim() || (AppState.ledger && AppState.ledger.sharedSpreadsheetUrl);
       if (!url) {
@@ -4842,14 +4976,17 @@ ${inviteUrl}`;
           alert("시트에서 유효한 내역을 찾을 수 없습니다. URL 권한(웹에 게시)을 확인해주세요.");
           return;
         }
-        if (!AppState.ledger.transactions) AppState.ledger.transactions = [];
-        txs.forEach(t => AppState.ledger.transactions.push(t));
+        const { addedCount, skippedCount, total } = ingestTransactionsWithDeduplication(txs);
         saveStateLocal();
         closeModal('shared-sheet-modal');
         renderLedgerView();
         renderStats();
         syncWithGist(false);
-        showToast(`🎉 ${txs.length}건의 내역을 공유 시트에서 성공적으로 가져왔습니다!`);
+        if (skippedCount > 0) {
+          showToast(`🎉 총 ${total}건 중 신규 ${addedCount}건 등록 완료! (중복 ${skippedCount}건 제외)`);
+        } else {
+          showToast(`🎉 ${addedCount}건의 내역을 공유 시트에서 성공적으로 가져왔습니다!`);
+        }
       } catch (err) {
         alert(`공유 시트 가져오기 실패: ${err.message}\n구글 시트의 [파일] ➔ [공유] ➔ [웹에 게시] CSV 링크인지 확인해주세요.`);
       }
@@ -4884,15 +5021,16 @@ ${inviteUrl}`;
             return;
           }
 
-          if (!AppState.ledger) AppState.ledger = {};
-          if (!Array.isArray(AppState.ledger.transactions)) AppState.ledger.transactions = [];
-
-          parsedTxs.forEach(t => AppState.ledger.transactions.push(t));
+          const { addedCount, skippedCount, total } = ingestTransactionsWithDeduplication(parsedTxs);
           saveStateLocal();
           renderLedgerView();
           renderStats();
           syncWithGist(false);
-          showToast(`🎉 엑셀에서 ${parsedTxs.length}건의 거래 내역을 일괄 등록했습니다!`);
+          if (skippedCount > 0) {
+            showToast(`🎉 총 ${total}건 중 신규 ${addedCount}건 등록 완료! (중복 ${skippedCount}건 제외)`);
+          } else {
+            showToast(`🎉 엑셀에서 ${addedCount}건의 거래 내역을 일괄 등록했습니다!`);
+          }
         } catch (err) {
           console.error("Excel import error:", err);
           alert("엑셀 파싱 중 오류가 발생했습니다: " + err.message);

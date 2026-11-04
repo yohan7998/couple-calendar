@@ -15,7 +15,8 @@ class TestModernDesign(unittest.TestCase):
     def setUp(self):
         self.css_path = CSS_FILE
         self.assertTrue(os.path.exists(self.css_path), "CSS 파일이 존재하지 않습니다.")
-        self.css_content = open(self.css_path, encoding='utf-8').read()
+        with open(self.css_path, encoding='utf-8') as f:
+            self.css_content = f.read()
 
     def test_file_exists(self):
         """CSS 파일 존재 확인"""
