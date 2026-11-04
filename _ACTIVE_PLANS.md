@@ -1,6 +1,6 @@
 ---
 title: 달콤살벌 캘린더 활성 계획서 및 설계 정본 색인 (SSOT Registry)
-version: v2.2.0
+version: v2.4.0
 status: active
 created: 2026-11-02
 updated: 2026-11-04
@@ -18,10 +18,13 @@ tags:
 
 ---
 
-## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v2.2.0)
+## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v2.4.0)
 
 | 구분 | 문서명 (버전 및 일자) | 상태 | 핵심 내용 및 역할 | 연계 구현 산출물 |
 | :---: | :--- | :---: | :--- | :--- |
+| **실시간 초고속 듀얼 동기화** | [[Couple-Calendar_실시간초고속동기화_상세설계사양서_v2.4_2026-11-04]] | `ACTIVE` | • Gist 20초 폴링 지연 한계 극복 ➔ 0.05초(50ms) 양방향 WebSocket 실시간 푸시<br/>• 델타(Delta) 단위 실시간 스트리밍 & 트래픽 98% 절감<br/>• Firebase RTDB 실시간 계층 + GitHub Gist 영구 백업 듀얼 하이브리드 아키텍처 | `modules/realtime_sync_engine.js`<br/>`modules/realtime_sync.css`<br/>`tests/test_realtime_sync.py` |
+| **다중 세션 총괄 거버넌스 규약** | [[_MULTI_AGENT_PROTOCOL]] | `ACTIVE` | • 최고 마스터 AI(Antigravity) 총괄 지휘 및 세션 간 작업 충돌 방지<br/>• `index.html` 단일 통합 책임 & 워커 세션 파일 경계(`modules/`, `tests/`) 잠금<br/>• 실시간 작업 잠금 레지스트리(`_SESSION_LOCK.json`) 운영 및 TDD 의무화 | `_SESSION_LOCK.json`<br/>`_MULTI_AGENT_PROTOCOL.md` |
+| **안 읽은 쪽지 브러시 언베일 인터랙션** | [[Couple-Calendar_안읽은쪽지브러시언베일_상세설계사양서_v2.3_2026-11-04]] | `ACTIVE` | • 기계적 깜빡임 전면 배제 및 감성적 수채화 브러시 스위프 & 스크래치 언베일<br/>• 블러(8px) 펄 오버레이 가림막 및 원터치 붓터치 개봉 & 스파클 파티클(✨💕)<br/>• 개봉 완결 시 자동 읽음 전환 & [안읽음] 수동 재봉인 토글 지원 | `modules/brush_reveal_effect.js`<br/>`modules/brush_reveal.css`<br/>`index.html`<br/>`sw.js`<br/>`tests/test_brush_reveal.py` |
 | **쪽지 및 메모 읽음/안읽음 분리 표현** | [[Couple-Calendar_쪽지및메모읽음구분_상세설계사양서_v2.2_2026-11-04]] | `ACTIVE` | • 쪽지 및 캘린더 일정 메모의 확인(읽음/안읽음) 상태 분리 표현<br/>• NEW 마이크로 뱃지, 미확인 펄스 닷, 차분한 읽음 라벨 및 타임스탬프<br/>• 미확인 개수 실시간 뱃지 연동 및 원클릭 '모두 읽음' 지원<br/>• Gist 동기화 시 읽음 상태 무손실 양방향 머지 보장 | `modules/read_status_engine.js`<br/>`modules/read_status.css`<br/>`index.html` |
 | **가계부 캘린더 일체화 & 스마트 멱등성** | [[Couple-Calendar_가계부데이터연계고도화_상세설계사양서_v2.2_2026-11-04]] | `ACTIVE` | • 캘린더 날짜 셀 지출 배지 표출 (💰 금액 단축 표기)<br/>• 날짜 상세 모달 내 가계부 지출 리스트 및 퀵 등록 버튼 연계<br/>• 엑셀/구글 시트 임포트 시 스마트 지문(Fingerprint) 기반 멱등성 중복 방지 | `index.html`<br/>`modules/excel_ledger_engine.js`<br/>E2E 테스트 스위트 |
 | **모던 디자인 & 가독성 대폭 향상** | [[Couple-Calendar_모던디자인및가독성개편_상세설계사양서_v2.1_2026-11-04]] | `ACTIVE` | • WCAG AAA 고대비 타이포그래피 & 뉴트럴 배경 (`#0F172A`, `#F8FAFC`)<br/>• 올드한 이모지 ➔ Lucide 스타일 정밀 SVG 인라인 아이콘 체계<br/>• 3D 메달리온 로고 완벽 보존 & 애플/토스 감성의 모던 카드 보더<br/>• 숫자 고정폭 정렬(`tnum, cv05`)로 가계부/날짜 가독성 극대화 | `index.html`<br/>`Couple-Calendar.html` |

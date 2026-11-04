@@ -1,0 +1,126 @@
+/**
+ * Brush Reveal Effect Styling (Couple-Calendar v2.3.0)
+ * 안 읽은 쪽지 브러시 언베일 인터랙션 & 글래스모피즘 스타일
+ */
+
+/* 1. 쪽지 본문 블러 및 전환 상태 */
+.note-content.unrevealed {
+  filter: blur(8px);
+  opacity: 0.15;
+  user-select: none;
+  pointer-events: none;
+  transition: filter 400ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.note-content.revealed {
+  filter: blur(0px);
+  opacity: 1;
+  user-select: auto;
+  pointer-events: auto;
+  transition: filter 400ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 2. 브러시 언베일 캔버스 컨테이너 (글래스모피즘 & 펄 샴페인 로즈) */
+.brush-reveal-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md, 12px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.brush-reveal-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  touch-action: none;
+  border-radius: inherit;
+  transition: opacity 300ms ease;
+}
+
+.brush-reveal-canvas.fading-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 3. 감성 가이드 칩 및 오버레이 힌트 */
+.brush-reveal-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #E11D48;
+  letter-spacing: -0.3px;
+  animation: pulseGuide 2s ease-in-out infinite;
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.brush-reveal-guide.hidden {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+@keyframes pulseGuide {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 4px 16px rgba(244, 63, 94, 0.15);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.04);
+    box-shadow: 0 6px 20px rgba(244, 63, 94, 0.28);
+  }
+}
+
+/* 4. 스파클 버스트 파티클 애니메이션 (개봉 순간 ✨💕) */
+.sparkle-particle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 30;
+  font-size: 16px;
+  line-height: 1;
+  user-select: none;
+  animation: burstParticle 700ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes burstParticle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(1.2) rotate(var(--rot, 20deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dx, 0px) * 1.3), calc(var(--dy, 0px) * 1.3)) scale(0.3) rotate(var(--rot, 40deg));
+  }
+}
+
+/* 5. 샴페인 펄 쉬머 오버레이 */
+.brush-pearl-shimmer {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 245, 240, 0.95) 0%,
+    rgba(255, 230, 235, 0.92) 50%,
+    rgba(254, 242, 230, 0.95) 100%
+  );
+}
+

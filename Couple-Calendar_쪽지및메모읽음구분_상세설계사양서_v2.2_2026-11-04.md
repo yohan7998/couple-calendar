@@ -115,3 +115,4 @@ interface Schedule {
 2. 기존 회귀 테스트 (`test_couple_calendar_e2e.py`, `test_modern_design.py` 등 56개) 100% 통과 유지.
 3. agent-browser 실측: 모바일/웹에서 읽음/안읽음 시각적 차이 및 뱃지 숫자 갱신 확인.
 4. 옵시디언 vault 동기화 및 `Couple-Calendar_버전기록_CHANGELOG.md` v2.2.0 기록.
+

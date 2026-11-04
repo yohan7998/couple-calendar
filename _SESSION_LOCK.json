@@ -1,0 +1,47 @@
+{
+  "project": "couple-calendar",
+  "version": "v2.4.0",
+  "updated_at": "2026-11-04T10:38:00+09:00",
+  "master_ai": "Antigravity (Supreme Commander)",
+  "active_locks": [
+    {
+      "lock_id": "LOCK-002",
+      "session_name": "worker_realtime_sync",
+      "assigned_to": "전체 워커 세션 (1651, 1685, 1656)",
+      "target_files": [
+        "modules/realtime_sync_engine.js",
+        "modules/realtime_sync.css",
+        "tests/test_realtime_sync.py"
+      ],
+      "status": "in_progress",
+      "acquired_at": "2026-11-04T10:38:00+09:00",
+      "expires_at": "2026-11-04T13:30:00+09:00",
+      "description": "0.05초 초저지연 실시간 동기화 듀얼 엔진 구축 및 UI 컴포넌트 개발"
+    },
+    {
+      "lock_id": "LOCK-001",
+      "session_name": "worker_brush_reveal",
+      "assigned_to": "옆세션 (Claude Code / Free세션)",
+      "target_files": [
+        "modules/brush_reveal_effect.js",
+        "modules/brush_reveal.css",
+        "tests/test_brush_reveal.py"
+      ],
+      "status": "completed",
+      "acquired_at": "2026-11-04T10:32:00+09:00",
+      "expires_at": "2026-11-04T13:00:00+09:00",
+      "description": "안 읽은 쪽지 브러시 언베일(Brush Reveal) 인터랙션 모듈 및 스타일 구축"
+    }
+  ],
+  "protected_files": [
+    "index.html",
+    "sw.js",
+    "_ACTIVE_PLANS.md",
+    "Couple-Calendar_버전기록_CHANGELOG.md"
+  ],
+  "rules": {
+    "protected_files_modification": "ONLY_MASTER_AI",
+    "module_creation": "WORKER_ALLOWED_UNDER_ASSIGNED_TARGETS",
+    "git_push_permission": "ONLY_MASTER_AI"
+  }
+}

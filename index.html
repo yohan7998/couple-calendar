@@ -38,8 +38,10 @@
   <link rel="stylesheet" href="modules/modern_theme.css">
   <link rel="stylesheet" href="modules/modern_components.css">
   <link rel="stylesheet" href="modules/read_status.css">
+  <link rel="stylesheet" href="modules/brush_reveal.css">
   <script src="modules/modern_icons.js"></script>
   <script src="modules/read_status_engine.js"></script>
+  <script src="modules/brush_reveal_effect.js"></script>
 
   <style>
     :root {
@@ -4155,6 +4157,24 @@
           </div>
         `;
         container.appendChild(card);
+
+        if (isReceived && !isRead && typeof BrushRevealEngine !== 'undefined') {
+          BrushRevealEngine.attach(card, note.id, (revealedNoteId) => {
+            if (typeof ReadStatusEngine !== 'undefined') {
+              ReadStatusEngine.markNoteAsRead(note, myRole);
+            } else {
+              note.read = true;
+            }
+            playCutePop();
+            saveStateLocal();
+            updateNotesBadge();
+            syncWithGist(false);
+            const unreadBadge = card.querySelector('.badge-unread-new');
+            if (unreadBadge) unreadBadge.remove();
+            card.classList.remove('unread');
+            card.classList.add('read');
+          });
+        }
       });
     }
 
