@@ -37,7 +37,9 @@
   <!-- Modern Design System & Icon Suite -->
   <link rel="stylesheet" href="modules/modern_theme.css">
   <link rel="stylesheet" href="modules/modern_components.css">
+  <link rel="stylesheet" href="modules/read_status.css">
   <script src="modules/modern_icons.js"></script>
+  <script src="modules/read_status_engine.js"></script>
 
   <style>
     :root {
@@ -1961,7 +1963,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="현재 정본 버전: v2.1.0 (2026-11-04)">v2.1</span>
+            <span class="app-version-badge" title="현재 정본 버전: v2.2.0 (2026-11-04)">v2.2</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -2124,13 +2126,18 @@
 
     <!-- VIEW 3: NOTES (쪽지함 - 주니->용이, 용이->주니 2분할) -->
     <div class="tab-view" id="notes-view">
-      <!-- 2 Mailboxes Subtabs -->
-      <div class="notes-subtabs">
-        <button class="notes-subtab-btn active" id="subtab-juni-to-yongi" onclick="switchNotesSubtab('juni-to-yongi')">
-          🐻 주니 ➔ 용이 <span class="subtab-count" id="count-juni-to-yongi">(0)</span>
-        </button>
-        <button class="notes-subtab-btn" id="subtab-yongi-to-juni" onclick="switchNotesSubtab('yongi-to-juni')">
-          🐰 용이 ➔ 주니 <span class="subtab-count" id="count-yongi-to-juni">(0)</span>
+      <!-- 2 Mailboxes Subtabs & Mark All Read Toolbar -->
+      <div class="notes-subtabs-wrap" style="display: flex; gap: 8px; align-items: center; margin-bottom: 14px;">
+        <div class="notes-subtabs" style="display: flex; gap: 8px; flex: 1; margin-bottom: 0;">
+          <button class="notes-subtab-btn active" id="subtab-juni-to-yongi" onclick="switchNotesSubtab('juni-to-yongi')">
+            🐻 주니 ➔ 용이 <span class="subtab-count" id="count-juni-to-yongi">(0)</span>
+          </button>
+          <button class="notes-subtab-btn" id="subtab-yongi-to-juni" onclick="switchNotesSubtab('yongi-to-juni')">
+            🐰 용이 ➔ 주니 <span class="subtab-count" id="count-yongi-to-juni">(0)</span>
+          </button>
+        </div>
+        <button type="button" class="btn-mark-all-read" id="btn-mark-all-read" onclick="handleMarkAllNotesAsRead()" title="수신된 쪽지 모두 읽음 처리">
+          <span>✓ 모두 읽음</span>
         </button>
       </div>
 
@@ -2536,7 +2543,7 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.0.0</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.2.0</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
           최근 갱신: 2026-11-04 (가족 일정 및 가계부·생활비 관리 통합 대개편)
@@ -2670,9 +2677,114 @@
 
   <script>
     /**
-     * Couple-Calendar (SweetSync Calendar) Engine v2.1
-     * Modern UI / Design Taste Frontend / Emil Design Eng Polish
+     * Couple-Calendar (SweetSync Calendar) Engine v2.2
+     * Modern UI & Read/Unread Note & Memo Status Engine
      */
+
+    // --- Module -1: ReadStatusEngine Embedded Fallback Guarantee ---
+    if (typeof window.ReadStatusEngine === 'undefined') {
+      window.ReadStatusEngine = {
+        isNoteRead: function(note, userRole) {
+          if (!note) return true;
+          if (note.author === userRole) return true;
+          if (note.read === true) return true;
+          if (Array.isArray(note.readBy) && note.readBy.includes(userRole)) return true;
+          return false;
+        },
+        markNoteAsRead: function(note, userRole) {
+          if (!note) return note;
+          note.read = true;
+          note.readAt = new Date().toISOString();
+          if (!Array.isArray(note.readBy)) note.readBy = [];
+          if (userRole && !note.readBy.includes(userRole)) note.readBy.push(userRole);
+          return note;
+        },
+        markNoteAsUnread: function(note, userRole) {
+          if (!note) return note;
+          note.read = false;
+          delete note.readAt;
+          if (Array.isArray(note.readBy) && userRole) {
+            note.readBy = note.readBy.filter(function(r) { return r !== userRole; });
+          }
+          return note;
+        },
+        getUnreadNotesCount: function(notes, userRole) {
+          if (!Array.isArray(notes)) return 0;
+          var self = this;
+          return notes.filter(function(note) {
+            if (note.author === userRole) return false;
+            return !self.isNoteRead(note, userRole);
+          }).length;
+        },
+        markAllNotesAsRead: function(notes, userRole) {
+          if (!Array.isArray(notes)) return 0;
+          var self = this;
+          var count = 0;
+          notes.forEach(function(note) {
+            if (note.author !== userRole && !self.isNoteRead(note, userRole)) {
+              self.markNoteAsRead(note, userRole);
+              count++;
+            }
+          });
+          return count;
+        },
+        isScheduleMemoRead: function(schedule, userRole) {
+          if (!schedule || !schedule.memo || schedule.memo.trim() === '') return true;
+          if (schedule.author === userRole) return true;
+          if (schedule.memoRead === true) return true;
+          if (Array.isArray(schedule.readBy) && schedule.readBy.includes(userRole)) return true;
+          return false;
+        },
+        markScheduleMemoAsRead: function(schedule, userRole) {
+          if (!schedule) return schedule;
+          schedule.memoRead = true;
+          schedule.memoReadAt = new Date().toISOString();
+          if (!Array.isArray(schedule.readBy)) schedule.readBy = [];
+          if (userRole && !schedule.readBy.includes(userRole)) schedule.readBy.push(userRole);
+          return schedule;
+        },
+        getUnreadMemosCountForDate: function(schedules, dateStr, userRole) {
+          if (!Array.isArray(schedules) || !dateStr) return 0;
+          var self = this;
+          return schedules.filter(function(s) {
+            if (!s.memo || s.memo.trim() === '') return false;
+            var match = false;
+            if (s.date === dateStr) {
+              match = true;
+            } else if (s.startDate && s.endDate) {
+              match = (dateStr >= s.startDate && dateStr <= s.endDate);
+            }
+            if (!match) return false;
+            return !self.isScheduleMemoRead(s, userRole);
+          }).length;
+        },
+        mergeReadStatus: function(localItem, remoteItem) {
+          if (!localItem && !remoteItem) return null;
+          if (!localItem) return remoteItem;
+          if (!remoteItem) return localItem;
+          var merged = Object.assign({}, remoteItem, localItem);
+          var isRead = (localItem.read === true || remoteItem.read === true);
+          merged.read = isRead;
+          if (localItem.readAt || remoteItem.readAt) {
+            merged.readAt = (localItem.readAt && remoteItem.readAt)
+              ? (localItem.readAt > remoteItem.readAt ? localItem.readAt : remoteItem.readAt)
+              : (localItem.readAt || remoteItem.readAt);
+          }
+          var isMemoRead = (localItem.memoRead === true || remoteItem.memoRead === true);
+          merged.memoRead = isMemoRead;
+          if (localItem.memoReadAt || remoteItem.memoReadAt) {
+            merged.memoReadAt = (localItem.memoReadAt && remoteItem.memoReadAt)
+              ? (localItem.memoReadAt > remoteItem.memoReadAt ? localItem.memoReadAt : remoteItem.memoReadAt)
+              : (localItem.memoReadAt || remoteItem.memoReadAt);
+          }
+          var readersSet = new Set();
+          if (Array.isArray(localItem.readBy)) localItem.readBy.forEach(function(r) { readersSet.add(r); });
+          if (Array.isArray(remoteItem.readBy)) remoteItem.readBy.forEach(function(r) { readersSet.add(r); });
+          merged.readBy = Array.from(readersSet);
+          return merged;
+        }
+      };
+    }
 
     // --- Module 0: ModernIcons Embedded Fallback Guarantee ---
     if (typeof window.ModernIcons === 'undefined') {
@@ -3385,8 +3497,18 @@
             badgesHtml += `<span class="badge-schedule-dot" title="일정"></span>`;
           }
         }
+        const myRole = getMyRole();
+        const unreadMemoCount = (typeof ReadStatusEngine !== 'undefined') 
+          ? ReadStatusEngine.getUnreadMemosCountForDate(AppState.schedules, dateStr, myRole) 
+          : 0;
+        if (unreadMemoCount > 0) {
+          badgesHtml += `<span class="badge-memo-unread" title="미확인 일정 메모 ${unreadMemoCount}건"></span>`;
+        }
         if (dayNotes.length > 0) {
-          badgesHtml += `<span class="badge-note" title="쪽지">💌</span>`;
+          const hasUnreadDayNote = (typeof ReadStatusEngine !== 'undefined')
+            ? dayNotes.some(n => n.author !== myRole && !ReadStatusEngine.isNoteRead(n, myRole))
+            : false;
+          badgesHtml += `<span class="badge-note ${hasUnreadDayNote ? 'has-unread' : ''}" title="쪽지${hasUnreadDayNote ? ' (새 쪽지)' : ''}">💌</span>`;
         }
 
         badgesHtml += '</div>';
@@ -3648,8 +3770,9 @@
       }
 
       const latestNote = spouseNotes[0];
-      const lastSeenId = localStorage.getItem('couple_last_seen_note_id');
-      const isNew = lastSeenId !== latestNote.id;
+      const isUnread = (typeof ReadStatusEngine !== 'undefined')
+        ? !ReadStatusEngine.isNoteRead(latestNote, myRole)
+        : (localStorage.getItem('couple_last_seen_note_id') !== latestNote.id);
 
       const typeLabels = {
         'love': { label: '💌 사랑/응원', cls: 'love' },
@@ -3664,12 +3787,12 @@
       const heartCount = (Array.isArray(latestNote.likedBy) ? latestNote.likedBy.length : (latestNote.reactions || 0));
 
       container.innerHTML = `
-        <div class="note-alert-inner ${isNew ? 'is-new' : ''}" onclick="onAlertCardClick('${latestNote.id}')">
+        <div class="note-alert-inner ${isUnread ? 'is-new' : ''}" onclick="onAlertCardClick('${latestNote.id}')">
           <div class="note-alert-header">
             <div class="note-alert-sender">
               <span class="sender-avatar">${spouseAvatar}</span>
               <span class="sender-name">${spouseName}의 최근 쪽지</span>
-              ${isNew ? '<span class="pulse-new-badge">✨ NEW</span>' : ''}
+              ${isUnread ? '<span class="pulse-new-badge"><span class="dot-unread-pulse"></span>NEW</span>' : ''}
             </div>
             <div class="note-alert-meta">
               <span class="note-type-chip ${typeInfo.cls}">${typeInfo.label}</span>
@@ -3754,13 +3877,97 @@
     }
 
     function markLatestNoteAsRead(id) {
-      if (id) {
-        localStorage.setItem('couple_last_seen_note_id', id);
-        const card = document.querySelector('.note-alert-inner');
-        if (card) card.classList.remove('is-new');
-        const badge = document.querySelector('.pulse-new-badge');
-        if (badge) badge.remove();
+      if (!id) return;
+      localStorage.setItem('couple_last_seen_note_id', id);
+      const myRole = getMyRole();
+      const note = (AppState.notes || []).find(n => n.id === id);
+      if (note && typeof ReadStatusEngine !== 'undefined') {
+        ReadStatusEngine.markNoteAsRead(note, myRole);
+        saveStateLocal();
+        updateNotesBadge();
+        syncWithGist(false);
       }
+      const card = document.querySelector('.note-alert-inner');
+      if (card) card.classList.remove('is-new');
+      const badge = document.querySelector('.pulse-new-badge');
+      if (badge) badge.remove();
+    }
+
+    function updateNotesBadge() {
+      const myRole = getMyRole();
+      const unreadCount = (typeof ReadStatusEngine !== 'undefined')
+        ? ReadStatusEngine.getUnreadNotesCount(AppState.notes, myRole)
+        : 0;
+
+      // 1. Top Bar / Tab button badge
+      const badgeEl = document.getElementById('notes-badge');
+      if (badgeEl) {
+        badgeEl.textContent = unreadCount > 0 ? `(${unreadCount})` : '';
+        if (unreadCount > 0) {
+          badgeEl.className = 'badge-unread-count';
+        } else {
+          badgeEl.className = '';
+        }
+      }
+
+      // 2. Bottom Navigation dot badge
+      const navBtn = document.getElementById('nav-notes');
+      if (navBtn) {
+        let navBadge = document.getElementById('nav-notes-unread-dot');
+        if (unreadCount > 0) {
+          if (!navBadge) {
+            navBadge = document.createElement('span');
+            navBadge.id = 'nav-notes-unread-dot';
+            navBadge.className = 'nav-unread-dot';
+            navBtn.appendChild(navBadge);
+          }
+          navBadge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+          navBadge.style.display = 'inline-flex';
+        } else if (navBadge) {
+          navBadge.style.display = 'none';
+        }
+      }
+
+      // 3. Mark All Read Button visibility
+      const btnMarkAll = document.getElementById('btn-mark-all-read');
+      if (btnMarkAll) {
+        btnMarkAll.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
+      }
+    }
+
+    function handleMarkAllNotesAsRead() {
+      const myRole = getMyRole();
+      if (typeof ReadStatusEngine === 'undefined') return;
+      const count = ReadStatusEngine.markAllNotesAsRead(AppState.notes, myRole);
+      if (count > 0) {
+        playCutePop();
+        showToast(`쪽지 ${count}건을 모두 읽음 처리했습니다! ✓`);
+        saveStateLocal();
+        renderAll();
+        syncWithGist(false);
+      } else {
+        showToast('새로 읽을 쪽지가 없습니다.');
+      }
+    }
+
+    function handleToggleNoteRead(id, event) {
+      if (event) event.stopPropagation();
+      const myRole = getMyRole();
+      const note = (AppState.notes || []).find(n => n.id === id);
+      if (!note || typeof ReadStatusEngine === 'undefined') return;
+
+      const isRead = ReadStatusEngine.isNoteRead(note, myRole);
+      if (isRead) {
+        ReadStatusEngine.markNoteAsUnread(note, myRole);
+        showToast('쪽지를 안 읽음 상태로 변경했습니다.');
+      } else {
+        ReadStatusEngine.markNoteAsRead(note, myRole);
+        showToast('쪽지를 확인 완료했습니다! ✓');
+      }
+      playCutePop();
+      saveStateLocal();
+      renderAll();
+      syncWithGist(false);
     }
 
     function renderNotes() {
@@ -3787,19 +3994,27 @@
 
       if (btnJuni && btnYongi) {
         if (isJuni) {
-          btnYongi.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName}) <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
+          const unreadForMe = (typeof ReadStatusEngine !== 'undefined')
+            ? ReadStatusEngine.getUnreadNotesCount(notesYongiToJuni, 'user1')
+            : 0;
+          const unreadBadgeText = unreadForMe > 0 ? ` <span class="badge-unread-chip">${unreadForMe} NEW</span>` : '';
+          btnYongi.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName})${unreadBadgeText} <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
           btnJuni.innerHTML = `📤 내가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
           btnYongi.style.order = '1';
           btnJuni.style.order = '2';
         } else {
-          btnJuni.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName}) <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
+          const unreadForMe = (typeof ReadStatusEngine !== 'undefined')
+            ? ReadStatusEngine.getUnreadNotesCount(notesJuniToYongi, 'user2')
+            : 0;
+          const unreadBadgeText = unreadForMe > 0 ? ` <span class="badge-unread-chip">${unreadForMe} NEW</span>` : '';
+          btnJuni.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName})${unreadBadgeText} <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
           btnYongi.innerHTML = `📤 내가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
           btnJuni.style.order = '1';
           btnYongi.style.order = '2';
         }
       }
 
-      document.getElementById('notes-badge').textContent = AppState.notes.length > 0 ? `(${AppState.notes.length})` : '';
+      updateNotesBadge();
 
       // Render Juni -> Yongi
       if (notesJuniToYongi.length === 0) {
@@ -3831,16 +4046,40 @@
     function renderNoteCardList(container, notesList, directionLabel) {
       const colors = ['', 'pink', 'green', 'purple'];
       const myRole = getMyRole();
+      const spouseRole = myRole === 'user1' ? 'user2' : 'user1';
 
       notesList.slice().reverse().forEach((note, idx) => {
         const card = document.createElement('div');
-        card.className = `note-card ${colors[idx % colors.length]}`;
+        const isReceived = (note.author !== myRole);
+        const isRead = (typeof ReadStatusEngine !== 'undefined')
+          ? ReadStatusEngine.isNoteRead(note, myRole)
+          : true;
+        const spouseRead = (typeof ReadStatusEngine !== 'undefined')
+          ? ReadStatusEngine.isNoteRead(note, spouseRole)
+          : false;
+
+        card.className = `note-card ${colors[idx % colors.length]} ${isRead ? 'read' : 'unread'} ${isReceived ? 'is-received' : 'is-sent'}`;
+        card.setAttribute('data-id', note.id);
+
+        // Click on received unread card automatically marks as read
+        if (isReceived && !isRead) {
+          card.onclick = () => {
+            if (typeof ReadStatusEngine !== 'undefined') {
+              ReadStatusEngine.markNoteAsRead(note, myRole);
+              playCutePop();
+              saveStateLocal();
+              renderAll();
+              syncWithGist(false);
+            }
+          };
+        }
+
         let grantBtnHtml = '';
         if (note.type === 'ticket-request' && !note.isGranted) {
           const canGrant = note.author !== myRole;
           if (canGrant) {
             grantBtnHtml = `
-              <button class="grant-ticket-btn" onclick="grantBonusTicket('${note.id}')">
+              <button class="grant-ticket-btn" onclick="event.stopPropagation(); grantBonusTicket('${note.id}')">
                 허가 +1장 🎫
               </button>
             `;
@@ -3856,17 +4095,63 @@
         const isLiked = Array.isArray(note.likedBy) && note.likedBy.includes(myRole);
         const heartCount = (Array.isArray(note.likedBy) ? note.likedBy.length : (note.reactions || 0));
 
+        // Read Status Badge / Tag
+        let readBadgeHtml = '';
+        if (isReceived) {
+          if (!isRead) {
+            readBadgeHtml = `
+              <span class="badge-unread-new">
+                <span class="dot-unread-pulse"></span>NEW
+              </span>
+            `;
+          } else {
+            readBadgeHtml = `
+              <span class="read-status-label read" title="확인 완료된 쪽지">✓ 읽음</span>
+            `;
+          }
+        } else {
+          // Sent by me: show spouse read state
+          if (spouseRead) {
+            readBadgeHtml = `
+              <span class="read-status-label read" title="상대방이 쪽지를 확인했습니다">✓ 읽음</span>
+            `;
+          } else {
+            readBadgeHtml = `
+              <span class="read-status-label unread" title="상대방이 아직 쪽지를 읽지 않았습니다">⏳ 읽지않음</span>
+            `;
+          }
+        }
+
+        // Toggle Read Button for received notes
+        let toggleReadBtnHtml = '';
+        if (isReceived) {
+          toggleReadBtnHtml = `
+            <button type="button" class="btn-toggle-read ${isRead ? 'is-read' : 'is-unread'}" onclick="handleToggleNoteRead('${note.id}', event)" title="${isRead ? '안읽음으로 표시' : '읽음으로 표시'}">
+              ${isRead ? '안읽음' : '✓ 읽음'}
+            </button>
+          `;
+        }
+
         card.innerHTML = `
           <div class="note-header">
-            <span class="note-author-tag">${directionLabel}</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="note-author-tag">${directionLabel}</span>
+              ${readBadgeHtml}
+            </div>
             <span class="note-date">${note.date || ''}</span>
           </div>
           <div class="note-content">${escapeHtml(note.content)}</div>
           <div class="note-footer">
-            <button class="heart-reaction-btn ${isLiked ? 'is-liked' : ''}" onclick="toggleNoteReaction('${note.id}')" title="${isLiked ? '하트 취소' : '하트 보내기'}">
-              ${isLiked ? '💖' : '🤍'} <span>${heartCount}</span>
-            </button>
-            ${grantBtnHtml}
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="heart-reaction-btn ${isLiked ? 'is-liked' : ''}" onclick="event.stopPropagation(); toggleNoteReaction('${note.id}')" title="${isLiked ? '하트 취소' : '하트 보내기'}">
+                ${isLiked ? '💖' : '🤍'} <span>${heartCount}</span>
+              </button>
+              ${grantBtnHtml}
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              ${toggleReadBtnHtml}
+              <button type="button" class="icon-btn" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="삭제" style="font-size: 13px;">🗑️</button>
+            </div>
           </div>
         `;
         container.appendChild(card);
@@ -3918,6 +4203,19 @@
       if (remainEl) remainEl.textContent = `🎫 ${stats.remaining}장`;
     }
 
+    function handleMarkScheduleMemoRead(id) {
+      const myRole = getMyRole();
+      const sched = (AppState.schedules || []).find(s => s.id === id);
+      if (!sched || typeof ReadStatusEngine === 'undefined') return;
+      ReadStatusEngine.markScheduleMemoAsRead(sched, myRole);
+      playCutePop();
+      showToast('일정 메모를 확인 완료했습니다! ✓');
+      saveStateLocal();
+      renderAll();
+      syncWithGist(false);
+      openDayDetail(selectedDate);
+    }
+
     // 6. MODALS & DAY DETAILS
     function openDayDetail(dateStr) {
       selectedDate = dateStr;
@@ -3950,41 +4248,92 @@
         return false;
       });
 
+      const myRole = getMyRole();
+
       if (schedules.length === 0) {
         sList.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 4px 0;">등록된 일정이 없어요 ✨</div>';
       } else {
-        sList.innerHTML = schedules.map(s => `
-          <div class="item-pill" style="flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 12px;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-              <span>📅 <b>${escapeHtml(s.title)}</b> ${s.isPeriod ? `<span style="font-size:11px; color:var(--primary-dark); font-weight:700; margin-left:4px;">[${s.startDate} ~ ${s.endDate}]</span>` : ''}</span>
-              <div style="display:flex; gap:6px;">
-                ${s.memo ? `<button type="button" class="btn-mini" onclick="forwardScheduleMemoAsNote('${s.id}')" title="쪽지로 전달">💌 쪽지 전달</button>` : ''}
-                <button type="button" class="icon-btn" onclick="deleteSchedule('${s.id}')" style="font-size: 14px;">🗑️</button>
-              </div>
-            </div>
-            ${s.memo ? `<div style="font-size: 11.5px; color: var(--text-sub); background: #FFF; padding: 5px 8px; border-radius: 8px; width: 100%; border: 1px dashed var(--border-color);">📝 ${escapeHtml(s.memo)}</div>` : ''}
-          </div>
-        `).join('');
-      }
+        sList.innerHTML = schedules.map(s => {
+          let memoBoxHtml = '';
+          if (s.memo && s.memo.trim() !== '') {
+            const isMemoRead = (typeof ReadStatusEngine !== 'undefined')
+              ? ReadStatusEngine.isScheduleMemoRead(s, myRole)
+              : true;
+            const isAuthor = (s.author === myRole);
+            const isRecipient = (s.author && s.author !== myRole);
+            const showConfirmBtn = isRecipient && !isMemoRead;
 
+            let memoStatusBadge = '';
+            if (isRecipient) {
+              memoStatusBadge = !isMemoRead
+                ? '<span class="badge-unread-new"><span class="dot-unread-pulse"></span>미확인</span>'
+                : '<span class="read-status-label read">✓ 확인됨</span>';
+            } else {
+              // Written by me: show whether spouse read
+              const spouseRole = myRole === 'user1' ? 'user2' : 'user1';
+              const spouseMemoRead = (typeof ReadStatusEngine !== 'undefined')
+                ? ReadStatusEngine.isScheduleMemoRead(s, spouseRole)
+                : true;
+              memoStatusBadge = spouseMemoRead
+                ? '<span class="read-status-label read" title="상대방이 확인했습니다">✓ 읽음</span>'
+                : '<span class="read-status-label unread" title="상대방이 아직 읽지 않았습니다">⏳ 읽지않음</span>';
+            }
+
+            memoBoxHtml = `
+              <div class="schedule-memo-box ${isMemoRead ? 'read' : 'unread'}">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-weight:700; color:var(--text-sub); font-size:11px;">📝 메모</span>
+                    ${memoStatusBadge}
+                  </div>
+                  ${showConfirmBtn ? `<button type="button" class="btn-mark-memo-read" onclick="handleMarkScheduleMemoRead('${s.id}')">✓ 확인완료</button>` : ''}
+                </div>
+                <div style="color:var(--text-main); font-size:12px; line-height:1.4;">${escapeHtml(s.memo)}</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="item-pill" style="flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px;">
+              <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                <span>📅 <b>${escapeHtml(s.title)}</b> ${s.isPeriod ? `<span style="font-size:11px; color:var(--primary-dark); font-weight:700; margin-left:4px;">[${s.startDate} ~ ${s.endDate}]</span>` : ''}</span>
+                <div style="display:flex; gap:6px;">
+                  ${s.memo ? `<button type="button" class="btn-mini" onclick="forwardScheduleMemoAsNote('${s.id}')" title="쪽지로 전달">💌 쪽지 전달</button>` : ''}
+                  <button type="button" class="icon-btn" onclick="deleteSchedule('${s.id}')" style="font-size: 14px;">🗑️</button>
+                </div>
+              </div>
+              ${memoBoxHtml}
+            </div>
+          `;
+        }).join('');
+      }
 
       // Notes
       const nList = document.getElementById('day-notes-list');
       const notes = AppState.notes.filter(n => n.date === dateStr);
-      const myRole = getMyRole();
       if (notes.length === 0) {
         nList.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 4px 0;">남겨진 쪽지가 없어요 💌</div>';
       } else {
         nList.innerHTML = notes.map(n => {
           const isReceived = n.author !== myRole;
+          const isRead = (typeof ReadStatusEngine !== 'undefined')
+            ? ReadStatusEngine.isNoteRead(n, myRole)
+            : true;
           const tag = isReceived ? '📬 받은 쪽지' : '📤 보낸 쪽지';
+          const unreadBadge = (isReceived && !isRead)
+            ? '<span class="badge-unread-new" style="margin-left:4px;"><span class="dot-unread-pulse"></span>NEW</span>'
+            : (isReceived ? '<span class="read-status-label read" style="margin-left:4px;">✓ 읽음</span>' : '');
+
           return `
-            <div class="item-pill" style="display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <span style="font-size:10px; color:var(--primary); font-weight:700; margin-right:4px;">${tag}</span>
-                <span>💌 ${escapeHtml(n.content)}</span>
+            <div class="item-pill ${isRead ? 'read' : 'unread'}" style="display:flex; justify-content:space-between; align-items:center; cursor:${isReceived && !isRead ? 'pointer' : 'default'};" onclick="${isReceived && !isRead ? `handleToggleNoteRead('${n.id}', event)` : ''}">
+              <div style="flex:1;">
+                <div style="display:flex; align-items:center;">
+                  <span style="font-size:10px; color:var(--primary); font-weight:700; margin-right:4px;">${tag}</span>
+                  ${unreadBadge}
+                </div>
+                <div style="margin-top:2px;">💌 ${escapeHtml(n.content)}</div>
               </div>
-              <button class="icon-btn" onclick="deleteNote('${n.id}')" style="font-size: 14px;">🗑️</button>
+              <button class="icon-btn" onclick="event.stopPropagation(); deleteNote('${n.id}')" style="font-size: 14px;">🗑️</button>
             </div>
           `;
         }).join('');
@@ -4395,7 +4744,7 @@
       }
       const mergedDrinks = Array.from(drinkMap.values()).sort((a,b) => (a.date || '').localeCompare(b.date || ''));
 
-      // 2. Merge Schedules by ID
+      // 2. Merge Schedules by ID (preserve memo read status)
       const schedMap = new Map();
       if (Array.isArray(remote.schedules)) {
         remote.schedules.forEach(s => {
@@ -4405,12 +4754,22 @@
       if (Array.isArray(local.schedules)) {
         local.schedules.forEach(s => {
           if (remoteHasRealSchedules && s.id === 's-1') return; // discard demo seed
-          if (s && s.id && !deletedIds.has(s.id)) schedMap.set(s.id, s);
+          if (s && s.id && !deletedIds.has(s.id)) {
+            if (schedMap.has(s.id)) {
+              const r = schedMap.get(s.id);
+              const merged = (typeof ReadStatusEngine !== 'undefined')
+                ? ReadStatusEngine.mergeReadStatus(s, r)
+                : Object.assign({}, r, s);
+              schedMap.set(s.id, merged);
+            } else {
+              schedMap.set(s.id, s);
+            }
+          }
         });
       }
       const mergedSchedules = Array.from(schedMap.values()).sort((a,b) => (a.date || '').localeCompare(b.date || ''));
 
-      // 3. Merge Notes by ID (preserve reactions & completion)
+      // 3. Merge Notes by ID (preserve reactions, completion & read status)
       const noteMap = new Map();
       if (Array.isArray(remote.notes)) {
         remote.notes.forEach(n => {
@@ -4423,13 +4782,13 @@
           if (n && n.id && !deletedIds.has(n.id)) {
             if (noteMap.has(n.id)) {
               const r = noteMap.get(n.id);
-              noteMap.set(n.id, {
-                ...r,
-                ...n,
-                reactions: Math.max(r.reactions || 0, n.reactions || 0),
-                isDone: r.isDone || n.isDone,
-                isGranted: r.isGranted || n.isGranted
-              });
+              const merged = (typeof ReadStatusEngine !== 'undefined')
+                ? ReadStatusEngine.mergeReadStatus(n, r)
+                : Object.assign({}, r, n);
+              merged.reactions = Math.max(r.reactions || 0, n.reactions || 0);
+              merged.isDone = r.isDone || n.isDone;
+              merged.isGranted = r.isGranted || n.isGranted;
+              noteMap.set(n.id, merged);
             } else {
               noteMap.set(n.id, n);
             }

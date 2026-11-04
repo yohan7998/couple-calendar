@@ -96,3 +96,4 @@
 - [ ] **Step 2: 옵시디언 vault 디렉토리로 신규 사양서, 계획서 및 산출물 파일 동기화**
 - [ ] **Step 3: `/Users/yohan/Downloads/Couple-Calendar.html` 단일 배포본 갱신**
 - [ ] **Step 4: Git 커밋 & 푸시 (GitHub Pages 실시간 배포)**
+

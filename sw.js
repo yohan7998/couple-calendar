@@ -1,5 +1,5 @@
-// SweetSync Couple Calendar - PWA Service Worker v2.1.0
-const CACHE_NAME = 'couple-calendar-v2.1.0';
+// SweetSync Couple Calendar - PWA Service Worker v2.2.0
+const CACHE_NAME = 'couple-calendar-v2.2.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,8 @@ const ASSETS_TO_CACHE = [
   './modules/modern_theme.css',
   './modules/modern_components.css',
   './modules/modern_icons.js',
+  './modules/read_status.css',
+  './modules/read_status_engine.js',
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png'
