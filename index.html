@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>달콤살벌 캘린더 💖⚔️ (v2.5.4)</title>
-  <meta name="version" content="v2.5.4">
+  <title>달콤살벌 캘린더 💖⚔️ (v2.5.5)</title>
+  <meta name="version" content="v2.5.5">
   
   <!-- PWA & Mobile Web App Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1984,7 +1984,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()" style="cursor:pointer;">v2.5.4 ⚡</span>
+            <span class="app-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()" style="cursor:pointer;">v2.5.5 ⚡</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -2480,10 +2480,10 @@
         </div>
       </div>
 
-      <!-- v2.5.4 Force Cache Purge Button -->
+      <!-- v2.5.5 Force Cache Purge Button -->
       <div style="margin-top: 14px; padding: 12px 14px; background: #FFF1F2; border-radius: 12px; border: 1px solid #FECDD3; text-align: center;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #BE123C; margin-bottom: 4px;">
-          <span>⚡</span> 최신 버전 강제 업데이트 (v2.5.4)
+          <span>⚡</span> 최신 버전 강제 업데이트 (v2.5.5)
         </div>
         <div style="font-size: 11px; color: #881337; margin-bottom: 8px; line-height: 1.4;">
           모바일 PWA/브라우저의 이전 캐시를 100% 완전 삭제하고 최신 정본을 즉시 로드합니다.
@@ -2600,7 +2600,7 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.5.4</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.5.5</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
           최근 갱신: 2026-11-04 (가족 일정 및 가계부·생활비 관리 통합 대개편)
@@ -3364,10 +3364,10 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    // v2.5.4 Force Cache Purge & App Update
+    // v2.5.5 Force Cache Purge & App Update
     async function forcePurgeAppCache() {
       try {
-        showToast('🚀 최신 버전(v2.5.4)으로 캐시를 완전 초기화하는 중입니다...');
+        showToast('🚀 최신 버전(v2.5.5)으로 캐시를 완전 초기화하는 중입니다...');
         if ('caches' in window) {
           const keys = await caches.keys();
           await Promise.all(keys.map(k => caches.delete(k)));
@@ -3378,7 +3378,7 @@
             await reg.unregister();
           }
         }
-        localStorage.setItem('couple_app_build_v', 'v2.5.4');
+        localStorage.setItem('couple_app_build_v', 'v2.5.5');
         try {
           await fetch('./emergency-update?t=' + Date.now(), { cache: 'no-store' });
         } catch(e){}
@@ -3495,8 +3495,8 @@
 
     // INIT
     window.addEventListener('DOMContentLoaded', () => {
-      // Auto cache-busting check for v2.5.4
-      const currentBuild = 'v2.5.4';
+      // Auto cache-busting check for v2.5.5
+      const currentBuild = 'v2.5.5';
       if (localStorage.getItem('couple_app_build_v') !== currentBuild) {
         localStorage.setItem('couple_app_build_v', currentBuild);
         if ('caches' in window) {
@@ -3925,7 +3925,8 @@
       const nextRole = current === 'user1' ? 'user2' : 'user1';
       setMyRole(nextRole);
       const name = nextRole === 'user1' ? '주니 🐻' : '용이 🐰';
-      showToast(`내 프로필: [${name}] (나에게 온 쪽지가 메인에 표시됩니다) ✨`);
+      const shortName = nextRole === 'user1' ? '주니' : '용이';
+      showToast(`내 프로필: [${name}] (${shortName}에게 온 쪽지가 메인에 표시됩니다) ✨`);
       currentNotesSubtab = nextRole === 'user1' ? 'yongi-to-juni' : 'juni-to-yongi';
       switchNotesSubtab(currentNotesSubtab);
       renderAll();
@@ -4211,6 +4212,9 @@
       broadcastRealtimeDelta('notes', 'update', note);
       renderAll();
       syncWithGist(false);
+      // [해결책] 메인 화면 NEW 뱃지 및 카운터 즉시 갱신
+      updateNotesBadge();
+      renderLatestNoteAlertCard();
     }
 
     function renderNotes() {
@@ -4241,8 +4245,8 @@
             ? ReadStatusEngine.getUnreadNotesCount(notesYongiToJuni, 'user1')
             : 0;
           const unreadBadgeText = unreadForMe > 0 ? ` <span class="badge-unread-chip">${unreadForMe} NEW</span>` : '';
-          btnYongi.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName})${unreadBadgeText} <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
-          btnJuni.innerHTML = `📤 내가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
+          btnYongi.innerHTML = `📬 주니에게 온 쪽지 (${spouseAvatar}${spouseName})${unreadBadgeText} <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
+          btnJuni.innerHTML = `📤 주니가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
           btnYongi.style.order = '1';
           btnJuni.style.order = '2';
         } else {
@@ -4250,8 +4254,8 @@
             ? ReadStatusEngine.getUnreadNotesCount(notesJuniToYongi, 'user2')
             : 0;
           const unreadBadgeText = unreadForMe > 0 ? ` <span class="badge-unread-chip">${unreadForMe} NEW</span>` : '';
-          btnJuni.innerHTML = `📬 나에게 온 쪽지 (${spouseAvatar}${spouseName})${unreadBadgeText} <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
-          btnYongi.innerHTML = `📤 내가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
+          btnJuni.innerHTML = `📬 용이에게 온 쪽지 (${spouseAvatar}${spouseName})${unreadBadgeText} <span class="subtab-count" id="count-juni-to-yongi">(${notesJuniToYongi.length})</span>`;
+          btnYongi.innerHTML = `📤 용이가 보낸 쪽지 (${myAvatar}나) <span class="subtab-count" id="count-yongi-to-juni">(${notesYongiToJuni.length})</span>`;
           btnJuni.style.order = '1';
           btnYongi.style.order = '2';
         }
@@ -4269,7 +4273,7 @@
           </div>
         `;
       } else {
-        renderNoteCardList(listJuni, notesJuniToYongi, isJuni ? '📤 내가 용이에게 보낸 쪽지' : '📬 주니가 나에게 보낸 쪽지');
+        renderNoteCardList(listJuni, notesJuniToYongi, isJuni ? '📤 주니가 용이에게 보낸 쪽지' : '📬 주니가 용이에게 보낸 쪽지');
       }
 
       // Render Yongi -> Juni
@@ -4282,7 +4286,7 @@
           </div>
         `;
       } else {
-        renderNoteCardList(listYongi, notesYongiToJuni, isJuni ? '📬 용이가 나에게 보낸 쪽지' : '📤 내가 주니에게 보낸 쪽지');
+        renderNoteCardList(listYongi, notesYongiToJuni, isJuni ? '📬 용이가 주니에게 보낸 쪽지' : '📤 용이가 주니에게 보낸 쪽지');
       }
     }
 
