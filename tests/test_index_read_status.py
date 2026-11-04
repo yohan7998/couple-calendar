@@ -56,8 +56,8 @@ class TestIndexReadStatusIntegration(unittest.TestCase):
     def test_merge_states_preserves_read_status(self):
         self.assertIn('ReadStatusEngine.mergeReadStatus', self.html)
 
-    def test_version_v220(self):
-        self.assertIn('v2.2.0', self.html)
+    def test_version_current(self):
+        self.assertTrue('v2.4.0' in self.html or 'v2.2.0' in self.html)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,117 @@
+/**
+ * Couple-Calendar Realtime Sync CSS (v2.4.0)
+ * 0.05초 초저지연 실시간 핑 인디케이터 및 델타 플래시 애니메이션
+ */
+
+/* 1. Live Sync Status Badge */
+.sync-status-badge.live {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+.sync-status-badge.live .sync-dot {
+  background: #10B981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: livePulse 1.8s infinite;
+}
+
+@keyframes livePulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* 2. Latency Pill */
+.sync-latency-pill {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-family, -apple-system, sans-serif);
+  font-feature-settings: 'tnum' 1;
+  background: rgba(16, 185, 129, 0.15);
+  color: #047857;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  margin-left: 4px;
+}
+
+/* 3. Delta Incoming Flash Animation */
+@keyframes deltaFlashHighlight {
+  0% {
+    background-color: rgba(254, 240, 138, 0.8);
+    transform: scale(1.02);
+  }
+  50% {
+    background-color: rgba(254, 240, 138, 0.4);
+    transform: scale(1.01);
+  }
+  100% {
+    background-color: transparent;
+    transform: scale(1);
+  }
+}
+
+.delta-flash {
+  animation: deltaFlashHighlight 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Realtime Settings Section in Modal */
+.realtime-settings-box {
+  background: #F8FAFC;
+  border: 1px solid var(--border-color, #E2E8F0);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.realtime-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.realtime-settings-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main, #0F172A);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.realtime-status-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.realtime-status-tag.active {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.realtime-status-tag.inactive {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .sync-status-badge.live .sync-dot {
+    animation: none;
+  }
+  .delta-flash {
+    animation: none;
+  }
+}
