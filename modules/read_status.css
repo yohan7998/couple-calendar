@@ -165,17 +165,17 @@
   position: absolute;
   top: var(--space-2);
   right: var(--space-2);
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background: var(--color-danger);
   border-radius: 50%;
-  animation: pulseUnread 2s infinite;
+  animation: none;
+  box-shadow: 0 0 4px rgba(244, 63, 94, 0.4);
 }
 
 @keyframes pulseUnread {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 0; transform: scale(0.8); }
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
 }
 
 /* Controls */
@@ -224,7 +224,7 @@
   background-color: var(--color-memo-unread-badge-bg, #FF9800);
   border-radius: 50%;
   margin-left: 2px;
-  animation: pulseUnread 2s infinite;
+  animation: none;
 }
 
 .schedule-memo-title {
