@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="달콤살벌캘린더">
-  <meta name="theme-color" content="#FFF5F5">
+  <meta name="theme-color" content="#FFFFFF">
 
   <!-- iOS Mobile Shortcut App Icon (Apple Touch Icon) -->
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20261103e">
@@ -26,7 +26,7 @@
 
   <!-- Google Cute Webfonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -34,29 +34,39 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
+  <!-- Modern Design System & Icon Suite -->
+  <link rel="stylesheet" href="modules/modern_theme.css">
+  <link rel="stylesheet" href="modules/modern_components.css">
+  <script src="modules/modern_icons.js"></script>
 
   <style>
     :root {
-      --bg-cream: #FFF7F6;
+      /* WCAG AAA High Contrast Design Tokens */
+      --bg-page: #F1F5F9;
+      --bg-cream: #FFFFFF;
       --bg-card: #FFFFFF;
-      --primary: #FF708F;
-      --primary-light: #FFE4EA;
-      --primary-dark: #E64C6D;
-      --secondary: #FFB385;
-      --secondary-light: #FFF0E6;
-      --accent-yellow: #FFE885;
-      --accent-green: #B8EBD0;
-      --accent-blue: #C5E5FC;
-      --accent-purple: #E2D9F3;
-      --text-main: #3D3535;
-      --text-sub: #7A6F6F;
-      --text-muted: #B5A8A8;
-      --border-color: #FCE6E6;
-      --shadow-soft: 0 10px 30px rgba(255, 140, 160, 0.12);
-      --shadow-pop: 0 6px 20px rgba(255, 112, 143, 0.25);
-      --radius-sm: 14px;
-      --radius-md: 22px;
-      --radius-lg: 30px;
+      --bg-elevated: #F8FAFC;
+      --bg-soft: #F8FAFC;
+      --primary: #F43F5E;
+      --primary-light: #FFF1F2;
+      --primary-dark: #E11D48;
+      --secondary: #F59E0B;
+      --secondary-light: #FEF3C7;
+      --accent-yellow: #FEF08A;
+      --accent-green: #D1FAE5;
+      --accent-blue: #DBEAFE;
+      --accent-purple: #EDE9FE;
+      --text-main: #0F172A;
+      --text-sub: #334155;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --border: #E2E8F0;
+      --shadow-soft: 0 1px 3px rgba(15, 23, 42, 0.05), 0 6px 16px rgba(15, 23, 42, 0.04);
+      --shadow-pop: 0 4px 14px rgba(244, 63, 94, 0.22);
+      --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.03);
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
     }
 
     * {
@@ -72,7 +82,7 @@
       -moz-osx-font-smoothing: grayscale;
       letter-spacing: -0.02em;
       word-break: keep-all;
-      background-color: #F8F0ED;
+      background-color: var(--bg-page);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -80,6 +90,8 @@
       align-items: flex-start;
       padding: 0;
       user-select: none;
+      font-feature-settings: "cv05", "tnum", "ss01";
+      font-variant-numeric: tabular-nums;
     }
 
     /* App Frame (Mobile Container) */
@@ -87,11 +99,13 @@
       width: 100%;
       max-width: 480px;
       min-height: 100vh;
-      background: var(--bg-cream);
+      background: var(--bg-card);
       display: flex;
       flex-direction: column;
       position: relative;
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 40px rgba(15, 23, 42, 0.06);
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
       overflow-x: hidden;
       padding-bottom: 95px; /* space for bottom nav */
     }
@@ -357,36 +371,52 @@
       75% { transform: translateX(3px); }
     }
 
-    /* View Navigation Tabs */
+    /* View Navigation Tabs (Apple Segmented Style) */
     .view-tabs {
       display: flex;
-      margin: 10px 20px 14px;
-      background: rgba(240, 230, 230, 0.5);
+      margin: 10px 18px 14px;
+      background: #F1F5F9;
       padding: 4px;
-      border-radius: var(--radius-sm);
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
     }
 
     .tab-btn {
       flex: 1;
-      padding: 10px 0;
+      padding: 9px 0;
       border: none;
       background: none;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-sub);
       border-radius: 10px;
       cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 5px;
     }
 
+    .tab-btn .tab-svg-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .tab-btn .tab-svg-icon svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      vertical-align: middle;
+    }
+
     .tab-btn.active {
-      background: var(--bg-card);
+      background: #FFFFFF;
       color: var(--primary);
-      box-shadow: 0 4px 12px rgba(255, 112, 143, 0.15);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 3px 8px rgba(15, 23, 42, 0.03);
     }
 
     /* Views container */
@@ -867,28 +897,31 @@
       bottom: 0;
       width: 100%;
       max-width: 480px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(16px);
-      border-top: 1.5px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
       z-index: 60;
+      box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.03);
     }
 
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       background: none;
       border: none;
       color: var(--text-muted);
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      transition: color 0.15s;
+      transition: color 0.15s ease, transform 0.15s ease;
+      padding: 4px 8px;
     }
 
     .nav-item.active {
@@ -896,28 +929,54 @@
     }
 
     .nav-item .nav-icon {
-      font-size: 22px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      line-height: 1;
     }
 
-    /* Floating Action Button */
+    .nav-item .nav-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      transition: stroke 0.15s, transform 0.15s;
+    }
+
+    .nav-item.active .nav-icon svg {
+      stroke: var(--primary);
+      transform: scale(1.08);
+    }
+
+    /* Floating Action Button (Apple Clean Flat) */
     .fab-btn {
       position: fixed;
-      bottom: 78px;
+      bottom: 76px;
       right: calc(50% - 220px);
-      width: 56px;
-      height: 56px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #FF9EAA 0%, #FF708F 100%);
+      background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);
       color: white;
       border: none;
-      box-shadow: 0 8px 24px rgba(255, 112, 143, 0.4);
-      font-size: 28px;
+      box-shadow: 0 4px 16px rgba(225, 29, 72, 0.35);
+      font-size: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       z-index: 70;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+
+    .fab-btn svg {
+      width: 26px;
+      height: 26px;
+      stroke: #FFFFFF;
+      stroke-width: 2.2;
     }
 
     @media (max-width: 480px) {
@@ -1871,7 +1930,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="현재 정본 버전: v1.8.0 (2026-11-03)">v1.8</span>
+            <span class="app-version-badge" title="현재 정본 버전: v2.1.0 (2026-11-04)">v2.1</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -1886,16 +1945,16 @@
           <span id="sync-dot">●</span>
           <span id="sync-text">동기화됨</span>
         </div>
-        <button class="icon-btn" onclick="openSettingsModal()" title="설정">⚙️</button>
+        <button class="icon-btn" onclick="openSettingsModal()" title="설정" id="header-settings-btn"><span id="header-settings-icon">⚙️</span></button>
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs (Modern SVG Tabs) -->
     <div class="view-tabs">
-      <button class="tab-btn active" id="tab-btn-calendar" onclick="switchView('calendar')">📅 달력</button>
-      <button class="tab-btn" id="tab-btn-ledger" onclick="switchView('ledger')">💰 가계부</button>
-      <button class="tab-btn" id="tab-btn-notes" onclick="switchView('notes')">💌 쪽지함 <span id="notes-badge"></span></button>
-      <button class="tab-btn" id="tab-btn-stats" onclick="switchView('stats')">📊 통계</button>
+      <button class="tab-btn active" id="tab-btn-calendar" onclick="switchView('calendar')"><span class="tab-svg-icon" id="tab-svg-calendar"></span> 달력</button>
+      <button class="tab-btn" id="tab-btn-ledger" onclick="switchView('ledger')"><span class="tab-svg-icon" id="tab-svg-ledger"></span> 가계부</button>
+      <button class="tab-btn" id="tab-btn-notes" onclick="switchView('notes')"><span class="tab-svg-icon" id="tab-svg-notes"></span> 쪽지함 <span id="notes-badge"></span></button>
+      <button class="tab-btn" id="tab-btn-stats" onclick="switchView('stats')"><span class="tab-svg-icon" id="tab-svg-stats"></span> 통계</button>
     </div>
 
     <!-- VIEW 1: CALENDAR -->
@@ -1905,9 +1964,9 @@
 
       <div class="calendar-card">
         <div class="cal-header">
-          <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
+          <button class="cal-nav-btn" onclick="changeMonth(-1)" title="이전 달" id="cal-prev-btn"><span id="cal-prev-icon">◀</span></button>
           <div class="cal-month-title" id="cal-month-display" onclick="goToToday()">2026년 11월</div>
-          <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
+          <button class="cal-nav-btn" onclick="changeMonth(1)" title="다음 달" id="cal-next-btn"><span id="cal-next-icon">▶</span></button>
         </div>
 
         <div class="cal-weekdays">
@@ -1929,20 +1988,20 @@
             <span class="ledger-month-title" id="ledger-month-title">2026년 11월 생활비</span>
             <div class="ledger-budget-info" id="ledger-budget-info">예산 2,500,000원 기준</div>
           </div>
-          <button class="btn-mini" onclick="openBudgetSettingModal()" title="예산 설정">⚙️ 예산 설정</button>
+          <button class="btn-mini" onclick="openBudgetSettingModal()" title="예산 설정" id="btn-budget-setting"><span id="icon-budget-setting">⚙️</span> 예산 설정</button>
         </div>
 
         <div class="ledger-kpi-grid">
           <div class="ledger-kpi-box expense">
-            <span class="kpi-label">총 지출 💸</span>
+            <span class="kpi-label">총 지출</span>
             <span class="kpi-value" id="ledger-total-expense">0원</span>
           </div>
           <div class="ledger-kpi-box income">
-            <span class="kpi-label">총 수입 💰</span>
+            <span class="kpi-label">총 수입</span>
             <span class="kpi-value" id="ledger-total-income">0원</span>
           </div>
           <div class="ledger-kpi-box remain">
-            <span class="kpi-label">남은 예산 ✨</span>
+            <span class="kpi-label">남은 예산</span>
             <span class="kpi-value" id="ledger-remain-budget">0원</span>
           </div>
         </div>
@@ -1973,16 +2032,16 @@
       <!-- Ledger Action Toolbar -->
       <div class="ledger-actions-toolbar">
         <button class="btn-action-primary" onclick="openAddTransactionModal()">
-          <span>➕ 내역 등록</span>
+          <span class="btn-icon-wrap" id="btn-icon-add-tx"></span><span>내역 등록</span>
         </button>
         <button class="btn-action-secondary" onclick="triggerExcelFileInput()">
-          <span>📂 엑셀 올리기</span>
+          <span class="btn-icon-wrap" id="btn-icon-upload"></span><span>엑셀 올리기</span>
         </button>
         <button class="btn-action-secondary" onclick="exportLedgerToExcel()">
-          <span>📥 엑셀 받기</span>
+          <span class="btn-icon-wrap" id="btn-icon-download"></span><span>엑셀 받기</span>
         </button>
         <button class="btn-action-secondary" onclick="openSharedSheetModal()">
-          <span>🔄 공유시트</span>
+          <span class="btn-icon-wrap" id="btn-icon-sync"></span><span>공유시트</span>
         </button>
         <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelFileUpload(event)">
       </div>
@@ -2151,28 +2210,28 @@
     <!-- END STATS VIEW -->
 
     <!-- Floating Action Button -->
-    <button class="fab-btn" onclick="openQuickRecordModal()" title="기록하기">➕</button>
+    <button class="fab-btn" onclick="openQuickRecordModal()" title="기록하기" id="fab-record-btn"><span id="fab-plus-icon">➕</span></button>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
       <button class="nav-item active" id="nav-cal" onclick="switchView('calendar')">
-        <span class="nav-icon">📅</span>
+        <span class="nav-icon" id="nav-icon-cal">📅</span>
         <span>달력</span>
       </button>
       <button class="nav-item" id="nav-ledger" onclick="switchView('ledger')">
-        <span class="nav-icon">💰</span>
+        <span class="nav-icon" id="nav-icon-ledger">💰</span>
         <span>가계부</span>
       </button>
       <button class="nav-item" id="nav-notes" onclick="switchView('notes')">
-        <span class="nav-icon">💌</span>
+        <span class="nav-icon" id="nav-icon-notes">💌</span>
         <span>쪽지함</span>
       </button>
       <button class="nav-item" id="nav-stats" onclick="switchView('stats')">
-        <span class="nav-icon">📊</span>
+        <span class="nav-icon" id="nav-icon-stats">📊</span>
         <span>통계</span>
       </button>
       <button class="nav-item" id="nav-settings" onclick="openSettingsModal()">
-        <span class="nav-icon">⚙️</span>
+        <span class="nav-icon" id="nav-icon-settings">⚙️</span>
         <span>설정</span>
       </button>
     </nav>
@@ -2573,9 +2632,203 @@
 
   <script>
     /**
-     * Couple-Calendar (SweetSync Calendar) Engine v2.0
-     * Zero-Backend Embedded Architecture
+     * Couple-Calendar (SweetSync Calendar) Engine v2.1
+     * Modern UI / Design Taste Frontend / Emil Design Eng Polish
      */
+
+    // --- Module 0: ModernIcons Embedded Fallback Guarantee ---
+    if (typeof window.ModernIcons === 'undefined') {
+      window.ModernIcons = (function() {
+        const DEFAULT_STROKE_WIDTH = 1.75;
+        const DEFAULT_VIEWBOX = "0 0 24 24";
+        const DEFAULT_FILL = "none";
+
+        function createSVG(paths, options = {}) {
+          const {
+            viewBox = DEFAULT_VIEWBOX,
+            fill = DEFAULT_FILL,
+            stroke = options.color || "currentColor",
+            strokeWidth = options.strokeWidth || DEFAULT_STROKE_WIDTH,
+            strokeLinecap = "round",
+            strokeLinejoin = "round",
+            size = options.size || 24,
+            className = "modern-icon",
+            ariaHidden = "true"
+          } = options;
+          const pathStr = Array.isArray(paths) ? paths.join(" ") : paths;
+          return `<svg class="${className}" width="${size}" height="${size}" viewBox="${viewBox}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="${strokeLinecap}" stroke-linejoin="${strokeLinejoin}" aria-hidden="${ariaHidden}" role="img">${pathStr}</svg>`;
+        }
+
+        const icons = {
+          calendar(color = "currentColor", size = 24) {
+            return createSVG([
+              '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>',
+              '<line x1="16" y1="2" x2="16" y2="6"/>',
+              '<line x1="8" y1="2" x2="8" y2="6"/>',
+              '<line x1="3" y1="10" x2="21" y2="10"/>'
+            ], { color, size });
+          },
+          ledger(color = "currentColor", size = 24) {
+            return createSVG([
+              '<path d="M21 12V7H5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5v-2"/>',
+              '<path d="M9 12v6"/>',
+              '<path d="M15 12v6"/>'
+            ], { color, size });
+          },
+          notes(color = "currentColor", size = 24) {
+            return createSVG([
+              '<path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>',
+              '<polyline points="22,6 12,13 2,6"/>'
+            ], { color, size });
+          },
+          stats(color = "currentColor", size = 24) {
+            return createSVG([
+              '<line x1="18" y1="20" x2="18" y2="10"/>',
+              '<line x1="12" y1="20" x2="12" y2="4"/>',
+              '<line x1="6" y1="20" x2="6" y2="14"/>'
+            ], { color, size });
+          },
+          settings(color = "currentColor", size = 24) {
+            return createSVG([
+              '<circle cx="12" cy="12" r="3"/>',
+              '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
+            ], { color, size });
+          },
+          plus(color = "currentColor", size = 24) {
+            return createSVG([
+              '<line x1="12" y1="5" x2="12" y2="19"/>',
+              '<line x1="5" y1="12" x2="19" y2="12"/>'
+            ], { color, size });
+          },
+          chevronLeft(color = "currentColor", size = 20) {
+            return createSVG(['<polyline points="15 18 9 12 15 6"/>'], { color, size });
+          },
+          chevronRight(color = "currentColor", size = 20) {
+            return createSVG(['<polyline points="9 18 15 12 9 6"/>'], { color, size });
+          },
+          upload(color = "currentColor", size = 24) {
+            return createSVG([
+              '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>',
+              '<polyline points="17 8 12 3 7 8"/>',
+              '<line x1="12" y1="3" x2="12" y2="15"/>'
+            ], { color, size });
+          },
+          download(color = "currentColor", size = 24) {
+            return createSVG([
+              '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>',
+              '<polyline points="7 10 12 15 17 10"/>',
+              '<line x1="12" y1="15" x2="12" y2="3"/>'
+            ], { color, size });
+          },
+          sync(color = "currentColor", size = 24) {
+            return createSVG([
+              '<path d="M23 4v6h-6"/>',
+              '<path d="M1 20v-6h6"/>',
+              '<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>'
+            ], { color, size });
+          }
+        };
+
+        const categoryIcons = {
+          "식비": '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
+          "장보기": '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+          "카페": '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a1 1 0 0 1 1-1h14"/><path d="M12 4v4"/>',
+          "카페/간식": '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a1 1 0 0 1 1-1h14"/><path d="M12 4v4"/>',
+          "주거": '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+          "주거/통신": '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+          "교통": '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.3-1.5.7C1.6 8.3 1.3 9 1.3 9s-1.3 1.4-2.2 2.3C-2 10 2.3 10.8 1.5 11.9 1 12.1 1 13 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
+          "의료": '<path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="10"/>',
+          "의료/건강": '<path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="10"/>',
+          "쇼핑": '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1 0 8"/>',
+          "생활용품": '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1 0 8"/>',
+          "문화/여가": '<line x1="2" y1="12" x2="22" y2="12"/><path d="M18 8a6 6 0 0 0-12 0"/><path d="M6 16a10 10 0 0 1 12 0"/>',
+          "급여/수입": '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/>',
+          "기타": '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>'
+        };
+
+        return {
+          get(name, options = {}) {
+            const fn = icons[name];
+            return fn ? fn(options.color, options.size) : '';
+          },
+          categoryIcon(cat, options = {}) {
+            const p = categoryIcons[cat] || categoryIcons["기타"];
+            return createSVG(p, {
+              color: options.color || "currentColor",
+              size: options.size || 20,
+              className: "modern-icon category-icon"
+            });
+          },
+          calendar: icons.calendar,
+          ledger: icons.ledger,
+          notes: icons.notes,
+          stats: icons.stats,
+          settings: icons.settings,
+          plus: icons.plus,
+          chevronLeft: icons.chevronLeft,
+          chevronRight: icons.chevronRight,
+          upload: icons.upload,
+          download: icons.download,
+          sync: icons.sync
+        };
+      })();
+    }
+
+    function applyModernIconsToDOM() {
+      try {
+        if (!window.ModernIcons) return;
+
+        // 헤더 설정
+        const headSet = document.getElementById('header-settings-icon');
+        if (headSet) headSet.innerHTML = window.ModernIcons.settings('#334155', 20);
+
+        // 상단 탭 4개
+        const tabCal = document.getElementById('tab-svg-calendar');
+        if (tabCal) tabCal.innerHTML = window.ModernIcons.calendar('currentColor', 15);
+        const tabLed = document.getElementById('tab-svg-ledger');
+        if (tabLed) tabLed.innerHTML = window.ModernIcons.ledger('currentColor', 15);
+        const tabNot = document.getElementById('tab-svg-notes');
+        if (tabNot) tabNot.innerHTML = window.ModernIcons.notes('currentColor', 15);
+        const tabSta = document.getElementById('tab-svg-stats');
+        if (tabSta) tabSta.innerHTML = window.ModernIcons.stats('currentColor', 15);
+
+        // 캘린더 네비
+        const prevIcon = document.getElementById('cal-prev-icon');
+        if (prevIcon) prevIcon.innerHTML = window.ModernIcons.chevronLeft('#334155', 18);
+        const nextIcon = document.getElementById('cal-next-icon');
+        if (nextIcon) nextIcon.innerHTML = window.ModernIcons.chevronRight('#334155', 18);
+
+        // 하단 네비 5개
+        const navCal = document.getElementById('nav-icon-cal');
+        if (navCal) navCal.innerHTML = window.ModernIcons.calendar('currentColor', 22);
+        const navLed = document.getElementById('nav-icon-ledger');
+        if (navLed) navLed.innerHTML = window.ModernIcons.ledger('currentColor', 22);
+        const navNot = document.getElementById('nav-icon-notes');
+        if (navNot) navNot.innerHTML = window.ModernIcons.notes('currentColor', 22);
+        const navSta = document.getElementById('nav-icon-stats');
+        if (navSta) navSta.innerHTML = window.ModernIcons.stats('currentColor', 22);
+        const navSet = document.getElementById('nav-icon-settings');
+        if (navSet) navSet.innerHTML = window.ModernIcons.settings('currentColor', 22);
+
+        // FAB 플로팅 버튼
+        const fabIcon = document.getElementById('fab-plus-icon');
+        if (fabIcon) fabIcon.innerHTML = window.ModernIcons.plus('#FFFFFF', 26);
+
+        // 가계부 툴바
+        const btnAdd = document.getElementById('btn-icon-add-tx');
+        if (btnAdd) btnAdd.innerHTML = window.ModernIcons.plus('currentColor', 14);
+        const btnUp = document.getElementById('btn-icon-upload');
+        if (btnUp) btnUp.innerHTML = window.ModernIcons.upload('currentColor', 14);
+        const btnDown = document.getElementById('btn-icon-download');
+        if (btnDown) btnDown.innerHTML = window.ModernIcons.download('currentColor', 14);
+        const btnSync = document.getElementById('btn-icon-sync');
+        if (btnSync) btnSync.innerHTML = window.ModernIcons.sync('currentColor', 14);
+        const iconBud = document.getElementById('icon-budget-setting');
+        if (iconBud) iconBud.innerHTML = window.ModernIcons.settings('currentColor', 13);
+      } catch (err) {
+        console.warn('applyModernIconsToDOM non-fatal:', err);
+      }
+    }
 
     // --- Module 1: PeriodScheduleEngine ---
     window.PeriodScheduleEngine = (function() {
@@ -2842,6 +3095,7 @@
 
     // INIT
     window.addEventListener('DOMContentLoaded', () => {
+      applyModernIconsToDOM();
       loadStateFromLocal();
       checkKakaoBrowser();
       checkUrlInvite();
@@ -4763,8 +5017,10 @@ ${inviteUrl}`;
           `;
         } else {
           listContainer.innerHTML = filtered.map(t => {
-            const icon = CATEGORY_ICONS[t.category] || '💸';
             const isExp = t.type === 'expense';
+            const icon = (window.ModernIcons && window.ModernIcons.categoryIcon)
+              ? window.ModernIcons.categoryIcon(t.category, { size: 20, color: isExp ? '#E11D48' : '#059669' })
+              : (CATEGORY_ICONS[t.category] || '💸');
             const sign = isExp ? '-' : '+';
             const payerLabel = t.payer === 'juni' ? '주니 🐻' : t.payer === 'yongi' ? '용이 🐰' : '공동 🥂';
             const payerClass = t.payer || 'together';
@@ -4984,6 +5240,7 @@ ${inviteUrl}`;
     }
 
     function renderAll() {
+      applyModernIconsToDOM();
       updateRoleUI();
       renderLatestNoteAlertCard();
       renderDrinkBanner();

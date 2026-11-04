@@ -1,6 +1,6 @@
 ---
 title: 달콤살벌 캘린더 활성 계획서 및 설계 정본 색인 (SSOT Registry)
-version: v2.0.0
+version: v2.1.0
 status: active
 created: 2026-11-02
 updated: 2026-11-04
@@ -18,11 +18,13 @@ tags:
 
 ---
 
-## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v2.0.0)
+## 1. 현재 적용 중인 정본 계획서 목록 (Active Plans — v2.1.0)
 
 | 구분 | 문서명 (버전 및 일자) | 상태 | 핵심 내용 및 역할 | 연계 구현 산출물 |
 | :---: | :--- | :---: | :--- | :--- |
+| **모던 디자인 & 가독성 대폭 향상** | [[Couple-Calendar_모던디자인및가독성개편_상세설계사양서_v2.1_2026-11-04]] | `ACTIVE` | • WCAG AAA 고대비 타이포그래피 & 뉴트럴 배경 (`#0F172A`, `#F8FAFC`)<br/>• 올드한 이모지 ➔ Lucide 스타일 정밀 SVG 인라인 아이콘 체계<br/>• 3D 메달리온 로고 완벽 보존 & 애플/토스 감성의 모던 카드 보더<br/>• 숫자 고정폭 정렬(`tnum, cv05`)로 가계부/날짜 가독성 극대화 | `index.html`<br/>`Couple-Calendar.html` |
 | **가족 일정 & 가계부 통합** | [[Couple-Calendar_가족일정및가계부통합_상세설계사양서_v2.0_2026-11-04]] | `ACTIVE` | • 음주티켓 배너 통계 탭 내부 이전<br/>• 캘린더 기간(시작~종료일) 일정 및 메모 쪽지함 즉시 전달 연동<br/>• 가계부(생활비) CRUD, 엑셀 업로드/공유링크연동/내보내기<br/>• 모바일 맞춤 통계 및 웹 대화면 엑셀 스타일 데이터 그리드 | `index.html`<br/>`Couple-Calendar.html`<br/>E2E 테스트 스위트 |
+
 | **원자적 구현 계획서** | [[Couple-Calendar_가족일정및가계부통합_원자적구현계획서_v2.0_2026-11-04]] | `ACTIVE` | • Superpowers 기반 WBS 및 6단계 원자적 TDD 구현 계획<br/>• Free세션 워커 분담 및 마스터 통합 체계 정의 | 구현 및 테스트 스위트 |
 | **버전 이력 & CHANGELOG** | [[Couple-Calendar_버전기록_CHANGELOG]] | `ACTIVE` | • v1.0.0부터 v2.0.0까지의 전체 기획, 설계, 버그픽스 및 기술 의사결정 누적 기록 | `index.html`<br/>`sw.js`<br/>`manifest.json` |
 | **쪽지 개인화 & 하트 단일 반응** | [[Couple-Calendar_쪽지개인화및하트단일반응_상세설계사양서_v1.8_2026-11-03]] | `ACTIVE` | • 메인 화면 상대방 쪽지만 엄격 필터링 (내가 쓴 글 배제)<br/>• 쪽지함 내 프로필(`myRole`) 기준 `[📬 나에게 온 쪽지]` 1순위 자동 열림<br/>• 하트 반응 1인 1회 제한 및 토글 지원 (`likedBy` 배열 연동) | `index.html`<br/>E2E 테스트 스위트 |

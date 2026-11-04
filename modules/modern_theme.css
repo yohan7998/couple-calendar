@@ -1,0 +1,1428 @@
+/**
+ * 달콤살벌 캘린더 - 모던 디자인 토큰 시스템 (Apple/Toss 스타일)
+ * 프로젝트: couple-calendar
+ * v2.0+ — 낮은 명도 대비 탈피, WCAG AAA 가독성, 세련된 로즈/슬레이트 팔레트
+ * 3D 메달리온 로고(헤더 로고)는 기존 그대로 보존됨
+ */
+
+/* ==========================================================================
+   1. COLOR TOKENS — Core Palette
+   ========================================================================== */
+:root {
+  /* ── Backgrounds ─────────────────────────────────────────────────────── */
+  --bg-page: #F1F3F5;              /* 바깥 페이지 배경 (Slate 100) */
+  --bg-app: #FFFFFF;                /* 앱 컨테이너/카드 서피스 (Pure White) */
+  --bg-elevated: #F8FAFC;           /* 서브 카드/호버 상태 (Slate 50) */
+  --bg-input: #FFFFFF;              /* 입력창 배경 */
+  --bg-modal-overlay: rgba(15, 23, 42, 0.45); /* 모달 오버레이 (Slate 900 @ 45%) */
+
+  /* ── Text — WCAG AAA 대비 (4.5:1 이상) ──────────────────────────────── */
+  --text-main: #0F172A;             /* 본문 텍스트 (Slate 900) — 대비 16.4:1 on white */
+  --text-sub: #334155;              /* 서브 텍스트 (Slate 700) — 대비 8.6:1 on white */
+  --text-muted: #64748B;            /* 힌트/비활성 (Slate 500) — 대비 4.6:1 on white */
+  --text-inverse: #FFFFFF;          /* 다크 배경 위 텍스트 */
+  --text-link: #F43F5E;             /* 링크/강조 텍스트 (Rose 600) */
+
+  /* ── Brand / Accent — 세련된 모던 로즈 & 슬레이트/인디고 ───────────── */
+  --brand-rose: #F43F5E;            /* 메인 브랜드 컬러 (Rose 600) */
+  --brand-rose-light: #FFF1F2;      /* Rose 50 — 칩/배지 배경 */
+  --brand-rose-hover: #E11D48;      /* Rose 700 — 호버 */
+  --brand-rose-active: #BE123C;     /* Rose 800 — 액티브/프레스드 */
+
+  --brand-indigo: #4F46E5;          /* 보조 액션/링크 (Indigo 600) */
+  --brand-indigo-light: #EEF2FF;    /* Indigo 50 */
+  --brand-indigo-hover: #4338CA;    /* Indigo 700 */
+
+  --brand-emerald: #059669;         /* 성공/수입 (Emerald 600) */
+  --brand-emerald-light: #ECFDF5;   /* Emerald 50 */
+
+  --brand-amber: #D97706;           /* 경고/대기 (Amber 600) */
+  --brand-amber-light: #FFFBEB;     /* Amber 50 */
+
+  --brand-slate: #475569;           /* 중립 액션 (Slate 600) */
+  --brand-slate-light: #F1F5F9;     /* Slate 100 */
+
+  /* ── Semantic Status ────────────────────────────────────────────────── */
+  --success: #059669;               /* Emerald 600 */
+  --success-bg: #ECFDF5;            /* Emerald 50 */
+  --success-border: #A7F3D0;        /* Emerald 200 */
+
+  --warning: #D97706;               /* Amber 600 */
+  --warning-bg: #FFFBEB;            /* Amber 50 */
+  --warning-border: #FDE68A;        /* Amber 200 */
+
+  --danger: #DC2626;                /* Red 600 */
+  --danger-bg: #FEF2F2;             /* Red 50 */
+  --danger-border: #FECACA;         /* Red 200 */
+
+  --info: #2563EB;                  /* Blue 600 */
+  --info-bg: #EFF6FF;               /* Blue 50 */
+  --info-border: #BFDBFE;           /* Blue 200 */
+
+  /* ── Borders & Dividers ─────────────────────────────────────────────── */
+  --border-primary: #E2E8F0;        /* 메인 보더 (Slate 200) */
+  --border-subtle: #F1F5F9;         /* 미세 보더 (Slate 100) */
+  --border-focus: #F43F5E;          /* 포커스 링 (Rose 600) */
+  --border-input: #CBD5E1;          /* 입력창 기본 보더 (Slate 300) */
+  --border-input-hover: #94A3B8;    /* 입력창 호버 (Slate 400) */
+
+  /* ── Shadows — 애플 감성 2단계 레이어드 ─────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.03);           /* 극미세 */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03); /* 카드 기본 */
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);  /* 카드 호버/모달 */
+  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.05);  /* 대형 모달/드롭다운 */
+  --shadow-xl: 0 20px 40px rgba(15, 23, 42, 0.1), 0 8px 16px rgba(15, 23, 42, 0.06);   /* 최상위 */
+
+  /* ── Radii ───────────────────────────────────────────────────────────── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* ── Spacing Scale (4px base) ───────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+
+  /* 폰트 피처 설정: cv05(대체 숫자), tnum(표 형식 숫자), ss01(스타일세트 1) */
+  --font-feature: "cv05" 1, "tnum" 1, "ss01" 1;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 17px;
+  --text-xl: 19px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 34px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* ── Transitions ────────────────────────────────────────────────────── */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-Index Scale ──────────────────────────────────────────────────── */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-backdrop: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+}
+
+/* ==========================================================================
+   2. GLOBAL RESET & BASE
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: var(--font-feature);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-main);
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+}
+
+/* 숫자 고정폭 (금액, 날짜, 카운터 등) */
+.tabular-nums,
+.amount,
+.count,
+.date-num,
+[data-tabular] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv05" 1;
+}
+
+/* ==========================================================================
+   3. APP CONTAINER — 모바일 프레임
+   ========================================================================== */
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  background: var(--bg-app);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  overflow-x: hidden;
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0));
+}
+
+/* ==========================================================================
+   4. HEADER & 3D 메달리온 로고 (보존 필수!)
+   ========================================================================== */
+header {
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.couple-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* 3D 메달리온 로고 — 기존 스타일 완벽 보존 */
+.header-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.16), 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  flex-shrink: 0;
+  /* 3D 메달리온 효과 유지 */
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.header-logo:active {
+  transform: scale(0.95);
+}
+
+.brand-text-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+}
+
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.app-version-badge {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--brand-rose);
+  background: var(--brand-rose-light);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-xs);
+  padding: 1px var(--space-1);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.app-name {
+  font-family: inherit;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.couple-avatars {
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: 1px;
+}
+
+/* 하트 펄스 애니메이션 */
+@keyframes heartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ==========================================================================
+   5. ICON BUTTONS & SYNC STATUS
+   ========================================================================== */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.sync-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  background: var(--brand-slate-light);
+  color: var(--brand-slate);
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid var(--border-primary);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.sync-status-badge.synced {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success-border);
+}
+
+.sync-status-badge.syncing {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+
+.sync-status-badge.error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-app);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.icon-btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-input-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+  box-shadow: var(--shadow-xs);
+}
+
+/* ==========================================================================
+   6. VIEW TABS (하단 네비게이션 포함)
+   ========================================================================== */
+.view-tabs {
+  display: flex;
+  margin: var(--space-3) var(--space-4) var(--space-4);
+  background: var(--bg-elevated);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: var(--space-2) 0;
+  border: none;
+  background: none;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.tab-btn:hover {
+  color: var(--text-sub);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.tab-btn.active {
+  background: var(--bg-app);
+  color: var(--brand-rose);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-btn:active {
+  transform: scale(0.97);
+}
+
+/* 하단 네비게이션 (모바일) */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-primary);
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06);
+  z-index: var(--z-sticky);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-2) 0;
+  border: none;
+  background: none;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.bottom-nav-item.active {
+  color: var(--brand-rose);
+}
+
+.bottom-nav-item .nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   7. TAB VIEWS & ANIMATIONS
+   ========================================================================== */
+.tab-view {
+  display: none;
+  padding: 0 var(--space-4) var(--space-10);
+  animation: fadeIn var(--duration-normal) var(--easing-standard);
+}
+
+.tab-view.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   8. CARDS & CONTAINERS
+   ========================================================================== */
+.card {
+  background: var(--bg-app);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-primary);
+}
+
+.card-elevated {
+  background: var(--bg-app);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-primary);
+}
+
+.card-subtle {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   9. BUTTONS — 슬릭하고 모던한 스타일
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Primary — 브랜드 로즈 */
+.btn-primary {
+  background: var(--brand-rose);
+  color: var(--text-inverse);
+  border-color: var(--brand-rose);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-rose-hover);
+  border-color: var(--brand-rose-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--brand-rose-active);
+  border-color: var(--brand-rose-active);
+  transform: scale(0.97);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Secondary — 아웃라인 */
+.btn-secondary {
+  background: var(--bg-app);
+  color: var(--text-main);
+  border-color: var(--border-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-elevated);
+  border-color: var(--border-input-hover);
+  color: var(--text-main);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background: var(--bg-elevated);
+  transform: scale(0.97);
+}
+
+/* Ghost — 텍스트만 */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-sub);
+  border-color: transparent;
+  padding: var(--space-1) var(--space-3);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-elevated);
+  color: var(--text-main);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background: var(--border-primary);
+  transform: scale(0.97);
+}
+
+/* Danger — 삭제/위험 액션 */
+.btn-danger {
+  background: var(--danger);
+  color: var(--text-inverse);
+  border-color: var(--danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #B91C1C;
+  border-color: #B91C1C;
+}
+
+/* Success — 수입/완료 */
+.btn-success {
+  background: var(--success);
+  color: var(--text-inverse);
+  border-color: var(--success);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #047857;
+  border-color: #047857;
+}
+
+/* Full width */
+.btn-block {
+  width: 100%;
+}
+
+/* Icon only */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+/* ==========================================================================
+   10. CHIPS & BADGES
+   ========================================================================== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.chip-sm {
+  padding: 2px 8px;
+  font-size: 10px;
+}
+
+.chip-rose {
+  background: var(--brand-rose-light);
+  color: var(--brand-rose);
+  border-color: #FEC6D1;
+}
+
+.chip-emerald {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success-border);
+}
+
+.chip-amber {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+
+.chip-slate {
+  background: var(--brand-slate-light);
+  color: var(--brand-slate);
+  border-color: var(--border-primary);
+}
+
+.chip-indigo {
+  background: var(--brand-indigo-light);
+  color: var(--brand-indigo);
+  border-color: #C7D2FE;
+}
+
+.chip-blue {
+  background: var(--info-bg);
+  color: var(--info);
+  border-color: var(--info-border);
+}
+
+/* ==========================================================================
+   11. FORM INPUTS
+   ========================================================================== */
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: var(--space-1);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-family: inherit;
+  color: var(--text-main);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.form-input:hover,
+.form-select:hover,
+.form-textarea:hover {
+  border-color: var(--border-input-hover);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+  background: var(--bg-app);
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* 인풋 위드 아이콘/액션 */
+.input-with-action {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.input-with-action .form-input {
+  flex: 1;
+}
+
+/* ==========================================================================
+   12. DRINK TICKET BANNER (통계 탭 내 위치)
+   ========================================================================== */
+#drink-ticket-banner {
+  margin: var(--space-4) var(--space-4) var(--space-3);
+  background: linear-gradient(135deg, var(--brand-rose-light) 0%, #FFF7ED 100%);
+  border: 1px solid #FEC6D1;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.ticket-title {
+  font-family: inherit;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ticket-quota-badge {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-sub);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.ticket-counter-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.ticket-count {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--brand-rose);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket-unit {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.ticket-subtext {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.drink-progress-track {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #FEC6D1;
+}
+
+.drink-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-rose) 0%, #FB7185 100%);
+  border-radius: var(--radius-full);
+  width: 0%;
+  transition: width var(--duration-slow) var(--easing-spring);
+}
+
+.ticket-status-pill {
+  margin-top: var(--space-2);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-plenty { background: var(--success-bg); color: var(--success); }
+.status-warning { background: var(--warning-bg); color: var(--warning); }
+.status-exhausted { background: var(--danger-bg); color: var(--danger); }
+.status-overlimit { background: var(--danger-bg); color: var(--danger); animation: shake 0.6s infinite; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* ==========================================================================
+   13. CALENDAR GRID
+   ========================================================================== */
+.calendar-card {
+  background: var(--bg-app);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-primary);
+}
+
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.cal-month-title {
+  font-family: inherit;
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--easing-standard);
+}
+
+.cal-month-title:hover {
+  color: var(--brand-rose);
+}
+
+.cal-nav-btn {
+  background: var(--brand-rose-light);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  color: var(--brand-rose);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.cal-nav-btn:hover {
+  background: var(--brand-rose);
+  color: var(--text-inverse);
+}
+
+.cal-nav-btn:active {
+  transform: scale(0.9);
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.cal-weekdays div:first-child { color: var(--danger); }
+.cal-weekdays div:last-child { color: var(--info); }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day {
+  min-height: 56px;
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.cal-day:hover {
+  background: var(--bg-app);
+  border-color: var(--border-primary);
+}
+
+.cal-day:active {
+  transform: scale(0.95);
+}
+
+.cal-day.other-month {
+  opacity: 0.3;
+}
+
+.cal-day.today {
+  background: var(--brand-rose-light);
+  border: 2px solid var(--brand-rose);
+}
+
+.cal-day-number {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1;
+  margin-bottom: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-day.today .cal-day-number {
+  color: var(--brand-rose);
+}
+
+.cal-day.other-month .cal-day-number {
+  color: var(--text-muted);
+}
+
+/* 일정 표시 — 연속 바 스타일 */
+.schedule-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  margin-top: 2px;
+}
+
+.schedule-bar {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  opacity: 0.9;
+}
+
+.schedule-bar.start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.schedule-bar.end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.schedule-bar.single { border-radius: var(--radius-full); }
+
+.schedule-more {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   14. LEDGER / TRANSACTION LIST
+   ========================================================================== */
+.ledger-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ledger-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-app);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.ledger-item:hover {
+  border-color: var(--border-input-hover);
+  box-shadow: var(--shadow-xs);
+}
+
+.ledger-item:active {
+  transform: scale(0.99);
+}
+
+.ledger-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.ledger-icon.expense { background: var(--brand-rose-light); color: var(--brand-rose); }
+.ledger-icon.income { background: var(--success-bg); color: var(--success); }
+
+.ledger-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ledger-category {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ledger-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.ledger-amount {
+  font-size: var(--text-base);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+.ledger-amount.expense { color: var(--brand-rose); }
+.ledger-amount.income { color: var(--success); }
+
+.ledger-payer {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.ledger-payer.juni { background: var(--brand-indigo-light); color: var(--brand-indigo); }
+.ledger-payer.yongi { background: var(--brand-rose-light); color: var(--brand-rose); }
+.ledger-payer.together { background: var(--success-bg); color: var(--success); }
+
+/* ==========================================================================
+   15. MODALS
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-modal-overlay);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-4);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--duration-normal) var(--easing-standard);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-sheet {
+  background: var(--bg-app);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  max-width: 480px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  transform: translateY(100%);
+  transition: transform var(--duration-normal) var(--easing-emphasized);
+}
+
+.modal-overlay.active .modal-sheet {
+  transform: translateY(0);
+}
+
+.modal-handle {
+  width: 40px;
+  height: 5px;
+  background: var(--border-primary);
+  border-radius: var(--radius-full);
+  margin: var(--space-2) auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.modal-title {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.modal-close:hover {
+  background: var(--border-primary);
+  color: var(--text-main);
+}
+
+.modal-close:active {
+  transform: scale(0.9);
+}
+
+.modal-body {
+  padding: var(--space-5);
+}
+
+.modal-footer {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-elevated);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.modal-footer .btn {
+  flex: 1;
+}
+
+/* ==========================================================================
+   16. TOAST & TOOLTIPS
+   ========================================================================== */
+.toast {
+  position: fixed;
+  bottom: calc(95px + var(--space-3));
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--text-main);
+  color: var(--text-inverse);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-toast);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--duration-normal) var(--easing-emphasized);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.warning { background: var(--warning); color: #1C1917; }
+.toast.info { background: var(--info); }
+
+/* ==========================================================================
+   17. STATS / CHARTS CONTAINERS
+   ========================================================================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-card {
+  background: var(--bg-app);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.stat-value {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  margin-top: var(--space-1);
+}
+
+.stat-trend.up { color: var(--brand-rose); }
+.stat-trend.down { color: var(--success); }
+
+/* 차트 컨테이너 */
+.chart-container {
+  background: var(--bg-app);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  height: 280px;
+}
+
+@media (min-width: 768px) {
+  .chart-container {
+    height: 340px;
+  }
+}
+
+/* ==========================================================================
+   18. EXCEL UPLOAD/DROP ZONE
+   ========================================================================== */
+.drop-zone {
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  background: var(--bg-elevated);
+  transition: all var(--duration-fast) var(--easing-standard);
+  cursor: pointer;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--brand-rose);
+  background: var(--brand-rose-light);
+}
+
+.drop-zone-icon {
+  font-size: 40px;
+  margin-bottom: var(--space-2);
+  opacity: 0.6;
+}
+
+.drop-zone-text {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.drop-zone-hint {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ==========================================================================
+   19. SETTINGS SECTIONS
+   ========================================================================== */
+.settings-section {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-3);
+}
+
+/* ==========================================================================
+   20. UTILITY CLASSES
+   ========================================================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+
+.w-full { width: 100%; }
+.flex-1 { flex: 1; }
+
+.hidden { display: none !important; }
+.invisible { visibility: hidden; }
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-input);
+}
+
+/* 포커스 가시성 */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* 선택 영역 */
+::selection {
+  background: var(--brand-rose-light);
+  color: var(--brand-rose);
+}
