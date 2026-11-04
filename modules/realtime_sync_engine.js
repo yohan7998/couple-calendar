@@ -293,3 +293,4 @@
         getConfig: function() { return Object.assign({}, config); }
     };
 }));
+
