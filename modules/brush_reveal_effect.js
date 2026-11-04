@@ -229,6 +229,9 @@
 
     function finishSweep() {
       if (canvas) canvas.dataset.revealed = 'true'; // 완료 마킹
+      if (targetContainer) {
+        targetContainer._isRevealed = true; // 확실하게 고정
+      }
       if (ctx) {
         try {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -252,11 +255,15 @@
         if (canvas && canvas.parentNode) {
           canvas.parentNode.removeChild(canvas);
         }
+        if (canvas) {
+          canvas.remove(); // 확실한 제거 보장
+        }
         if (targetContainer) {
           const guide = targetContainer.querySelector('.brush-reveal-guide');
           if (guide && guide.parentNode) {
             guide.parentNode.removeChild(guide);
           }
+          guide?.remove();
         }
         if (typeof onRevealed === 'function') {
           onRevealed(noteId);
@@ -331,12 +338,18 @@
     cardElement._brushRevealData = { note, onRevealed };
     cardElement._noteId = noteId;
 
-    // 1. 감성 가이드 칩 추가 ("🎨 살포시 터치해서 열어보기")
+    // 1. 상단 감성 가이드 추가 ("🎨 살포시 터치해서 열어보기")
     let guide = cardElement.querySelector('.brush-reveal-guide');
     if (!guide) {
       guide = document.createElement('div');
       guide.className = 'brush-reveal-guide';
-      guide.innerHTML = '<span>🎨</span><span>살포시 터치해서 열어보기</span>';
+      // 하단 모서리 스타일 가이드
+      guide.innerHTML = `
+        <div style="display:flex; align-items:center; gap:4px;">
+          <span style="font-size:16px;">🎨</span>
+          <span style="font-size:12px; color:#9CA3AF;">살포시 터치해서 열어보기</span>
+        </div>
+      `;
       cardElement.appendChild(guide);
     }
 
@@ -355,9 +368,9 @@
       ctx = null;
     }
 
-    const rect = (cardElement.getBoundingClientRect && cardElement.getBoundingClientRect()) || { width: 320, height: 100 };
+    const rect = (cardElement.getBoundingClientRect && cardElement.getBoundingClientRect()) || { width: 320, height: 120 };
     const w = rect.width || 320;
-    const h = rect.height || 100;
+    const h = rect.height || 120;
 
     if (ctx) {
       initCanvasSurface(canvas, ctx, w, h);

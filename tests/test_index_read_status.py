@@ -43,7 +43,8 @@ class TestIndexReadStatusIntegration(unittest.TestCase):
         self.assertIn('badge-unread-new', self.html)
         self.assertIn('dot-unread-pulse', self.html)
         self.assertIn('read-status-label', self.html)
-        self.assertIn('btn-toggle-read', self.html)
+        # v2.5.3: 카드 우측 하단 불필요한 안읽음 버튼 제거, 깔끔한 읽음 뱃지만 유지
+        self.assertIn('handleToggleNoteRead', self.html)
 
     def test_calendar_has_unread_memo_indicator(self):
         self.assertIn('ReadStatusEngine.getUnreadMemosCountForDate', self.html)

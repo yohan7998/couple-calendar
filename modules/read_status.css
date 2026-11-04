@@ -266,6 +266,28 @@
   font-weight: var(--font-medium);
 }
 
+/* Unread Unsealed Badge - 미개봉 카드 우측하단 표시 */
+.unread-unsealed-badge {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+  background: var(--color-note-unread-bg);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.unread-unsealed-badge svg {
+  width: 12px;
+  height: 12px;
+  margin-right: var(--space-1);
+  vertical-align: middle;
+}
+
 .read-status-label.unread {
   background: var(--color-unread-badge-bg);
   color: var(--color-unread-badge-text);

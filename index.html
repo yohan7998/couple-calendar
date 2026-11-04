@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>달콤살벌 캘린더 💖⚔️</title>
+  <title>달콤살벌 캘린더 💖⚔️ (v2.5.3)</title>
+  <meta name="version" content="v2.5.3">
   
   <!-- PWA & Mobile Web App Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1970,7 +1971,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="현재 정본 버전: v2.5.0 (2026-11-04)">v2.5</span>
+            <span class="app-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()" style="cursor:pointer;">v2.5.3 ⚡</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -2466,6 +2467,19 @@
         </div>
       </div>
 
+      <!-- v2.5.3 Force Cache Purge Button -->
+      <div style="margin-top: 14px; padding: 12px 14px; background: #FFF1F2; border-radius: 12px; border: 1px solid #FECDD3; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #BE123C; margin-bottom: 4px;">
+          <span>⚡</span> 최신 버전 강제 업데이트 (v2.5.3)
+        </div>
+        <div style="font-size: 11px; color: #881337; margin-bottom: 8px; line-height: 1.4;">
+          모바일 PWA/브라우저의 이전 캐시를 100% 완전 삭제하고 최신 정본을 즉시 로드합니다.
+        </div>
+        <button type="button" class="btn-primary" onclick="forcePurgeAppCache()" style="width: 100%; padding: 8px 12px; font-size: 12px; font-weight: 600; background: #E11D48; border: none; border-radius: 8px; cursor: pointer; color: white;">
+          🚀 원클릭 캐시 완전 초기화 & 최신 버전 받기
+        </button>
+      </div>
+
       <div class="form-group" style="margin-top: 14px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
           <label class="form-label" style="margin: 0;">🔒 GitHub 2인 실시간 동기화</label>
@@ -2573,7 +2587,7 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.5.0</span>
+          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.5.3</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
           최근 갱신: 2026-11-04 (가족 일정 및 가계부·생활비 관리 통합 대개편)
@@ -3337,6 +3351,34 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
+    // v2.5.3 Force Cache Purge & App Update
+    async function forcePurgeAppCache() {
+      try {
+        showToast('🚀 최신 버전(v2.5.3)으로 캐시를 완전 초기화하는 중입니다...');
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            await reg.unregister();
+          }
+        }
+        localStorage.setItem('couple_app_build_v', 'v2.5.3');
+        try {
+          await fetch('./emergency-update?t=' + Date.now(), { cache: 'no-store' });
+        } catch(e){}
+        setTimeout(() => {
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.location.href = cleanUrl + '?v=2.5.3&t=' + Date.now();
+        }, 400);
+      } catch (err) {
+        console.error('Failed to purge cache:', err);
+        window.location.reload(true);
+      }
+    }
+
     // --- Realtime Low-Latency Sync Subsystem (v2.4.0) ---
     function initRealtimeSync() {
       if (typeof RealtimeSyncEngine === 'undefined') return;
@@ -3440,6 +3482,14 @@
 
     // INIT
     window.addEventListener('DOMContentLoaded', () => {
+      // Auto cache-busting check for v2.5.3
+      const currentBuild = 'v2.5.3';
+      if (localStorage.getItem('couple_app_build_v') !== currentBuild) {
+        localStorage.setItem('couple_app_build_v', currentBuild);
+        if ('caches' in window) {
+          caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+        }
+      }
       applyModernIconsToDOM();
       loadStateFromLocal();
       checkKakaoBrowser();
@@ -4241,6 +4291,14 @@
         card.className = `note-card modern-note-card ${isRead ? 'read' : 'unread'} ${isReceived ? 'is-received' : 'is-sent'}`;
         card.setAttribute('data-id', note.id);
 
+        // 📍 미개봉 카드의 맥락 표시: 오른쪽 하단에 "미개봉" 배지 (사용자만 보임)
+        if (!isRead && isReceived) {
+          const unreadBadge = document.createElement('span');
+          unreadBadge.className = 'unread-unsealed-badge';
+          unreadBadge.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H4"/><path d="M4 12h16"/></svg> 미개봉`;
+          card.appendChild(unreadBadge);
+        }
+
         let grantBtnHtml = '';
         if (note.type === 'ticket-request' && !note.isGranted) {
           const canGrant = note.author !== myRole;
@@ -4289,16 +4347,6 @@
           }
         }
 
-        // Toggle Read Button for received notes
-        let toggleReadBtnHtml = '';
-        if (isReceived) {
-          toggleReadBtnHtml = `
-            <button type="button" class="btn-toggle-read ${isRead ? 'is-read' : 'is-unread'}" onclick="handleToggleNoteRead('${note.id}', event)" title="${isRead ? '안읽음으로 표시' : '읽음으로 표시'}">
-              ${isRead ? '안읽음' : '✓ 읽음'}
-            </button>
-          `;
-        }
-
         card.innerHTML = `
           <div class="note-header">
             <div style="display:flex; align-items:center; gap:6px;">
@@ -4316,7 +4364,6 @@
               ${grantBtnHtml}
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
-              ${toggleReadBtnHtml}
               <button type="button" class="icon-btn" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="삭제" style="font-size: 13px;">🗑️</button>
             </div>
           </div>
@@ -4324,7 +4371,25 @@
         container.appendChild(card);
 
         if (isReceived && !isRead && typeof BrushRevealEngine !== 'undefined') {
+          // [해결책 A/B] 렌더링 시점에 이미 로컬에서 개봉된 상태라면 캔버스를 붙이지 않음
+          if (note._localRevealed === true || localStorage.getItem('note_revealed_' + note.id) === 'true') {
+            card.classList.remove('unread');
+            card.classList.add('read');
+            return;
+          }
+
           BrushRevealEngine.attach(card, note.id, (revealedNoteId) => {
+            // [해결책 A] 즉시 로컬 상태 고정
+            note._localRevealed = true;
+            try {
+              localStorage.setItem('note_revealed_' + note.id, 'true');
+            } catch(e){}
+            card._isRevealed = true;
+
+            // [해결책 B] 캔버스 및 가이드 제거 보장
+            card.querySelector('.brush-reveal-canvas')?.remove();
+            card.querySelector('.brush-reveal-guide')?.remove();
+
             if (typeof ReadStatusEngine !== 'undefined') {
               ReadStatusEngine.markNoteAsRead(note, myRole);
             } else {
@@ -4332,16 +4397,15 @@
             }
             if (!Array.isArray(note.readBy)) note.readBy = [];
             if (!note.readBy.includes(myRole)) note.readBy.push(myRole);
-            note._localRevealed = true;
-            try {
-              localStorage.setItem('note_revealed_' + note.id, 'true');
-            } catch(e){}
-            card._isRevealed = true;
+
             playCutePop();
             saveStateLocal();
             broadcastRealtimeDelta('notes', 'update', note);
             updateNotesBadge();
-            syncWithGist(false);
+
+            // [해결책 C] 1초 지연 후 서버 동기화 (DOM 안정화 및 레이스 컨디션 방지)
+            setTimeout(() => syncWithGist(false), 1000);
+
             card.classList.remove('unread');
             card.classList.add('read');
             const statusArea = card.querySelector('.note-header div');
@@ -4356,14 +4420,6 @@
                 statusArea.appendChild(label);
               }
             }
-            const toggleBtn = card.querySelector('.btn-toggle-read');
-            if (toggleBtn) {
-              toggleBtn.className = 'btn-toggle-read is-read';
-              toggleBtn.textContent = '안읽음';
-            }
-          });
-        }
-      });
     }
 
     function reactToNote(id) {

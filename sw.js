@@ -1,5 +1,5 @@
-// SweetSync Couple Calendar - PWA Service Worker v2.5.2
-const CACHE_NAME = 'couple-calendar-v2.5.2';
+// SweetSync Couple Calendar - PWA Service Worker v2.5.3
+const CACHE_NAME = 'couple-calendar-v2.5.3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -21,7 +21,7 @@ const ASSETS_TO_CACHE = [
   './apple-touch-icon.png'
 ];
 
-// Install: Cache critical core shell assets immediately
+// Install: Cache critical core shell assets immediately and skip waiting
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -32,7 +32,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate: Clean up old caches and take control of all clients
+// Activate: Clean up old caches and take control of all clients immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -52,12 +52,27 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  // 1. Bypass Service Worker cache for GitHub Gist API sync & external POST/PATCH calls
-  if (requestUrl.hostname.includes('github.com') || event.request.method !== 'GET') {
+  // 1. 비상 업데이트 엔드포인트
+  if (requestUrl.pathname.includes('/emergency-update') || requestUrl.search.includes('purge-cache=1')) {
+    event.respondWith(
+      (async () => {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        console.log('[SW] All caches cleared via emergency endpoint');
+        return new Response(JSON.stringify({ status: 'cleared', version: CACHE_NAME, timestamp: Date.now() }), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })()
+    );
     return;
   }
 
-  // 2. Network-first strategy for app resources
+  // 2. Bypass Service Worker cache for GitHub Gist API sync, Firebase, & external POST/PATCH calls
+  if (requestUrl.hostname.includes('github.com') || requestUrl.hostname.includes('firebaseio.com') || event.request.method !== 'GET') {
+    return;
+  }
+
+  // 3. Network-first strategy for app resources
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
@@ -82,4 +97,3 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
-

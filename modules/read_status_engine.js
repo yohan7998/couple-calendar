@@ -154,36 +154,42 @@
         if (!localItem) return remoteItem;
         if (!remoteItem) return localItem;
 
-        const merged = Object.assign({}, remoteItem, localItem);
+        // 1단계: 동시 타임스탬프 결정 (합병 시 최신 타임스탬프 사용)
+        const latestReadAt = (localItem.readAt && remoteItem.readAt)
+            ? (localItem.readAt > remoteItem.readAt ? localItem.readAt : remoteItem.readAt)
+            : (localItem.readAt || remoteItem.readAt);
 
-        // 1. 쪽지 읽음 병합
+        const latestMemoReadAt = (localItem.memoReadAt && remoteItem.memoReadAt)
+            ? (localItem.memoReadAt > remoteItem.memoReadAt ? localItem.memoReadAt : remoteItem.memoReadAt)
+            : (localItem.memoReadAt || remoteItem.memoReadAt);
+
+        // 2단계: OR 논리로 읽음 상태 결정 (양쪽 중 하나라도 true이면 true)
         const isRead = (localItem.read === true || remoteItem.read === true);
-        merged.read = isRead;
-        if (localItem.readAt || remoteItem.readAt) {
-            merged.readAt = (localItem.readAt && remoteItem.readAt)
-                ? (localItem.readAt > remoteItem.readAt ? localItem.readAt : remoteItem.readAt)
-                : (localItem.readAt || remoteItem.readAt);
-        }
-
-        // 2. 메모 읽음 병합
         const isMemoRead = (localItem.memoRead === true || remoteItem.memoRead === true);
-        merged.memoRead = isMemoRead;
-        if (localItem.memoReadAt || remoteItem.memoReadAt) {
-            merged.memoReadAt = (localItem.memoReadAt && remoteItem.memoReadAt)
-                ? (localItem.memoReadAt > remoteItem.memoReadAt ? localItem.memoReadAt : remoteItem.memoReadAt)
-                : (localItem.memoReadAt || remoteItem.memoReadAt);
-        }
 
-        // 3. 독자 목록 Set 병합 (readBy & memoReadBy)
+        // 3단계: 독자 목록 Set 병합 (전체 합집합)
         const readBySet = new Set();
         if (Array.isArray(localItem.readBy)) localItem.readBy.forEach(r => readBySet.add(r));
         if (Array.isArray(remoteItem.readBy)) remoteItem.readBy.forEach(r => readBySet.add(r));
-        merged.readBy = Array.from(readBySet);
+        const mergedReadBy = Array.from(readBySet);
 
         const memoReadBySet = new Set();
         if (Array.isArray(localItem.memoReadBy)) localItem.memoReadBy.forEach(r => memoReadBySet.add(r));
         if (Array.isArray(remoteItem.memoReadBy)) remoteItem.memoReadBy.forEach(r => memoReadBySet.add(r));
-        merged.memoReadBy = Array.from(memoReadBySet);
+        const mergedMemoReadBy = Array.from(memoReadBySet);
+
+        // 4단계: 각 필드를 순차적으로 병합 (나중에 오는 값이 이전 값을 덮어쓰기 방지)
+        const merged = {
+            ...remoteItem,
+            ...localItem,
+            // 타임스탬프는 OR + 최신 값으로 재설정
+            readAt: latestReadAt,
+            memoReadAt: latestMemoReadAt,
+            read: isRead,
+            memoRead: isMemoRead,
+            readBy: mergedReadBy,
+            memoReadBy: mergedMemoReadBy
+        };
 
         return merged;
     }
