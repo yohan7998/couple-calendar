@@ -23,7 +23,8 @@ class TestIndexReadStatusIntegration(unittest.TestCase):
         self.assertIn('modules/read_status_engine.js', self.html)
 
     def test_mark_all_read_button_exists(self):
-        self.assertIn('id="btn-mark-all-read"', self.html)
+        # v2.5.1: 상단 일괄 읽음 버튼은 사용자 요청으로 UI에서 제거됨
+        self.assertNotIn('id="btn-mark-all-read"', self.html)
         self.assertIn('handleMarkAllNotesAsRead()', self.html)
 
     def test_notes_badge_in_markup(self):

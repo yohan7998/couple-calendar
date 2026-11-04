@@ -124,3 +124,82 @@
   );
 }
 
+/* 6. 모던 미니멀 쪽지 카드 (토스/애플 스타일 화이트 & 소프트 글래스) */
+.note-card.modern-note-card {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(226, 232, 240, 0.85) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  padding: 16px 18px !important;
+  margin-bottom: 12px !important;
+  transition: transform 180ms ease, box-shadow 180ms ease !important;
+}
+
+.note-card.modern-note-card:hover {
+  box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.07) !important;
+}
+
+.note-card.modern-note-card.unread {
+  border-left: 4px solid #F43F5E !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBFB 100%) !important;
+}
+
+.note-card.modern-note-card.read {
+  border-left: 4px solid #E2E8F0 !important;
+  opacity: 0.92;
+}
+
+.note-card.modern-note-card .note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.note-card.modern-note-card .note-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1E293B;
+  min-height: 48px;
+  word-break: break-word;
+}
+
+.note-card.modern-note-card .note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(241, 245, 249, 0.8);
+}
+
+/* 세련된 마이크로 칩 버튼 (투박한 네모 박스 완전 대체) */
+.btn-toggle-read {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 3px 9px !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(203, 213, 225, 0.7) !important;
+  background: #F8FAFC !important;
+  color: #64748B !important;
+  cursor: pointer;
+  transition: all 150ms ease;
+  line-height: 1.3;
+}
+
+.btn-toggle-read:hover {
+  background: #F1F5F9 !important;
+  color: #334155 !important;
+  border-color: #94A3B8 !important;
+}
+
+.btn-toggle-read.is-read {
+  color: #94A3B8 !important;
+}
+
+.btn-toggle-read.is-unread {
+  background: rgba(244, 63, 94, 0.08) !important;
+  color: #E11D48 !important;
+  border-color: rgba(244, 63, 94, 0.3) !important;
+}
+

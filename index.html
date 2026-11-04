@@ -2146,9 +2146,6 @@
             🐰 용이 ➔ 주니 <span class="subtab-count" id="count-yongi-to-juni">(0)</span>
           </button>
         </div>
-        <button type="button" class="btn-mark-all-read" id="btn-mark-all-read" onclick="handleMarkAllNotesAsRead()" title="수신된 쪽지 모두 읽음 처리">
-          <span>✓ 모두 읽음</span>
-        </button>
       </div>
 
       <!-- Notification / Alarm test banner -->
@@ -4232,21 +4229,8 @@
           ? ReadStatusEngine.isNoteRead(note, spouseRole)
           : false;
 
-        card.className = `note-card ${colors[idx % colors.length]} ${isRead ? 'read' : 'unread'} ${isReceived ? 'is-received' : 'is-sent'}`;
+        card.className = `note-card modern-note-card ${isRead ? 'read' : 'unread'} ${isReceived ? 'is-received' : 'is-sent'}`;
         card.setAttribute('data-id', note.id);
-
-        // Click on received unread card automatically marks as read
-        if (isReceived && !isRead) {
-          card.onclick = () => {
-            if (typeof ReadStatusEngine !== 'undefined') {
-              ReadStatusEngine.markNoteAsRead(note, myRole);
-              playCutePop();
-              saveStateLocal();
-              renderAll();
-              syncWithGist(false);
-            }
-          };
-        }
 
         let grantBtnHtml = '';
         if (note.type === 'ticket-request' && !note.isGranted) {
@@ -4341,10 +4325,25 @@
             saveStateLocal();
             updateNotesBadge();
             syncWithGist(false);
-            const unreadBadge = card.querySelector('.badge-unread-new');
-            if (unreadBadge) unreadBadge.remove();
             card.classList.remove('unread');
             card.classList.add('read');
+            const statusArea = card.querySelector('.note-header div');
+            if (statusArea) {
+              const unreadNew = statusArea.querySelector('.badge-unread-new');
+              if (unreadNew) unreadNew.remove();
+              if (!statusArea.querySelector('.read-status-label')) {
+                const label = document.createElement('span');
+                label.className = 'read-status-label read';
+                label.title = '확인 완료된 쪽지';
+                label.textContent = '✓ 읽음';
+                statusArea.appendChild(label);
+              }
+            }
+            const toggleBtn = card.querySelector('.btn-toggle-read');
+            if (toggleBtn) {
+              toggleBtn.className = 'btn-toggle-read is-read';
+              toggleBtn.textContent = '안읽음';
+            }
           });
         }
       });

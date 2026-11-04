@@ -242,6 +242,9 @@
       }
 
       setTimeout(() => {
+        if (typeof canvas._cleanupListeners === 'function') {
+          canvas._cleanupListeners();
+        }
         if (canvas && canvas.parentNode) {
           canvas.parentNode.removeChild(canvas);
         }
@@ -441,31 +444,42 @@
       sweepReveal(canvas, onRevealed, cardElement);
     });
 
-    // 터치 이벤트 바인딩
+    // 터치 이벤트 바인딩 (버블링 차단)
     canvas.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
       if (e.touches && e.touches.length > 0) {
         handleStart(e.touches[0].clientX, e.touches[0].clientY);
       }
-    }, { passive: true });
+    }, { passive: false });
 
     canvas.addEventListener('touchmove', (e) => {
+      e.stopPropagation();
       if (e.touches && e.touches.length > 0) {
         handleMove(e.touches[0].clientX, e.touches[0].clientY);
       }
-    }, { passive: true });
+    }, { passive: false });
 
-    canvas.addEventListener('touchend', handleEnd, { passive: true });
+    canvas.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      handleEnd();
+    }, { passive: false });
 
-    // 마우스 이벤트 바인딩
+    // 마우스 이벤트 바인딩 (버블링 차단)
     canvas.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
       handleStart(e.clientX, e.clientY);
     });
 
+    const onWinMouseMove = (e) => {
+      if (isDrawing) handleMove(e.clientX, e.clientY);
+    };
+    const onWinMouseUp = () => {
+      if (isDrawing) handleEnd();
+    };
+
     if (typeof window !== 'undefined') {
-      window.addEventListener('mousemove', (e) => {
-        if (isDrawing) handleMove(e.clientX, e.clientY);
-      });
-      window.addEventListener('mouseup', handleEnd);
+      window.addEventListener('mousemove', onWinMouseMove);
+      window.addEventListener('mouseup', onWinMouseUp);
 
       // 브라우저 리사이즈 시 캔버스 반응형 크기 보정
       window.addEventListener('resize', () => {
@@ -477,6 +491,14 @@
         }
       }, { passive: true });
     }
+
+    // 캔버스 객체에 정리 훅 바인딩
+    canvas._cleanupListeners = () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('mousemove', onWinMouseMove);
+        window.removeEventListener('mouseup', onWinMouseUp);
+      }
+    };
   }
 
   /**
