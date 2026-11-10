@@ -1,0 +1,47 @@
+{
+  "dispatch_time": "2026-11-04T10:57:00+09:00",
+  "project": "couple-calendar",
+  "version": "v2.5.0",
+  "master_ai": "Antigravity (Supreme Commander)",
+  "tasks": [
+    {
+      "task_id": "FREE-TASK-001",
+      "assigned_to": "Free세션 1 (PID 1651 / Core Logic)",
+      "target_file": "/Users/yohan/couple-calendar/modules/excel_ledger_engine.js",
+      "goal": "엑셀 연동 엔진 고도화 & 템플릿 생성 & 공유 시트 동기화",
+      "spec": {
+        "1": "generateTemplateXlsx(): 사용자가 바로 기입 가능한 엑셀 표준 템플릿 XLSX 데이터 반환",
+        "2": "고정비 플래그(isFixed) 및 카테고리 태그(식비, 카페, 마트, 주거, 교통, 의료, 데이트, 기타) 정규화",
+        "3": "공유 시트 CSV 비동기 패치(fetchSharedCsv) 시 URL 정규화(구글 시트 export?format=csv 변환 지원)",
+        "4": "스마트 멱등성 중복 제거(deduplicateTransactions) 고도화"
+      },
+      "verification": "node -c /Users/yohan/couple-calendar/modules/excel_ledger_engine.js"
+    },
+    {
+      "task_id": "FREE-TASK-002",
+      "assigned_to": "Free세션 2 (PID 1656 / UI & Responsive Stats)",
+      "target_file": "/Users/yohan/couple-calendar/modules/ledger_stats_view.js",
+      "sub_file": "/Users/yohan/couple-calendar/modules/ledger_stats.css",
+      "goal": "모바일/웹 반응형 듀얼 통계 뷰 컴포넌트 & 스타일링",
+      "spec": {
+        "1": "renderMobileStats(container, txs, month, budget): 모바일 최적화 카드 뷰, 부부 분담률 게이지, 카테고리 랭킹 아코디언, 월별 미니 바 차트",
+        "2": "renderWebStats(container, txs, month, budget): 대화면 월별x카테고리 피벗 테이블(Pivot Matrix), 일별 누적 추이 차트, 결제자별 상세 분석",
+        "3": "CSS: WCAG AAA 고대비 타이포그래피, 글래스모피즘 펄 카드, 부드러운 전환 트윈"
+      },
+      "verification": "node -c /Users/yohan/couple-calendar/modules/ledger_stats_view.js"
+    },
+    {
+      "task_id": "FREE-TASK-003",
+      "assigned_to": "Free세션 3 (PID 1685 / QA Tester)",
+      "target_file": "/Users/yohan/couple-calendar/tests/test_ledger_v25.py",
+      "goal": "가계부 v2.5.0 TDD 전용 단위/통합 테스트 스위트 작성",
+      "spec": {
+        "1": "엑셀 파싱 및 템플릿 생성 검증",
+        "2": "공유 시트 URL 정규화 및 멱등성 중복 제거 검증",
+        "3": "모바일/웹 통계 집계(월별 요약, 결제자 분배, 피벗 데이터) 15개 이상 케이스 검증"
+      },
+      "verification": "python3 -m unittest /Users/yohan/couple-calendar/tests/test_ledger_v25.py"
+    }
+  ]
+}
+

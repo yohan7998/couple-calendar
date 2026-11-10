@@ -1,0 +1,622 @@
+/**
+ * Couple-Calendar Modern Components
+ * 프로젝트: couple-calendar
+ * 설계: Emil Design Engineering + Design Taste Frontend
+ */
+
+/* ============================================
+   DESIGN TOKENS
+   ============================================ */
+:root {
+  /* Colors - High Contrast Palette */
+  --color-bg: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-ink: #111827;
+  --color-ink-muted: #6B7280;
+  --color-ink-subtle: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-border-strong: #D1D5DB;
+
+  /* Semantic Colors */
+  --color-expense: #E11D48;       /* 지출 - Rose 600 */
+  --color-income: #2563EB;        /* 수입 - Blue 600 */
+  --color-budget: #059669;        /* 잔여 예산 - Emerald 600 */
+  --color-today-ring: #F59E0B;    /* 오늘 링 - Amber 500 */
+
+  /* Category Chips */
+  --color-chip-food: #F97316;        /* 식비 */
+  --color-chip-transport: #0891B2;   /* 교통 */
+  --color-chip-shopping: #EC4899;    /* 쇼핑 */
+  --color-chip-cafe: #84CC16;        /* 카페 */
+  --color-chip-medical: #EF4444;     /* 의료 */
+  --color-chip-etc: #6B7280;         /* 기타 */
+
+  /* Period Schedule Gradient Tints */
+  --gradient-period-1: linear-gradient(90deg, rgba(249, 115, 22, 0.18), rgba(249, 115, 22, 0.08));
+  --gradient-period-2: linear-gradient(90deg, rgba(8, 145, 178, 0.18), rgba(8, 145, 178, 0.08));
+  --gradient-period-3: linear-gradient(90deg, rgba(236, 72, 153, 0.18), rgba(236, 72, 153, 0.08));
+  --gradient-period-4: linear-gradient(90deg, rgba(132, 204, 22, 0.18), rgba(132, 204, 22, 0.08));
+  --gradient-period-5: linear-gradient(90deg, rgba(239, 68, 68, 0.18), rgba(239, 68, 68, 0.08));
+  --gradient-period-6: linear-gradient(90deg, rgba(107, 114, 128, 0.18), rgba(107, 114, 128, 0.08));
+
+  /* Period Border Colors */
+  --color-period-border-1: #F97316;
+  --color-period-border-2: #0891B2;
+  --color-period-border-3: #EC4899;
+  --color-period-border-4: #84CC16;
+  --color-period-border-5: #EF4444;
+  --color-period-border-6: #6B7280;
+
+  /* Typography */
+  --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  /* Font Features */
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* Fluid Type Scale */
+  --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+  --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+  --text-base: clamp(0.9375rem, 0.875rem + 0.3125vw, 1rem);
+  --text-lg: clamp(1.0625rem, 1rem + 0.3125vw, 1.125rem);
+  --text-xl: clamp(1.25rem, 1.125rem + 0.625vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 3rem);
+  --text-4xl: clamp(2.25rem, 1.75rem + 2.5vw, 4rem);
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04);
+  --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.06);
+  --shadow-lg: 0 12px 28px rgba(17, 24, 39, 0.08);
+
+  /* Transitions */
+  --transition-fast: 120ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 300ms ease-out;
+
+  /* Grid */
+  --calendar-grid-gap: 1px;
+  --calendar-day-min-height: 84px;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0F172A;
+    --color-surface: #1E293B;
+    --color-surface-elevated: #334155;
+    --color-ink: #F8FAFC;
+    --color-ink-muted: #94A3B8;
+    --color-ink-subtle: #64748B;
+    --color-border: #334155;
+    --color-border-strong: #475569;
+    --color-today-ring: #FBBF24;
+  }
+}
+
+/* ============================================
+   CALENDAR GRID COMPONENTS
+   ============================================ */
+
+/* Calendar Container */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--calendar-grid-gap);
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-family: var(--font-family);
+}
+
+/* Day Headers (일~토) - High Contrast */
+.calendar-day-header {
+  background: var(--color-surface);
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  border-bottom: 2px solid var(--color-border-strong);
+}
+
+.calendar-day-header.sunday { color: var(--color-expense); }
+.calendar-day-header.saturday { color: var(--color-income); }
+
+/* Day Cells */
+.calendar-day {
+  background: var(--color-surface);
+  min-height: var(--calendar-day-min-height);
+  padding: var(--space-2);
+  position: relative;
+  transition: background-color var(--transition-fast);
+}
+
+.calendar-day:hover {
+  background: var(--color-bg);
+}
+
+.calendar-day.today {
+  background: #FEFCE8;
+}
+
+.calendar-day.other-month {
+  background: #F9FAFB;
+  color: var(--color-ink-subtle);
+}
+
+/* Today Ring Indicator */
+.calendar-day.today::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-today-ring);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-today-ring);
+  z-index: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+  .calendar-day.today {
+    background: #1E293B;
+  }
+  .calendar-day.today::before {
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-today-ring);
+  }
+}
+
+/* Day Number */
+.calendar-day-number {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.calendar-day.other-month .calendar-day-number {
+  color: var(--color-ink-subtle);
+}
+
+.calendar-day.today .calendar-day-number {
+  color: var(--color-ink);
+}
+
+/* Period Schedule Continuous Bar */
+.schedule-period-bar {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 6px;
+  border-radius: 3px;
+  opacity: 0.9;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Position variants for continuous bar */
+.schedule-period-bar.start {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.schedule-period-bar.end {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.schedule-period-bar.middle {
+  border-radius: 0;
+}
+
+.schedule-period-bar.single {
+  border-radius: 3px;
+}
+
+/* Gradient variants for period bars */
+.schedule-period-bar.period-1 { background: var(--gradient-period-1); border-left: 2px solid var(--color-period-border-1); }
+.schedule-period-bar.period-2 { background: var(--gradient-period-2); border-left: 2px solid var(--color-period-border-2); }
+.schedule-period-bar.period-3 { background: var(--gradient-period-3); border-left: 2px solid var(--color-period-border-3); }
+.schedule-period-bar.period-4 { background: var(--gradient-period-4); border-left: 2px solid var(--color-period-border-4); }
+.schedule-period-bar.period-5 { background: var(--gradient-period-5); border-left: 2px solid var(--color-period-border-5); }
+.schedule-period-bar.period-6 { background: var(--gradient-period-6); border-left: 2px solid var(--color-period-border-6); }
+
+/* Schedule Items in Day */
+.calendar-schedule-list {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-schedule-item {
+  font-size: var(--text-xs);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.calendar-schedule-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   ACCOUNTING SUMMARY CARDS
+   ============================================ */
+
+.accounting-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.accounting-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.accounting-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.accounting-card-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Large Amount Typography - 20~24px, 800 weight */
+.accounting-card-amount {
+  font-size: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
+  font-weight: 800;
+  font-family: var(--font-family);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Expense: -67,400원 */
+.accounting-card.expense .accounting-card-amount {
+  color: var(--color-expense);
+}
+
+/* Income: +3,200,000원 */
+.accounting-card.income .accounting-card-amount {
+  color: var(--color-income);
+}
+
+/* Budget: 잔여 예산 */
+.accounting-card.budget .accounting-card-amount {
+  color: var(--color-budget);
+}
+
+.accounting-card-trend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.accounting-card-trend.positive { color: var(--color-budget); }
+.accounting-card-trend.negative { color: var(--color-expense); }
+.accounting-card-trend.neutral { color: var(--color-ink-muted); }
+
+/* ============================================
+   MOBILE TRANSACTION LIST
+   ============================================ */
+
+.transaction-list {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.transaction-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-item:hover {
+  background: var(--color-bg);
+}
+
+/* Category Icon/Chip */
+.transaction-category {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-category.food { background: rgba(249, 115, 22, 0.15); color: var(--color-chip-food); }
+.transaction-category.transport { background: rgba(8, 145, 178, 0.15); color: var(--color-chip-transport); }
+.transaction-category.shopping { background: rgba(236, 72, 153, 0.15); color: var(--color-chip-shopping); }
+.transaction-category.cafe { background: rgba(132, 204, 22, 0.15); color: var(--color-chip-cafe); }
+.transaction-category.medical { background: rgba(239, 68, 68, 0.15); color: var(--color-chip-medical); }
+.transaction-category.etc { background: rgba(107, 114, 128, 0.15); color: var(--color-chip-etc); }
+
+/* Transaction Info */
+.transaction-info {
+  min-width: 0;
+}
+
+.transaction-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+/* Payer Badge */
+.payer-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.payer-badge.user1 { border-color: var(--color-income); color: var(--color-income); background: rgba(37, 99, 235, 0.1); }
+.payer-badge.user2 { border-color: var(--color-expense); color: var(--color-expense); background: rgba(225, 29, 72, 0.1); }
+
+/* Transaction Amount */
+.transaction-amount {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  font-family: var(--font-mono);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.transaction-amount.expense { color: var(--color-expense); }
+.transaction-amount.income { color: var(--color-income); }
+
+/* ============================================
+   DESKTOP DATA GRID (Excel-style)
+   ============================================ */
+
+.data-grid {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-family: var(--font-family);
+}
+
+.data-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.data-grid-header {
+  background: var(--color-bg);
+  border-bottom: 2px solid var(--color-border-strong);
+}
+
+.data-grid-th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-grid-td {
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.data-grid-row:hover .data-grid-td {
+  background: var(--color-bg);
+}
+
+.data-grid-row:last-child .data-grid-td {
+  border-bottom: none;
+}
+
+/* Amount column in grid */
+.data-grid-amount {
+  font-family: var(--font-mono);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-grid-amount.expense { color: var(--color-expense); }
+.data-grid-amount.income { color: var(--color-income); }
+
+/* Category chip in grid */
+.data-grid-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+}
+
+.data-grid-chip.food { background: rgba(249, 115, 22, 0.12); color: var(--color-chip-food); }
+.data-grid-chip.transport { background: rgba(8, 145, 178, 0.12); color: var(--color-chip-transport); }
+.data-grid-chip.shopping { background: rgba(236, 72, 153, 0.12); color: var(--color-chip-shopping); }
+.data-grid-chip.cafe { background: rgba(132, 204, 22, 0.12); color: var(--color-chip-cafe); }
+.data-grid-chip.medical { background: rgba(239, 68, 68, 0.12); color: var(--color-chip-medical); }
+.data-grid-chip.etc { background: rgba(107, 114, 128, 0.12); color: var(--color-chip-etc); }
+
+/* Payer badge in grid */
+.data-grid-payer {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  border: 1px solid var(--color-border);
+}
+
+.data-grid-payer.user1 { border-color: var(--color-income); color: var(--color-income); background: rgba(37, 99, 235, 0.1); }
+.data-grid-payer.user2 { border-color: var(--color-expense); color: var(--color-expense); background: rgba(225, 29, 72, 0.1); }
+
+/* Responsive: Mobile adjustments */
+@media (max-width: 768px) {
+  .accounting-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-day {
+    min-height: 72px;
+  }
+
+  .data-grid-table {
+    font-size: var(--text-xs);
+  }
+
+  .data-grid-th,
+  .data-grid-td {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Focus Visible for Accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-income);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .calendar-day.today::before {
+    display: none;
+  }
+  .schedule-period-bar {
+    background: none !important;
+    border-left: 2px solid currentColor !important;
+  }
+}
+
+/* Expense Badge in Calendar */
+.badge-expense-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin: 1px 0;
+}
+
+.badge-expense-icon {
+  font-size: 11px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
+}
+
+.badge-expense-amount {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #E11D48;
+  background: #FFE4E6;
+  border: 1px solid #FECDD3;
+  border-radius: 6px;
+  padding: 1px 3px;
+  margin-top: 1.5px;
+  white-space: nowrap;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  font-feature-settings: "tnum";
+}

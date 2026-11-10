@@ -1,0 +1,1630 @@
+/**
+ * real_estate.css - Mobile-First Stylesheet for Real Estate Property Manager
+ * Couple-Calendar v2.7.0
+ */
+
+.re-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ========================================================================
+   Track B: Map & Bottom Sheet Styles
+   ======================================================================== */
+
+#re-map-container {
+  width: 100%;
+  min-height: 500px;
+  height: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+}
+
+@media (max-width: 768px) {
+  #re-map-container {
+    min-height: 400px;
+    height: calc(100vh - 200px);
+    flex: 1;
+  }
+}
+
+/* Map Markers */
+.re-map-marker {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--marker-color, #F59E0B);
+  border-radius: 12px 12px 12px 0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15);
+  transform: rotate(-45deg);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.re-map-marker:hover,
+.re-map-marker:active {
+  transform: rotate(-45deg) scale(1.05);
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.2);
+}
+
+.re-map-marker > * {
+  transform: rotate(45deg); /* 내용물은 다시 회전 보정 */
+  display: block;
+}
+
+.re-marker-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1E293B;
+  line-height: 1.2;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.re-marker-price {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--marker-color, #F59E0B);
+  line-height: 1.2;
+}
+
+.re-marker-status {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--marker-color, #F59E0B);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 상태별 테두리 색상은 인라인 style의 --marker-color로 처리 */
+
+/* Bottom Sheet */
+.re-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
+}
+
+.re-sheet-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.re-bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: #FFFFFF;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.15);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.re-bottom-sheet.show {
+  transform: translateY(0);
+}
+
+.re-sheet-handle {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.re-sheet-handle::after {
+  content: '';
+  width: 36px;
+  height: 4px;
+  background: #CBD5E1;
+  border-radius: 2px;
+  transition: background 0.15s ease;
+}
+
+.re-sheet-handle:active::after {
+  background: #94A3B8;
+}
+
+.re-sheet-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 16px;
+}
+
+.re-sheet-header {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0 8px;
+}
+
+.re-sheet-thumb,
+.re-sheet-thumb-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.re-sheet-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F1F5F9;
+  color: #94A3B8;
+  font-size: 24px;
+}
+
+.re-sheet-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.re-sheet-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.re-sheet-building {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.re-sheet-price-row {
+  padding: 8px 0;
+  border-top: 1px solid #F1F5F9;
+  border-bottom: 1px solid #F1F5F9;
+  margin-bottom: 8px;
+}
+
+.re-sheet-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.4px;
+}
+
+.re-sheet-specs {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.re-sheet-spec {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.re-sheet-spec .spec-label {
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+.re-sheet-spec .spec-val {
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.re-sheet-spec .re-star-text {
+  color: #F59E0B;
+  font-size: 14px;
+}
+
+.re-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.re-sheet-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  width: 100%;
+}
+
+.re-sheet-btn-primary {
+  background: linear-gradient(135deg, #C5A059 0%, #B38E46 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(179, 142, 70, 0.25);
+}
+
+.re-sheet-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.re-sheet-btn-secondary {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+}
+
+.re-sheet-btn-secondary:active {
+  background: #E2E8F0;
+}
+
+.re-sheet-btn-close {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}
+
+.re-sheet-btn-close:active {
+  background: #FEE2E2;
+}
+
+/* 기존 스타일들... */
+
+/* Action Bar */
+.re-action-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.re-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.re-btn-primary {
+  background: linear-gradient(135deg, #C5A059 0%, #B38E46 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(179, 142, 70, 0.25);
+}
+
+.re-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.re-btn-secondary {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+}
+
+.re-btn-sm {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.re-btn-cal {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+  width: 100%;
+}
+
+.re-btn-ledger {
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+  width: 100%;
+}
+
+/* Region Chips Horizontal Scroll */
+.re-region-chips-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0;
+}
+
+.re-region-chips-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.re-region-chips {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.re-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.re-chip.active {
+  background: #0F172A;
+  color: #F8FAFC;
+  border-color: #0F172A;
+}
+
+.re-chip-badge {
+  font-size: 11px;
+  background: rgba(100, 116, 139, 0.15);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.re-chip.active .re-chip-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+/* Stage Pipeline Tabs */
+.re-pipeline-tabs {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 6px;
+  background: #F8FAFC;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.re-pipeline-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.re-pipe-tab {
+  flex: 1;
+  min-width: 65px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #64748B;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.re-pipe-tab.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Sub controls */
+.re-sub-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.re-count-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.re-sort-select {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: #FFFFFF;
+  outline: none;
+}
+
+/* Property Cards */
+.re-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.re-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.re-card:active {
+  transform: scale(0.99);
+}
+
+.re-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.re-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.re-deal-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: -0.2px;
+}
+
+.deal-sale {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.deal-lease {
+  background: #E0F2FE;
+  color: #0369A1;
+}
+
+.deal-rent {
+  background: #F3E8FF;
+  color: #7E22CE;
+}
+
+.re-region-tag {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.re-status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #475569;
+}
+
+.status-scheduled {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.status-visited {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.status-favorite {
+  background: #FCE7F3;
+  color: #BE185D;
+}
+
+.re-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.re-star-text {
+  color: #F59E0B;
+  font-size: 14px;
+}
+
+.re-rating-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.re-complex-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.4px;
+}
+
+.re-price-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.re-price-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.5px;
+}
+
+.re-spec-grid {
+  display: flex;
+  gap: 12px;
+  background: #F8FAFC;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.re-spec-item {
+  display: flex;
+  gap: 6px;
+}
+
+.spec-label {
+  color: #94A3B8;
+}
+
+.spec-val {
+  font-weight: 600;
+  color: #334155;
+}
+
+.re-tags-wrapper {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.re-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.re-tag-pro {
+  background: #ECFDF5;
+  color: #065F46;
+}
+
+.re-tag-con {
+  background: #FEF2F2;
+  color: #991B1B;
+}
+
+.re-visit-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #1E40AF;
+  margin-bottom: 8px;
+}
+
+.re-notes-preview {
+  font-size: 13px;
+  color: #475569;
+  font-style: italic;
+  background: #FFFBEB;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.re-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #F1F5F9;
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.re-social-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.re-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748B;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.re-link-anchor {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0284C7;
+  text-decoration: none;
+  background: #F0F9FF;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.re-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.re-micro-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.re-micro-btn:hover {
+  background: #F8FAFC;
+}
+
+/* Empty State */
+.re-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px dashed #CBD5E1;
+}
+
+.re-empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.re-empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 6px;
+}
+
+.re-empty-desc {
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.5;
+}
+
+/* Modals */
+.re-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 9999;
+}
+
+.re-modal-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: reModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes reModalPop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.re-modal-scrollable .re-modal-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.re-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.re-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.re-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #94A3B8;
+  cursor: pointer;
+}
+
+.re-modal-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.re-modal-guide {
+  font-size: 13px;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.re-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid #F1F5F9;
+  background: #F8FAFC;
+}
+
+/* Forms */
+.re-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.re-form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.re-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.re-input, .re-select, .re-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #0F172A;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.re-input:focus, .re-select:focus, .re-textarea:focus {
+  border-color: #C5A059;
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+}
+
+.re-input-hint {
+  font-size: 12px;
+  color: #C5A059;
+  font-weight: 700;
+}
+
+.re-rating-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.re-rating-select input[type="range"] {
+  flex: 1;
+}
+
+/* Target Preview Box */
+.re-target-box {
+  background: #F1F5F9;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #0F172A;
+}
+
+/* Checklist items */
+.re-checklist-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #F8FAFC;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.checklist-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.re-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #1E293B;
+  cursor: pointer;
+}
+
+.re-check-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #C5A059;
+}
+
+/* Cost Breakdown */
+.re-cost-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #F8FAFC;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.re-cost-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #475569;
+}
+
+.re-cost-item .highlight {
+  font-weight: 700;
+  color: #C5A059;
+}
+
+.re-cost-divider {
+  height: 1px;
+  background: #E2E8F0;
+  margin: 4px 0;
+}
+
+.re-cost-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.total-val {
+  font-size: 18px;
+  color: #B45309;
+}
+
+/* Comment Thread */
+.re-comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.re-empty-comments {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+.re-comment-bubble {
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+  font-size: 13px;
+}
+
+.re-comment-bubble.mine {
+  align-self: flex-end;
+  background: #FEF3C7;
+  color: #78350F;
+  border-bottom-right-radius: 4px;
+}
+
+.re-comment-bubble.partner {
+  align-self: flex-start;
+  background: #F1F5F9;
+  color: #334155;
+  border-bottom-left-radius: 4px;
+}
+
+.cmt-author {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  opacity: 0.8;
+}
+
+.cmt-time {
+  font-size: 10px;
+  opacity: 0.6;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.re-comment-input-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.re-comment-input-bar input {
+  flex: 1;
+}
+
+/* Parse Preview */
+.re-parse-preview {
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.preview-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #C5A059;
+  margin-bottom: 6px;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.re-parse-warn {
+  color: #DC2626;
+  font-size: 12px;
+}
+
+/* ========================================================================
+   Track B: 추가 스타일 (마스터 요구사항 보완)
+   ======================================================================== */
+
+/* 마커 꼬리(핀 말풍선 꼬리) - .re-marker-tail 요소용 */
+.re-map-marker .re-marker-tail {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg); /* 부모가 -45deg 회전했으므로 보정 */
+  width: 12px;
+  height: 12px;
+  background: inherit; /* 부모의 배경색/보더색 상속 */
+  border: 2px solid var(--marker-color, #F59E0B);
+  border-top: none;
+  border-right: none;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 계약 상태는 골드 색상 (마스터 요구사항: 후보 앰버, 방문 퍼플, 임장 블루, 계약 골드) */
+.re-marker-contract {
+  --marker-color: #D4A843 !important; /* 골드 */
+}
+
+/* 바텀시트 카드 버튼 스타일 */
+.re-sheet-btn-card {
+  background: #FFFFFF;
+  color: #C5A059;
+  border: 1px solid #C5A059;
+}
+
+.re-sheet-btn-card:active {
+  background: #FEFCE8;
+}
+
+/* 바텀시트 썸네일 여러 개일 때 가로 스크롤 */
+.re-sheet-thumbs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.re-sheet-thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.re-sheet-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.re-sheet-thumb-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F1F5F9;
+  color: #94A3B8;
+  font-size: 24px;
+}
+
+/* 바텀시트 제목/동 스타일 */
+.re-sheet-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.re-sheet-dong {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* 바텀시트 거래 태그 */
+.re-sheet-deal-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #C5A059;
+  background: #FEFCE8;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+/* 바텀시트 스펙 인라인 스타일 */
+.re-sheet-specs {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.re-sheet-spec {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.re-sheet-spec .spec-label {
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+.re-sheet-spec .spec-val {
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.re-sheet-spec .re-sheet-rating {
+  color: #F59E0B;
+}
+
+.re-sheet-spec .rating-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: #F59E0B;
+  margin-left: 4px;
+}
+
+/* 바텀시트 액션 버튼 컨테이너 */
+.re-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+/* 닫기 버튼 (헤더 우측) */
+.re-sheet-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+}
+
+.re-sheet-close:active {
+  color: #64748B;
+}
+
+/* ========================================================================
+   v2.0: 당근부동산 스타일 단일 카드 UI & 캘린더 메인 관심매물 요약 위젯
+   ======================================================================== */
+
+/* 1. 캘린더 메인 상단 관심 매물 요약 위젯 */
+.calendar-fav-property-widget {
+  margin: 10px 16px 14px 16px;
+}
+.calendar-fav-property-widget:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.re-fav-widget-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 245, 247, 0.98) 100%);
+  border: 1.5px solid #FFD1DC;
+  border-radius: 18px;
+  padding: 13px 15px;
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.re-fav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.re-fav-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.re-fav-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.re-fav-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.2px;
+}
+
+.re-fav-count-badge {
+  background: #FFF1F2;
+  color: #E11D48;
+  border: 1px solid #FECDD3;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.re-fav-more-link {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748B;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 4px;
+}
+
+.re-fav-more-link:hover {
+  color: #E11D48;
+}
+
+/* KPI Summary Bar */
+.re-fav-kpi-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1px solid #FFE4EA;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.re-fav-kpi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.re-fav-kpi-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #64748B;
+  margin-bottom: 2px;
+}
+
+.re-fav-kpi-val {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #0F172A;
+  white-space: nowrap;
+}
+
+.re-fav-kpi-val.highlight {
+  color: #E11D48;
+}
+
+.re-fav-kpi-val.dday {
+  color: #2563EB;
+}
+
+/* Horizontal Mini Card Slider */
+.re-fav-slider {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0;
+}
+.re-fav-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.re-fav-mini-card {
+  flex: 0 0 auto;
+  width: 175px;
+  background: #FFFFFF;
+  border: 1px solid #FFE4EA;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.re-fav-mini-card:active {
+  transform: scale(0.97);
+}
+
+.re-fav-mini-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #F1F5F9;
+}
+
+.re-fav-mini-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.re-fav-mini-price {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0F172A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.re-fav-mini-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.re-fav-mini-dday {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #2563EB;
+}
+
+/* 2. 당근부동산 스타일 통합 단일 카드 UI */
+.re-daangn-card {
+  background: #FFFFFF;
+  border: 1.5px solid #F1F5F9;
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.re-daangn-card:hover {
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.re-daangn-card:active {
+  transform: scale(0.99);
+}
+
+/* Left: 1:1 Aspect Ratio Thumbnail Column */
+.re-daangn-thumb-col {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #F8FAFC;
+}
+
+.re-daangn-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+}
+
+.re-source-badge {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 6px;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.re-source-naver {
+  background: #03C75A;
+  color: #FFFFFF;
+}
+
+.re-source-daangn {
+  background: #FF6F0F;
+  color: #FFFFFF;
+}
+
+.re-source-manual {
+  background: #64748B;
+  color: #FFFFFF;
+}
+
+/* Right: Information Column */
+.re-daangn-info-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.re-daangn-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.re-badge-deal {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+
+.re-badge-deal.sale { background: #FEF3C7; color: #92400E; }
+.re-badge-deal.lease { background: #E0F2FE; color: #0369A1; }
+.re-badge-deal.rent { background: #F3E8FF; color: #7E22CE; }
+
+.re-daangn-region {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.re-daangn-dday {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #E11D48;
+  background: #FFF1F2;
+  border: 1px solid #FECDD3;
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+/* 2행: 굵은 가격 (당근 대표 스타일) */
+.re-daangn-bold-price {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+}
+
+/* 3행: 단지명 / 평수 / 층수 */
+.re-daangn-sub-spec {
+  font-size: 12.5px;
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 4행: 부부 전용 메모 */
+.re-daangn-memo-box {
+  background: #FFF8F9;
+  border-left: 2.5px solid #F43F5E;
+  border-radius: 0 6px 6px 0;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  color: #9F1239;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 5행: 소셜 및 액션 푸터 */
+.re-daangn-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #F1F5F9;
+}
+
+.re-daangn-social {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.re-daangn-like-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748B;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 4px;
+}
+
+.re-daangn-like-btn.liked {
+  color: #E11D48;
+}
+
+.re-daangn-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -1,0 +1,349 @@
+/**
+ * Ledger Stats Responsive Styling (Couple-Calendar v2.5.0)
+ * 모바일 최적화 & 웹 대화면 피벗 매트릭스 듀얼 통계 스타일
+ */
+
+/* 1. 모바일 기본 레이아웃 (<=768px) */
+.mobile-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.stats-summary-card,
+.stats-payer-card,
+.stats-category-card,
+.stats-trend-card,
+.web-pivot-card {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, rgba(226, 232, 240, 0.8));
+  border-radius: var(--radius-lg, 16px);
+  padding: 18px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.stats-summary-card:hover,
+.stats-payer-card:hover,
+.stats-category-card:hover,
+.stats-trend-card:hover,
+.web-pivot-card:hover {
+  box-shadow: 0 6px 24px -2px rgba(15, 23, 42, 0.08);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary, #0F172A);
+  margin-bottom: 12px;
+  letter-spacing: -0.3px;
+}
+
+/* 요약 카드 */
+.summary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.summary-month-chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748B;
+  background: #F1F5F9;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+.budget-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 3px 8px;
+  border-radius: 9999px;
+}
+
+.budget-badge.over {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.summary-main-amt {
+  margin: 8px 0 12px 0;
+}
+
+.summary-main-amt .amt-label {
+  display: block;
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.summary-main-amt .amt-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary, #0F172A);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.8px;
+}
+
+.summary-main-amt .amt-value small {
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 2px;
+  color: #64748B;
+}
+
+.budget-progress-track {
+  width: 100%;
+  height: 8px;
+  background: #F1F5F9;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.budget-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981, #059669);
+  border-radius: 9999px;
+  transition: width 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.budget-progress-bar.over {
+  background: linear-gradient(90deg, #F43F5E, #E11D48);
+}
+
+.summary-sub-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748B;
+  font-variant-numeric: tabular-nums;
+}
+
+.fixed-expense-pill {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(244, 63, 94, 0.05);
+  border: 1px dashed rgba(244, 63, 94, 0.25);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: #BE123C;
+}
+
+/* 부부 분담률 */
+.payer-split-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: #E2E8F0;
+  margin-bottom: 12px;
+}
+
+.payer-bar.juni { background: #3B82F6; }
+.payer-bar.together { background: #10B981; }
+.payer-bar.yongi { background: #F43F5E; }
+
+.payer-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #334155;
+  font-variant-numeric: tabular-nums;
+}
+
+.payer-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.payer-legend .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.payer-legend .dot.juni { background: #3B82F6; }
+.payer-legend .dot.together { background: #10B981; }
+.payer-legend .dot.yongi { background: #F43F5E; }
+
+/* 카테고리 랭킹 */
+.cat-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-cat-row {
+  display: grid;
+  grid-template-columns: 20px 75px 1fr 70px 38px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.cat-rank {
+  font-weight: 800;
+  color: #94A3B8;
+  font-size: 11px;
+}
+
+.cat-name {
+  font-weight: 600;
+  color: #1E293B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-bar-track {
+  height: 6px;
+  background: #F1F5F9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.cat-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F43F5E, #FB7185);
+  border-radius: 9999px;
+}
+
+.cat-amt {
+  text-align: right;
+  font-weight: 700;
+  color: #0F172A;
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-pct {
+  text-align: right;
+  font-size: 11px;
+  color: #64748B;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 트렌드 SVG */
+.stats-trend-svg {
+  overflow: visible;
+  margin-top: 4px;
+}
+
+/* 2. 웹(대화면) 피벗 매트릭스 테이블 (>768px) */
+.web-pivot-card {
+  margin-top: 8px;
+}
+
+.pivot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pivot-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6366F1;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 3px 8px;
+  border-radius: 9999px;
+}
+
+.pivot-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+.pivot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: right;
+}
+
+.pivot-table th,
+.pivot-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #F1F5F9;
+  font-variant-numeric: tabular-nums;
+}
+
+.pivot-table thead th {
+  background: #F8FAFC;
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.pivot-table th:first-child,
+.pivot-table td:first-child {
+  text-align: left;
+}
+
+.pivot-table .cat-label {
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.pivot-table .has-val {
+  color: #0F172A;
+  font-weight: 500;
+}
+
+.pivot-table .zero-val {
+  color: #CBD5E1;
+}
+
+.pivot-table .row-total {
+  font-weight: 700;
+  color: #E11D48;
+  background: rgba(244, 63, 94, 0.03);
+}
+
+.pivot-table tfoot th {
+  background: #F8FAFC;
+  border-top: 2px solid #CBD5E1;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.pivot-table .grand-total {
+  font-size: 13px;
+  color: #E11D48;
+  background: rgba(244, 63, 94, 0.08);
+}
+
+/* 반응형 그리드 전환 (웹 대화면에서는 2열 그리드 배치) */
+@media (min-width: 769px) {
+  .mobile-stats-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .stats-summary-card {
+    grid-column: span 1;
+  }
+  .stats-payer-card {
+    grid-column: span 1;
+  }
+  .stats-category-card {
+    grid-column: span 1;
+  }
+  .stats-trend-card {
+    grid-column: span 1;
+  }
+}
+
