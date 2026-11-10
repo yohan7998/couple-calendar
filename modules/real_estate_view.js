@@ -1577,31 +1577,50 @@
       window.renderDaangnCrawlerView('naver-radar-root');
     };
 
-    window.syncDaangnItemToCalendar = function(itemId) {
+    window.syncDaangnItemToCalendar = function(itemId, silent = false) {
       const item = window.DAANGN_SEOUL_LISTINGS.find(x => x.id === itemId);
-      if (!item || typeof RealEstateEngine === 'undefined') return;
+      if (!item) return null;
 
-      const unified = RealEstateEngine.createUnifiedProperty({
+      const baseObj = {
         id: item.id,
         source: 'daangn',
         rawUrl: item.rawUrl,
+        sourceUrl: item.rawUrl,
+        url: item.rawUrl,
         title: item.title,
+        complexName: item.title,
+        region: item.district + ' ' + item.dong,
         propertyType: item.propertyType,
         tradeType: 'sale',
+        dealType: '매매',
+        price: item.priceManwon,
+        priceManwon: item.priceManwon,
         priceRaw: item.priceRaw,
+        formattedPrice: '매매 ' + item.priceRaw,
         priceDeposit: item.priceDeposit,
         priceMonthly: 0,
+        area: item.areaPyeong + '평 (' + item.areaSquareMeter + '㎡)',
         areaPyeong: item.areaPyeong,
         areaSquareMeter: item.areaSquareMeter,
         address: item.address,
+        floor: item.floorInfo,
         floorInfo: item.floorInfo,
-        favorite: { user1: true, user2: true },
+        status: 'favorite',
+        likes: ['주니', '용이'],
+        favorite: { user1: true, user2: true, together: true },
         visitDate: '2026-11-21',
+        coupleMemo: item.memo + ' (' + item.changeStatus + ')',
+        notes: item.memo + ' | ' + item.commute,
         coupleNotes: [{ id: 'cn-' + Date.now(), author: 'user1', text: item.memo + ' (' + item.changeStatus + ')', createdAt: new Date().toISOString() }]
-      });
+      };
 
+      const unified = (typeof RealEstateEngine !== 'undefined' && RealEstateEngine.createUnifiedProperty)
+        ? Object.assign(RealEstateEngine.createUnifiedProperty(baseObj), baseObj)
+        : baseObj;
+
+      if (!window.AppState) return unified;
       if (!Array.isArray(window.AppState.realEstates)) window.AppState.realEstates = [];
-      const existingIdx = window.AppState.realEstates.findIndex(p => p.id === item.id || p.title === item.title);
+      const existingIdx = window.AppState.realEstates.findIndex(p => p.id === item.id || p.title === item.title || p.complexName === item.title);
       if (existingIdx === -1) {
         window.AppState.realEstates.unshift(unified);
       } else {
@@ -1611,10 +1630,18 @@
       if (window.realEstateStore) {
         window.realEstateStore.properties = window.AppState.realEstates;
       }
-      if (typeof window.saveStateLocal === 'function') window.saveStateLocal();
-      if (typeof window.renderFavoriteSummaryWidget === 'function') window.renderFavoriteSummaryWidget();
-      if (typeof window.showToast === 'function') window.showToast('💖 관심매물 등록 및 달력 상단 위젯에 자동 연동되었습니다!');
-      window.renderDaangnCrawlerView('naver-radar-root');
+      if (!silent) {
+        if (typeof window.saveStateLocal === 'function') window.saveStateLocal();
+        if (typeof window.renderFavoriteSummaryWidget === 'function') window.renderFavoriteSummaryWidget();
+        if (typeof window.showToast === 'function') window.showToast('💖 관심매물 등록 및 달력 상단 위젯에 자동 연동되었습니다!');
+        window.renderDaangnCrawlerView('naver-radar-root');
+      }
+      return unified;
+    };
+
+    window.getDefaultSeedRealEstates = function() {
+      const defaultIds = ['dg-1001', 'dg-1004', 'dg-1002', 'dg-1009', 'dg-1003', 'dg-1006'];
+      return defaultIds.map(id => window.syncDaangnItemToCalendar(id, true)).filter(Boolean);
     };
 
     window.syncAllFilteredDaangnToCalendar = function() {

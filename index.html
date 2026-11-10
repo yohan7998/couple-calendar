@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>달콤살벌 캘린더 💖⚔️ (v2.8.6)</title>
-  <meta name="version" content="v2.8.6">
+  <title>달콤살벌 캘린더 💖⚔️ (v3.0.0)</title>
+  <meta name="version" content="v3.0.0">
   
   <!-- PWA & Mobile Web App Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,8 +42,8 @@
   <link rel="stylesheet" href="modules/brush_reveal.css">
   <link rel="stylesheet" href="modules/realtime_sync.css">
   <link rel="stylesheet" href="modules/ledger_stats.css">
-  <link rel="stylesheet" href="modules/real_estate.css?v=2.8.0">
-  <link rel="stylesheet" href="modules/naver_radar.css?v=2.8.0">
+  <link rel="stylesheet" href="modules/real_estate.css?v=3.0.0">
+  <link rel="stylesheet" href="modules/naver_radar.css?v=3.0.0">
   <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e7a68e82a39fa2818985c57b30fef3a3&libraries=services,clusterer&autoload=false"></script>
   <script src="modules/modern_icons.js"></script>
   <script src="modules/read_status_engine.js"></script>
@@ -51,12 +51,12 @@
   <script src="modules/realtime_sync_engine.js"></script>
   <script src="modules/excel_ledger_engine.js"></script>
   <script src="modules/ledger_stats_view.js"></script>
-  <script src="modules/real_estate_scraper.js?v=2.8.0"></script>
-  <script src="modules/real_estate_map.js?v=2.8.0"></script>
-  <script src="modules/real_estate_engine.js?v=2.8.0"></script>
-  <script src="modules/real_estate_view.js?v=2.8.0"></script>
-  <script src="modules/naver_radar_engine.js?v=2.8.0"></script>
-  <script src="modules/naver_radar_view.js?v=2.8.0"></script>
+  <script src="modules/real_estate_scraper.js?v=3.0.0"></script>
+  <script src="modules/real_estate_map.js?v=3.0.0"></script>
+  <script src="modules/real_estate_engine.js?v=3.0.0"></script>
+  <script src="modules/real_estate_view.js?v=3.0.0"></script>
+  <script src="modules/naver_radar_engine.js?v=3.0.0"></script>
+  <script src="modules/naver_radar_view.js?v=3.0.0"></script>
 
   <style>
     :root {
@@ -1998,7 +1998,7 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()" style="cursor:pointer;">v2.8.6 ⚡</span>
+            <span class="app-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()" style="cursor:pointer;">v3.0.0 🥕</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -2291,13 +2291,13 @@
 
     <!-- VIEW 5: REAL ESTATE / MOVING PLANNER -->
     <div class="tab-view" id="realestate-view">
-      <!-- Category Sub-tabs: My Properties vs Naver Radar -->
+      <!-- Category Sub-tabs: Daangn Crawler vs My Properties -->
       <div class="re-category-tabs" id="re-category-tabs" style="display: flex; gap: 8px; padding: 12px 16px 0 16px; max-width: 600px; margin: 0 auto;">
-        <button class="re-cat-tab active" id="tab-re-my" onclick="switchRealEstateCategory('my')" style="flex: 1; padding: 8px 12px; font-size: 13px; font-weight: 700; border-radius: 10px; border: 1.5px solid var(--accent, #f43f5e); background: var(--card-bg, #ffffff); color: var(--text-color, #1e293b); cursor: pointer; transition: all 0.2s;">📌 내 찜·임장 관리</button>
-        <button class="re-cat-tab" id="tab-re-radar" onclick="switchRealEstateCategory('radar')" style="flex: 1; padding: 8px 12px; font-size: 13px; font-weight: 700; border-radius: 10px; border: 1.5px solid var(--border-color, #e2e8f0); background: transparent; color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.2s;">🥕 당근 서울 매매 수집기</button>
+        <button class="re-cat-tab active" id="tab-re-radar" onclick="switchRealEstateCategory('radar')" style="flex: 1; padding: 8px 12px; font-size: 13px; font-weight: 700; border-radius: 10px; border: 1.5px solid var(--accent, #f43f5e); background: var(--card-bg, #ffffff); color: var(--text-color, #1e293b); cursor: pointer; transition: all 0.2s;">🥕 당근 서울 매매 수집기</button>
+        <button class="re-cat-tab" id="tab-re-my" onclick="switchRealEstateCategory('my')" style="flex: 1; padding: 8px 12px; font-size: 13px; font-weight: 700; border-radius: 10px; border: 1.5px solid var(--border-color, #e2e8f0); background: transparent; color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.2s;">📌 내 찜·임장 관리</button>
       </div>
-      <div id="realestate-root" style="padding: 12px 0 80px 0;"></div>
-      <div id="naver-radar-root" style="display: none; padding: 12px 0 80px 0;"></div>
+      <div id="naver-radar-root" style="padding: 12px 0 80px 0;"></div>
+      <div id="realestate-root" style="display: none; padding: 12px 0 80px 0;"></div>
     </div>
     <!-- END REAL ESTATE VIEW -->
 
@@ -3557,8 +3557,8 @@
 
     // INIT
     window.addEventListener('DOMContentLoaded', () => {
-      // Auto cache-busting check for v2.8.6
-      const currentBuild = 'v2.8.6';
+      // Auto cache-busting check for v3.0.0
+      const currentBuild = 'v3.0.0';
       if (localStorage.getItem('couple_app_build_v') !== currentBuild) {
         localStorage.setItem('couple_app_build_v', currentBuild);
         if ('caches' in window) {
@@ -3601,15 +3601,24 @@
         try {
           const parsed = JSON.parse(saved);
           AppState = Object.assign(AppState, parsed);
-          // Migration guarantee for v2.0
+          // Migration guarantee for v3.0 (당근부동산 기본 시드 자동 병합)
           if (!AppState.ledger) {
             AppState.ledger = { monthlyBudget: 2500000, sharedSpreadsheetUrl: '', transactions: [] };
           }
           if (!Array.isArray(AppState.ledger.transactions)) {
             AppState.ledger.transactions = [];
           }
-          if (!Array.isArray(AppState.realEstates) || AppState.realEstates.length === 0) {
-            AppState.realEstates = (typeof getDefaultSeedRealEstates === 'function') ? getDefaultSeedRealEstates() : [];
+          if (!Array.isArray(AppState.realEstates)) {
+            AppState.realEstates = [];
+          }
+          if (!AppState.realEstates.some(p => p && p.source === 'daangn') && typeof getDefaultSeedRealEstates === 'function') {
+            const seeded = getDefaultSeedRealEstates();
+            seeded.forEach(item => {
+              if (!AppState.realEstates.some(p => p.id === item.id)) {
+                AppState.realEstates.unshift(item);
+              }
+            });
+            saveStateLocal();
           }
           if (window.realEstateStore) {
             window.realEstateStore.properties = AppState.realEstates;
@@ -3660,6 +3669,7 @@
           { id: 'tx-3', date: today, type: 'income', category: '급여/수입', amount: 3200000, payer: 'juni', paymentMethod: '계좌이체', memo: '11월 급여 입금 💵', createdAt: new Date(Date.now() - 86400000).toISOString() }
         ]
       };
+      AppState.realEstates = (typeof getDefaultSeedRealEstates === 'function') ? getDefaultSeedRealEstates() : [];
       saveStateLocal();
     }
 
@@ -6196,6 +6206,7 @@ ${inviteUrl}`;
         const nav = document.getElementById('nav-realestate');
         if (nav) nav.classList.add('active');
         renderRealEstateView();
+        renderNaverRadarView();
       }
     }
 
