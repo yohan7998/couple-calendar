@@ -1,9 +1,9 @@
 ---
 title: 달콤살벌 캘린더 활성 계획서 및 설계 정본 색인 (SSOT Registry)
-version: v2.9.8
+version: v3.1.0
 status: active
 created: 2026-11-02
-updated: 2026-11-09
+updated: 2026-11-11
 author: 마스터 AI
 tags:
   - SSOT
