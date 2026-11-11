@@ -666,6 +666,62 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertIn("loadDaangnFilterFromStorage", render_fn,
                       "renderDaangnCrawlerView 시작 시 loadDaangnFilterFromStorage가 호출되어야 함")
 
+    def test_36_dday_badge_removed(self):
+        """Verify D-Day badge (re-daangn-dday) is completely removed from renderPropertyCardHtml."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Find the renderPropertyCardHtml function specifically
+        render_card_fn = content[content.find("renderPropertyCardHtml(p) {"):content.find("renderPropertyCardHtml(p) {") + 3000]
+
+        self.assertNotIn('re-daangn-dday', render_card_fn, "renderPropertyCardHtml에서 D-Day 뱃지 클래스가 제거되어야 함")
+        self.assertNotIn('dDayDisplay', render_card_fn, "renderPropertyCardHtml에서 dDayDisplay 변수 선언이 제거되어야 함")
+        self.assertNotIn('D-DAY', render_card_fn, "renderPropertyCardHtml에서 D-DAY 텍스트가 제거되어야 함")
+        # calculateDDay는 다른 메서드에서 사용될 수 있으므로 renderPropertyCardHtml에서만 호출되지 않는지 확인
+        self.assertNotIn('calculateDDay(p.visitDate)', render_card_fn, "renderPropertyCardHtml에서 calculateDDay 호출이 제거되어야 함")
+
+    def test_37_card_anchor_deeplinks(self):
+        """Verify card thumbnail and buttons have proper <a> tags with target=_blank and rel=noopener noreferrer."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Thumbnail should be wrapped in <a> tag
+        self.assertIn('<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="re-daangn-thumb-link"', content)
+
+        # Complex name should be wrapped in <a> tag
+        self.assertIn('<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">${complexNameDisplay}</a>', content)
+
+        # Price should be wrapped in <a> tag
+        self.assertIn('<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">${priceDisplay}</a>', content)
+
+        # Source button should be <a> tag
+        self.assertIn('<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="re-micro-btn btn-source"', content)
+
+        # Source button labels
+        self.assertIn('🥕 당근 원문 바로가기 ↗', content)
+        self.assertIn('🟢 네이버 원문 ↗', content)
+
+    def test_38_sync_image_urls(self):
+        """Verify syncDaangnItemToCalendar includes imageUrl and thumbnailUrl."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Check that syncDaangnItemToCalendar includes imageUrl and thumbnailUrl
+        self.assertIn('imageUrl: item.imageUrl', content)
+        self.assertIn('thumbnailUrl: item.imageUrl', content)
+
+    def test_39_hydration_image(self):
+        """Verify Hydration logic for existing saved properties to restore real images from DAANGN_SEOUL_LISTINGS."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Check Hydration logic exists in renderPropertyCardHtml
+        self.assertIn('DAANGN_SEOUL_LISTINGS', content, "DAANGN_SEOUL_LISTINGS 참조가 있어야 함")
+        self.assertIn('item.id === p.id', content, "ID 매칭 로직이 있어야 함")
+        self.assertIn('item.articleId === String(p.id).replace', content, "articleId 매칭 로직이 있어야 함")
+        self.assertIn('match.imageUrl', content, "매칭된 item의 imageUrl을 사용해야 함")
+        self.assertIn('match.imageUrl && match.imageUrl.startsWith', content, "유효한 HTTPS 이미지 URL 검증이 있어야 함")
+
 
 if __name__ == "__main__":
     unittest.main()

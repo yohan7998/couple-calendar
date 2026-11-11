@@ -1,6 +1,6 @@
 /**
  * real_estate_view.js - Mobile-first UI Component for Real Estate & Moving Planner
- * Couple-Calendar v2.6.0
+ * Couple-Calendar v3.8.0
  */
 
 (function (root, factory) {
@@ -339,12 +339,24 @@
         sourceCls = 're-source-manual';
       }
 
-      // Thumbnail Image & Fallback
+      // Hydration: 당근 매물(DAANGN_SEOUL_LISTINGS)에서 실사 이미지 자동 복원
+      let thumbUrl = p.thumbnailUrl || p.imageUrl;
+      let displayImageUrl = p.imageUrl;
+      const isDaangn = p.source === 'daangn' || (p.id && String(p.id).startsWith('dg-'));
+      if (isDaangn && window.DAANGN_SEOUL_LISTINGS) {
+        const match = window.DAANGN_SEOUL_LISTINGS.find(item => item.id === p.id || item.articleId === String(p.id).replace('dg-', ''));
+        if (match && match.imageUrl && match.imageUrl.startsWith('https://')) {
+          thumbUrl = match.imageUrl;
+          displayImageUrl = match.imageUrl;
+        }
+      }
       const fallbackSvg = Engine && Engine.getAptSvgPlaceholder ? Engine.getAptSvgPlaceholder(p.complexName) : '';
-      const thumbUrl = p.thumbnailUrl || p.imageUrl || fallbackSvg;
+      if (!thumbUrl || thumbUrl.includes('placeholder') || thumbUrl.startsWith('data:')) {
+        thumbUrl = fallbackSvg;
+      }
 
-      // D-Day
-      const dDayDisplay = p.dDay || (p.visitDate && Engine && Engine.calculateDDay ? Engine.calculateDDay(p.visitDate) : '');
+      // targetUrl 계산: sourceUrl > url > rawUrl > daangn article URL
+      const targetUrl = p.sourceUrl || p.url || p.rawUrl || (p.id && String(p.id).startsWith('dg-') ? `https://realty.daangn.com/articles/${String(p.id).replace('dg-','')}` : '');
 
       // Couple Memo (우선순위: coupleMemo > notes)
       const coupleMemoDisplay = (p.coupleMemo || p.notes || '').trim();
@@ -353,11 +365,31 @@
         ? this.escapeHtml(p.complexName)
         : '<span style="color:#e11d48; font-size:13px; font-weight:600;">(단지명 미확인 - 수정 필요)</span>';
 
+      // 썸네일 링크 HTML
+      const thumbLinkHtml = targetUrl
+        ? `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="re-daangn-thumb-link" style="display:block; width:100%; height:100%;">
+            <img src="${thumbUrl}" class="re-daangn-thumb-img" alt="${this.escapeHtml(p.complexName)}" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.onerror=null; this.src='${fallbackSvg}';">
+           </a>`
+        : `<img src="${thumbUrl}" class="re-daangn-thumb-img" alt="${this.escapeHtml(p.complexName)}" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.onerror=null; this.src='${fallbackSvg}';">`;
+
+      // 단지명/가격 링크 스타일
+      const linkStyle = 'text-decoration:none; color:inherit;';
+      const complexNameLinkHtml = targetUrl
+        ? `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">${complexNameDisplay}</a>`
+        : complexNameDisplay;
+
+      const priceLinkHtml = targetUrl
+        ? `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">${priceDisplay}</a>`
+        : priceDisplay;
+
+      // 원문 버튼 라벨
+      const sourceBtnLabel = source === 'naver' ? '🟢 네이버 원문 ↗' : '🥕 당근 원문 바로가기 ↗';
+
       return `
         <div class="re-daangn-card" data-id="${p.id}">
           <!-- 좌측 1:1 실사 썸네일 & 출처 뱃지 -->
           <div class="re-daangn-thumb-col">
-            <img src="${thumbUrl}" class="re-daangn-thumb-img" alt="${this.escapeHtml(p.complexName)}" onerror="this.onerror=null; this.src='${fallbackSvg}';">
+            ${thumbLinkHtml}
             <span class="re-source-badge ${sourceCls}">${sourceLabel}</span>
           </div>
 
@@ -367,15 +399,14 @@
               <span class="re-badge-deal ${p.dealType === '매매' ? 'sale' : (p.dealType === '전세' ? 'lease' : 'rent')}">${p.dealType || '매매'}</span>
               ${p.region ? `<span class="re-daangn-region">${this.escapeHtml(p.region)}</span>` : ''}
               <span class="re-status-badge ${statusInfo.cls}">${statusInfo.label}</span>
-              ${dDayDisplay ? `<span class="re-daangn-dday">🚗 ${this.escapeHtml(dDayDisplay)}</span>` : ''}
             </div>
 
-            <!-- 당근 특유의 굵은 가격 -->
-            <div class="re-daangn-bold-price">${priceDisplay}</div>
+            <!-- 당근 특유의 굵은 가격 (클릭 시 원문 이동) -->
+            <div class="re-daangn-bold-price">${priceLinkHtml}</div>
 
-            <!-- 단지명 / 평수 / 층수 요약 -->
+            <!-- 단지명 / 평수 / 층수 요약 (클릭 시 원문 이동) -->
             <div class="re-daangn-sub-spec">
-              ${complexNameDisplay}${p.building ? ' ' + this.escapeHtml(p.building) : ''}${p.area ? ' · ' + this.escapeHtml(p.area) : ''}${p.floor ? ' · ' + this.escapeHtml(p.floor) : ''}
+              ${complexNameLinkHtml}${p.building ? ' ' + this.escapeHtml(p.building) : ''}${p.area ? ' · ' + this.escapeHtml(p.area) : ''}${p.floor ? ' · ' + this.escapeHtml(p.floor) : ''}
             </div>
 
             <!-- 커플 메모 -->
@@ -396,11 +427,6 @@
                   <span>💬</span>
                   <span>${commentsCount}</span>
                 </button>
-                ${(p.sourceUrl || p.url) ? `
-                  <a href="${p.sourceUrl || p.url}" target="_blank" rel="noopener noreferrer" class="re-link-anchor" title="매물 원문 열기">
-                    <span>원문 ↗</span>
-                  </a>
-                ` : ''}
               </div>
 
               <div class="re-daangn-actions">
@@ -408,6 +434,11 @@
                 <button class="re-micro-btn btn-calc" data-id="${p.id}" title="이사비용/복비 계산">🧮</button>
                 <button class="re-micro-btn btn-edit" data-id="${p.id}" title="수정">✏️</button>
                 <button class="re-micro-btn btn-delete" data-id="${p.id}" title="삭제">🗑️</button>
+                ${targetUrl ? `
+                  <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="re-micro-btn btn-source" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                    ${sourceBtnLabel}
+                  </a>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -2455,6 +2486,8 @@ window.renderDaangnCrawlerView = function(containerId) {
         visitDate: '2026-11-21',
         coupleMemo: item.memo + ' (' + item.changeStatus + ')',
         notes: item.memo + ' | ' + item.commute,
+        imageUrl: item.imageUrl,
+        thumbnailUrl: item.imageUrl,
         coupleNotes: [{ id: 'cn-' + Date.now(), author: 'user1', text: item.memo + ' (' + item.changeStatus + ')', createdAt: new Date().toISOString() }]
       };
 

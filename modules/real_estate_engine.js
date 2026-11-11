@@ -1,6 +1,6 @@
 /**
  * real_estate_engine.js - Unified Real Estate Engine & Multi-Source Normalization Layer
- * Couple-Calendar v2.9.0
+ * Couple-Calendar v3.8.0
  * Supports: UnifiedPropertyCard schema, NaverPropertyAdapter, DaangnPropertyAdapter, RealEstateStore
  */
 
@@ -174,6 +174,9 @@
     if (!thumb || thumb.includes('land.pstatic.net') || thumb.includes('placeholder')) {
       thumb = getAptSvgPlaceholder(complexName);
     }
+    // 당근 실사 이미지(CDN)가 있으면 원본을 그대로 보존 — 플레이스홀더로 덮어쓰지 않음
+    const sourceImage = (data.imageUrl && !data.imageUrl.includes('land.pstatic.net') && !data.imageUrl.includes('placeholder'))
+      ? data.imageUrl : (data.thumbnailUrl || '');
 
     return {
       id: data.id || `prop_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
@@ -191,6 +194,7 @@
       area: (data.area || '').trim(),
       floor: (data.floor || '').trim(),
       thumbnailUrl: thumb,
+      imageUrl: sourceImage || thumb,
       coupleMemo: data.coupleMemo || data.notes || '',
       visitDate: visitDate,
       dDay: dDay,
