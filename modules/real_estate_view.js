@@ -1920,6 +1920,72 @@
       }
 ];
 
+// =========================================================================
+// localStorage Persistence Helpers for Daangn Filter State
+// =========================================================================
+const DAANGN_FILTER_STORAGE_KEY = 'daangn_filter_state';
+
+function saveDaangnFilterToStorage() {
+  try {
+    const state = window.daangnFilterState;
+    if (state) {
+      localStorage.setItem(DAANGN_FILTER_STORAGE_KEY, JSON.stringify({
+        districts: state.districts,
+        minPriceWon: state.minPriceWon,
+        maxPriceWon: state.maxPriceWon,
+        minAge: state.minAge,
+        maxAge: state.maxAge,
+        minPyeong: state.minPyeong,
+        maxPyeong: state.maxPyeong,
+        types: state.types
+      }));
+    }
+  } catch (e) {
+    console.warn('[daangn] localStorage save failed:', e);
+  }
+}
+
+function loadDaangnFilterFromStorage() {
+  try {
+    const stored = localStorage.getItem(DAANGN_FILTER_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // 병합: 저장된 값이 있으면 덮어쓰고, 없으면 기본값 유지
+      const defaults = {
+        districts: ['all'],
+        minPriceWon: 100000000,
+        maxPriceWon: 5000000000,
+        minAge: 0,
+        maxAge: 35,
+        minPyeong: 5,
+        maxPyeong: 70,
+        types: { apt: true, house: true, villa: true }
+      };
+      window.daangnFilterState = {
+        ...defaults,
+        ...parsed,
+        types: { ...defaults.types, ...(parsed.types || {}) }
+      };
+    }
+  } catch (e) {
+    console.warn('[daangn] localStorage load/parse failed, using defaults:', e);
+    window.daangnFilterState = {
+      districts: ['all'],
+      minPriceWon: 100000000,
+      maxPriceWon: 5000000000,
+      minAge: 0,
+      maxAge: 35,
+      minPyeong: 5,
+      maxPyeong: 70,
+      types: { apt: true, house: true, villa: true }
+    };
+  }
+}
+
+window.DAANGN_FILTER_STORAGE_KEY = DAANGN_FILTER_STORAGE_KEY;
+window.saveDaangnFilterToStorage = saveDaangnFilterToStorage;
+window.loadDaangnFilterFromStorage = loadDaangnFilterFromStorage;
+
 window.daangnFilterState = window.daangnFilterState || {
       districts: ['all'],  // 다중 선택 지원: ['all'] 또는 ['마포구', '용산구', ...]
       minPriceWon: 100000000,
@@ -1932,6 +1998,9 @@ window.daangnFilterState = window.daangnFilterState || {
     };
 
 window.renderDaangnCrawlerView = function(containerId) {
+      // 1순위: localStorage에서 저장된 필터 상태 복원
+      loadDaangnFilterFromStorage();
+
       const root = document.getElementById(containerId);
       if (!root) return;
 
@@ -2213,6 +2282,7 @@ window.renderDaangnCrawlerView = function(containerId) {
         maxPyeong: finalMaxPyeong,
         types: { apt: chkApt, house: chkHouse, villa: chkVilla }
       };
+      saveDaangnFilterToStorage();
       window.renderDaangnCrawlerView('naver-radar-root');
     };
 
@@ -2243,6 +2313,7 @@ window.renderDaangnCrawlerView = function(containerId) {
       }
 
       window.daangnFilterState.districts = current;
+      saveDaangnFilterToStorage();
       window.renderDaangnCrawlerView('naver-radar-root');
     };
 
@@ -2275,6 +2346,7 @@ window.renderDaangnCrawlerView = function(containerId) {
     };
 
     window.resetDaangnFilter = function() {
+      localStorage.removeItem(DAANGN_FILTER_STORAGE_KEY);
       window.daangnFilterState = {
         districts: ['all'],
         minPriceWon: 100000000,
@@ -2299,7 +2371,8 @@ window.renderDaangnCrawlerView = function(containerId) {
       btn.disabled = true;
 
       setTimeout(() => {
-        // 현재 필터 상태로 다시 렌더링
+        // 현재 필터 상태 저장 후 렌더링
+        saveDaangnFilterToStorage();
         window.renderDaangnCrawlerView('naver-radar-root');
 
         // 버튼 원상복구

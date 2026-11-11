@@ -37,6 +37,15 @@ def run_node_eval(script: str) -> str:
     }};
     global.document = document;
 
+    // Mock localStorage (in-memory)
+    const _storage = {{}};
+    global.localStorage = {{
+        getItem: (k) => (k in _storage) ? _storage[k] : null,
+        setItem: (k, v) => {{ _storage[k] = String(v); }},
+        removeItem: (k) => {{ delete _storage[k]; }},
+        clear: () => {{ for (const k in _storage) delete _storage[k]; }}
+    }};
+
     require('{REAL_ESTATE_VIEW_JS}');
     {script}
     """
@@ -506,6 +515,156 @@ class TestDaangnRealtySuite(unittest.TestCase):
             content = f.read()
 
         self.assertIn("districts: ['all']", content, "초기화 시 districts가 ['all']로 복원되어야 함")
+
+    def test_29_persist_filter_storage_helpers_exist(self):
+        """Verify localStorage persistence helper functions exist."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("saveDaangnFilterToStorage", content, "저장 헬퍼 함수가 있어야 함")
+        self.assertIn("loadDaangnFilterFromStorage", content, "불러오기 헬퍼 함수가 있어야 함")
+        self.assertIn("DAANGN_FILTER_STORAGE_KEY", content, "스토리지 키 상수가 있어야 함")
+        self.assertIn("daangn_filter_state", content, "스토리지 키 값이 'daangn_filter_state'이어야 함")
+        self.assertIn("window.saveDaangnFilterToStorage", content, "저장 함수가 window에 노출되어야 함")
+        self.assertIn("window.loadDaangnFilterFromStorage", content, "불러오기 함수가 window에 노출되어야 함")
+
+    def test_30_persist_filter_storage_roundtrip(self):
+        """Test localStorage save and load roundtrip preserves all filter fields."""
+        script = """
+        // 1. Set custom filter state
+        window.daangnFilterState = {
+          districts: ['강남구', '마포구'],
+          minPriceWon: 500000000,
+          maxPriceWon: 3000000000,
+          minAge: 2,
+          maxAge: 15,
+          minPyeong: 20,
+          maxPyeong: 50,
+          types: { apt: true, house: false, villa: true }
+        };
+
+        // 2. Save to localStorage
+        window.saveDaangnFilterToStorage();
+
+        // 3. Read back from localStorage
+        const stored = localStorage.getItem(window.DAANGN_FILTER_STORAGE_KEY);
+        const parsed = JSON.parse(stored);
+
+        // 4. Verify all fields match
+        console.log(JSON.stringify({
+          districts: parsed.districts,
+          minPriceWon: parsed.minPriceWon,
+          maxPriceWon: parsed.maxPriceWon,
+          minAge: parsed.minAge,
+          maxAge: parsed.maxAge,
+          minPyeong: parsed.minPyeong,
+          maxPyeong: parsed.maxPyeong,
+          types: parsed.types
+        }));
+        """
+        data = json.loads(run_node_eval(script))
+        self.assertEqual(data["districts"], ["강남구", "마포구"])
+        self.assertEqual(data["minPriceWon"], 500000000)
+        self.assertEqual(data["maxPriceWon"], 3000000000)
+        self.assertEqual(data["minAge"], 2)
+        self.assertEqual(data["maxAge"], 15)
+        self.assertEqual(data["minPyeong"], 20)
+        self.assertEqual(data["maxPyeong"], 50)
+        self.assertEqual(data["types"], {"apt": True, "house": False, "villa": True})
+
+    def test_31_persist_filter_load_restores_state(self):
+        """Test loadDaangnFilterFromStorage restores saved state with defaults merge."""
+        script = """
+        // 1. Pre-save a custom state
+        window.daangnFilterState = {
+          districts: ['송파구'],
+          minPriceWon: 1000000000,
+          maxPriceWon: 2000000000,
+          minAge: 5,
+          maxAge: 10,
+          minPyeong: 25,
+          maxPyeong: 40,
+          types: { apt: false, house: true, villa: false }
+        };
+        window.saveDaangnFilterToStorage();
+
+        // 2. Clear window state to simulate fresh page load
+        delete window.daangnFilterState;
+
+        // 3. Load from storage
+        window.loadDaangnFilterFromStorage();
+
+        console.log(JSON.stringify(window.daangnFilterState));
+        """
+        data = json.loads(run_node_eval(script))
+        self.assertEqual(data["districts"], ["송파구"])
+        self.assertEqual(data["minPriceWon"], 1000000000)
+        self.assertEqual(data["maxPriceWon"], 2000000000)
+        self.assertEqual(data["minAge"], 5)
+        self.assertEqual(data["maxAge"], 10)
+        self.assertEqual(data["minPyeong"], 25)
+        self.assertEqual(data["maxPyeong"], 40)
+        self.assertEqual(data["types"]["apt"], False)
+        self.assertEqual(data["types"]["house"], True)
+        self.assertEqual(data["types"]["villa"], False)
+
+    def test_32_persist_filter_load_defaults_on_corrupt(self):
+        """Test loadDaangnFilterFromStorage falls back to defaults on corrupt data."""
+        script = """
+        // 1. Write corrupt data
+        localStorage.setItem(window.DAANGN_FILTER_STORAGE_KEY, '{invalid json');
+
+        // 2. Clear window state
+        delete window.daangnFilterState;
+
+        // 3. Load - should use defaults
+        window.loadDaangnFilterFromStorage();
+
+        console.log(JSON.stringify(window.daangnFilterState));
+        """
+        data = json.loads(run_node_eval(script))
+        self.assertEqual(data["districts"], ["all"])
+        self.assertEqual(data["minPriceWon"], 100000000)
+        self.assertEqual(data["maxPriceWon"], 5000000000)
+        self.assertEqual(data["minAge"], 0)
+        self.assertEqual(data["maxAge"], 35)
+        self.assertEqual(data["minPyeong"], 5)
+        self.assertEqual(data["maxPyeong"], 70)
+        self.assertEqual(data["types"]["apt"], True)
+        self.assertEqual(data["types"]["house"], True)
+        self.assertEqual(data["types"]["villa"], True)
+
+    def test_33_persist_filter_reset_clears_storage(self):
+        """Test resetDaangnFilter clears localStorage."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # resetDaangnFilter must call localStorage.removeItem
+        self.assertIn("localStorage.removeItem(DAANGN_FILTER_STORAGE_KEY)", content,
+                      "resetDaangnFilter가 localStorage를 삭제해야 함")
+
+    def test_34_persist_filter_save_on_events(self):
+        """Verify saveDaangnFilterToStorage is called in key event handlers."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # saveDaangnFilterToStorage should be called in:
+        # 1. toggleDaangnDistrict
+        # 2. updateDaangnFilter
+        # 3. executeDaangnSearch
+        save_calls = content.count("saveDaangnFilterToStorage()")
+        self.assertGreaterEqual(save_calls, 3,
+                                "saveDaangnFilterToStorage 호출이 3개 이상이어야 함 (district toggle, updateFilter, search)")
+
+    def test_35_persist_filter_load_on_render(self):
+        """Verify loadDaangnFilterFromStorage is called at render start."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Check that renderDaangnCrawlerView calls loadDaangnFilterFromStorage
+        render_fn = content[content.find("window.renderDaangnCrawlerView = function"):content.find("window.renderDaangnCrawlerView = function") + 300]
+        self.assertIn("loadDaangnFilterFromStorage", render_fn,
+                      "renderDaangnCrawlerView 시작 시 loadDaangnFilterFromStorage가 호출되어야 함")
 
 
 if __name__ == "__main__":
