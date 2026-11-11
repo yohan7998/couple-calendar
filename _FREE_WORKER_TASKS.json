@@ -41,7 +41,33 @@
         "3": "모바일/웹 통계 집계(월별 요약, 결제자 분배, 피벗 데이터) 15개 이상 케이스 검증"
       },
       "verification": "python3 -m unittest /Users/yohan/couple-calendar/tests/test_ledger_v25.py"
+    },
+    {
+      "task_id": "TASK-DAANGN-ENHANCE-1",
+      "worker": "free_worker_1",
+      "socket": "/tmp/cc-socks/62984.sock",
+      "status": "COMPLETED",
+      "assigned_at": "2026-11-11T09:06:25.325992+09:00",
+      "description": "real_estate_view.js 데이터 레이어: buildYear, imageUrl, 고유 rawUrl 보강 및 캘린더일괄연동/옵시디언전체내보내기 삭제",
+      "completed_at": "2026-11-11T09:08:00+09:00"
+    },
+    {
+      "task_id": "TASK-DAANGN-ENHANCE-2",
+      "worker": "free_worker_2",
+      "socket": "/tmp/cc-socks/95842.sock",
+      "status": "COMPLETED",
+      "assigned_at": "2026-11-11T09:06:25.325992+09:00",
+      "description": "real_estate_view.js 뷰 레이어: 건물연식/평수 필터 UI, 실물 사진 렌더링, PC(3열)/모바일(1열) 반응형 그리드 구축",
+      "completed_at": "2026-11-11T09:08:00+09:00"
+    },
+    {
+      "task_id": "TASK-DAANGN-ENHANCE-3",
+      "worker": "free_worker_3",
+      "socket": "/tmp/cc-socks/4877.sock",
+      "status": "COMPLETED",
+      "assigned_at": "2026-11-11T09:06:25.325992+09:00",
+      "description": "tests/test_daangn_realty.py: TDD 검증 스위트 작성 및 양방향 동기화",
+      "completed_at": "2026-11-11T09:08:00+09:00"
     }
   ]
 }
-

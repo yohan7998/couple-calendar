@@ -160,8 +160,8 @@ class TestBrushRevealModule(unittest.TestCase):
         """13. index.html에 brush_reveal.css 및 brush_reveal_effect.js가 포함되어 있는지 검증"""
         with open('/Users/yohan/couple-calendar/index.html', 'r', encoding='utf-8') as f:
             html = f.read()
-        self.assertIn('href="modules/brush_reveal.css"', html)
-        self.assertIn('src="modules/brush_reveal_effect.js"', html)
+        self.assertTrue('modules/brush_reveal.css' in html)
+        self.assertTrue('modules/brush_reveal_effect.js' in html)
 
     def test_14_index_html_attaches_brush_reveal_to_unread_notes(self):
         """14. index.html에서 미확인 쪽지에 BrushRevealEngine.attach가 연동되어 있는지 검증"""

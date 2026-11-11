@@ -1,34 +1,3 @@
 {
-  "project": "couple-calendar",
-  "version": "v2.5.0",
-  "updated_at": "2026-11-04T11:12:00+09:00",
-  "master_ai": "Antigravity (Supreme Commander)",
-  "active_locks": [
-    {
-      "lock_id": "LOCK-003",
-      "session_name": "worker_free_ledger_v25",
-      "assigned_to": "Free세션 풀 (Claude Code PID 1651, 1656, 1685)",
-      "target_files": [
-        "modules/excel_ledger_engine.js",
-        "modules/ledger_stats_view.js",
-        "modules/ledger_stats.css",
-        "tests/test_ledger_v25.py"
-      ],
-      "status": "completed",
-      "acquired_at": "2026-11-04T10:56:00+09:00",
-      "expires_at": "2026-11-04T13:30:00+09:00",
-      "description": "가계부 엑셀 연동, 고정비/예산 관리, 모바일/웹 듀얼 통계 고도화 완료"
-    }
-  ],
-  "protected_files": [
-    "index.html",
-    "sw.js",
-    "_ACTIVE_PLANS.md",
-    "Couple-Calendar_버전기록_CHANGELOG.md"
-  ],
-  "rules": {
-    "protected_files_modification": "ONLY_MASTER_AI",
-    "module_creation": "FREE_WORKER_PRIORITY_ROUTING",
-    "git_push_permission": "ONLY_MASTER_AI"
-  }
+  "active_locks": []
 }

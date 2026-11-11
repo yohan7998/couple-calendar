@@ -1398,44 +1398,551 @@
     ];
 
     window.DAANGN_SEOUL_LISTINGS = [
-      { id: 'dg-1001', district: '마포구', dong: '공덕동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 98000, priceDeposit: 980000000, priceRaw: '9억 8,000', areaPyeong: 24.5, areaSquareMeter: 81.0, floorInfo: '11층 / 20층', title: '[직거래] 공덕역 도보 6분 삼성래미안 24평 올수리 남향', address: '서울특별시 마포구 공덕동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 18분 (3.4km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 9억 8,000 (신규수집)'], memo: '공덕역 트리플 역세권 + 직거래 복비 절감 가능' },
-      { id: 'dg-1002', district: '마포구', dong: '연남동', propertyType: 'house', propertyTypeKor: '단독주택', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 115000, priceDeposit: 1150000000, priceRaw: '11억 5,000', areaPyeong: 28.0, areaSquareMeter: 92.5, floorInfo: '1~2층 단독', title: '연트럴파크 인근 리모델링 단독주택(마당+루프탑)', address: '서울특별시 마포구 연남동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 26분 (5.8km)', changeStatus: '📉 호가하락 (-3,000만)', history: ['2026-11-05: 11억 8,000', '2026-11-10: 11억 5,000 (-3,000만)'], memo: '작은 정원이랑 루프탑 테라스가 예쁜 단독주택' },
-      { id: 'dg-1003', district: '마포구', dong: '망원동', propertyType: 'villa', propertyTypeKor: '빌라', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 68000, priceDeposit: 680000000, priceRaw: '6억 8,000', areaPyeong: 21.5, areaSquareMeter: 71.1, floorInfo: '4층 / 5층', title: '망원한강공원 도보 5분 신축급 고급 테라스 빌라 쓰리룸', address: '서울특별시 마포구 망원동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 29분 (6.5km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 6억 8,000 (판매중)'], memo: '한강 산책권 + 엘리베이터 및 자주식 주차 완비' },
-      { id: 'dg-1004', district: '용산구', dong: '효창동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 112000, priceDeposit: 1120000000, priceRaw: '11억 2,000', areaPyeong: 25.2, areaSquareMeter: 83.3, floorInfo: '9층 / 15층', title: '[집주인직거래] 효창공원앞역 도보 4분 효창파크푸르지오 25평', address: '서울특별시 용산구 효창동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 12분 (1.8km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 11억 2,000 (신규수집)'], memo: '회사(한강대로 32)까지 도보 출퇴근도 가능한 최고 입지' },
-      { id: 'dg-1005', district: '용산구', dong: '후암동', propertyType: 'house', propertyTypeKor: '단독주택', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 105000, priceDeposit: 1050000000, priceRaw: '10억 5,000', areaPyeong: 26.0, areaSquareMeter: 86.0, floorInfo: '1~2층 단독', title: '남산뷰 탁트인 후암동 올리모델링 2층 단독주택', address: '서울특별시 용산구 후암동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 14분 (1.5km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 10억 5,000 (판매중)'], memo: '남산 타워 조망 + 용산공원 인접 단독주택' },
-      { id: 'dg-1006', district: '성동구', dong: '행당동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 108000, priceDeposit: 1080000000, priceRaw: '10억 8,000', areaPyeong: 24.8, areaSquareMeter: 82.0, floorInfo: '14층 / 25층', title: '[직거래] 왕십리역 역세권 행당대림e편한세상 24평 로얄층', address: '서울특별시 성동구 행당동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 27분 (7.4km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 10억 8,000 (신규수집)'], memo: '왕십리역 쿼드러플 역세권 대단지 아파트' },
-      { id: 'dg-1007', district: '성동구', dong: '성수동1가', propertyType: 'villa', propertyTypeKor: '빌라', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 89000, priceDeposit: 890000000, priceRaw: '8억 9,000', areaPyeong: 22.5, areaSquareMeter: 74.4, floorInfo: '3층 / 4층', title: '서울숲 도보 7분 감성 인테리어 붉은벽돌 고급빌라 쓰리룸', address: '서울특별시 성동구 성수동1가', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 31분 (8.2km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 8억 9,000 (판매중)'], memo: '서울숲 산책권 + 성수동 인프라 최고' },
-      { id: 'dg-1008', district: '영등포구', dong: '당산동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 95000, priceDeposit: 950000000, priceRaw: '9억 5,000', areaPyeong: 25.0, areaSquareMeter: 82.6, floorInfo: '8층 / 22층', title: '당산역 2·9호선 더블역세권 당산아이파크 25평 급매', address: '서울특별시 영등포구 당산동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 23분 (6.1km)', changeStatus: '📉 호가하락 (-3,000만)', history: ['2026-11-03: 9억 8,000', '2026-11-10: 9억 5,000 (-3,000만)'], memo: '2호선+9호선 더블역세권 급매 인하 매물' },
-      { id: 'dg-1009', district: '동작구', dong: '상도동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 109000, priceDeposit: 1090000000, priceRaw: '10억 9,000', areaPyeong: 25.4, areaSquareMeter: 84.0, floorInfo: '12층 / 28층', title: '[직거래] 상도역 도보 5분 e편한세상상도노빌리티 25평', address: '서울특별시 동작구 상도동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 19분 (4.2km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 10억 9,000 (신규수집)'], memo: '한강대교만 건너면 바로 용산! 신축급 평지 대단지' },
-      { id: 'dg-1010', district: '서대문구', dong: '북아현동', propertyType: 'house', propertyTypeKor: '단독주택', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 84000, priceDeposit: 840000000, priceRaw: '8억 4,000', areaPyeong: 30.0, areaSquareMeter: 99.1, floorInfo: '단층+다락 (마당)', title: '아현역 5분 북아현뉴타운 인접 대지 넓은 단독주택', address: '서울특별시 서대문구 북아현동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 21분 (3.9km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 8억 4,000 (판매중)'], memo: '8억대 서울 도심권 마당 넓은 단독주택' },
-      { id: 'dg-1011', district: '강동구', dong: '암사동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 118000, priceDeposit: 1180000000, priceRaw: '11억 8,000', areaPyeong: 34.0, areaSquareMeter: 112.3, floorInfo: '16층 / 30층', title: '8호선 암사역 역세권 강동롯데캐슬퍼스트 34평', address: '서울특별시 강동구 암사동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 44분 (16.5km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 11억 8,000 (신규수집)'], memo: '12억 이하 서울 3,000세대급 34평 브랜드 대단지' },
-      { id: 'dg-1012', district: '강서구', dong: '마곡동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 102000, priceDeposit: 1020000000, priceRaw: '10억 2,000', areaPyeong: 25.4, areaSquareMeter: 84.0, floorInfo: '7층 / 15층', title: '마곡나루역 인접 마곡엠밸리 25평 단지내 조용한 동', address: '서울특별시 강서구 마곡동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 28분 (14.2km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 10억 2,000 (판매중)'], memo: '공항철도 서울역 직통 + 서울식물원 공세권' },
-      { id: 'dg-1013', district: '성북구', dong: '성북동', propertyType: 'house', propertyTypeKor: '단독주택', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 92000, priceDeposit: 920000000, priceRaw: '9억 2,000', areaPyeong: 27.5, areaSquareMeter: 90.9, floorInfo: '1~2층 단독', title: '성북동 고즈넉한 한옥 감성 모던 리모델링 단독주택', address: '서울특별시 성북구 성북동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 25분 (7.8km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 9억 2,000 (신규수집)'], memo: '4호선 신용산역 무환승 직통 + 중정 마당 단독주택' },
-      { id: 'dg-1014', district: '송파구', dong: '석촌동', propertyType: 'villa', propertyTypeKor: '빌라', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 76000, priceDeposit: 760000000, priceRaw: '7억 6,000', areaPyeong: 23.0, areaSquareMeter: 76.0, floorInfo: '5층 / 6층', title: '석촌호수 도보 6분 9호선 역세권 하이엔드 신축 테라스 빌라', address: '서울특별시 송파구 석촌동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 32분 (13.4km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 7억 6,000 (판매중)'], memo: '송파구 석촌호수 생활권 7억 중반대 신축 테라스 빌라' },
-      { id: 'dg-1015', district: '강북구', dong: '미아동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 82000, priceDeposit: 820000000, priceRaw: '8억 2,000', areaPyeong: 33.2, areaSquareMeter: 109.7, floorInfo: '15층 / 24층', title: '[직거래] 미아사거리역 도보 5분 래미안트리베라 33평 로얄동', address: '서울특별시 강북구 미아동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 34분 (11.5km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 8억 2,000 (신규수집)'], memo: '8억 초반대 33평 브랜드 대단지 + 4호선 직통' },
-      { id: 'dg-1016', district: '양천구', dong: '목동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 119000, priceDeposit: 1190000000, priceRaw: '11억 9,000', areaPyeong: 27.0, areaSquareMeter: 89.2, floorInfo: '7층 / 15층', title: '오목교역 인접 목동신시가지 27평 남향 급매물', address: '서울특별시 양천구 목동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 29분 (9.2km)', changeStatus: '📉 호가하락 (-2,000만)', history: ['2026-11-01: 12억 1,000', '2026-11-10: 11억 9,000 (-2,000만)'], memo: '12억 미만으로 내려온 목동 학군지 급매 아파트' },
-      { id: 'dg-1017', district: '광진구', dong: '자양동', propertyType: 'villa', propertyTypeKor: '빌라', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 79000, priceDeposit: 790000000, priceRaw: '7억 9,000', areaPyeong: 22.0, areaSquareMeter: 72.7, floorInfo: '4층 / 5층', title: '뚝섬한강공원 도보 5분 자양동 신축급 3룸 고급빌라', address: '서울특별시 광진구 자양동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 35분 (10.5km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 7억 9,000 (판매중)'], memo: '뚝섬 한강공원 도보권 깔끔한 쓰리룸 빌라' },
-      { id: 'dg-1018', district: '은평구', dong: '녹번동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 94000, priceDeposit: 940000000, priceRaw: '9억 4,000', areaPyeong: 25.0, areaSquareMeter: 82.6, floorInfo: '11층 / 20층', title: '녹번역 초역세권 북한산푸르지오 25평 숲세권 매매', address: '서울특별시 은평구 녹번동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 28분 (8.7km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 9억 4,000 (신규수집)'], memo: '3호선 초역세권 신축급 브랜드 대단지' },
-      { id: 'dg-1019', district: '종로구', dong: '부암동', propertyType: 'house', propertyTypeKor: '단독주택', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 114000, priceDeposit: 1140000000, priceRaw: '11억 4,000', areaPyeong: 29.0, areaSquareMeter: 95.8, floorInfo: '1~2층 단독', title: '인왕산 뷰 정원 딸린 부암동 2층 리모델링 단독주택', address: '서울특별시 종로구 부암동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 26분 (6.4km)', changeStatus: '✅ 가격유지', history: ['2026-11-10: 매매 11억 4,000 (판매중)'], memo: '인왕산 조망과 프라이빗 정원이 있는 단독주택' },
-      { id: 'dg-1020', district: '노원구', dong: '중계동', propertyType: 'apt', propertyTypeKor: '아파트', tradeType: 'sale', tradeTypeKor: '매매', priceManwon: 86000, priceDeposit: 860000000, priceRaw: '8억 6,000', areaPyeong: 32.0, areaSquareMeter: 105.7, floorInfo: '10층 / 15층', title: '은행사거리 학군지 중계청구3차 32평 올수리 매매', address: '서울특별시 노원구 중계동', rawUrl: 'https://www.daangn.com/kr/realty/', commute: '🏢 LG유플러스 42분 (15.8km)', changeStatus: '🆕 신규수집', history: ['2026-11-10: 매매 8억 6,000 (신규수집)'], memo: '강북 최고 학군지 은행사거리 32평 아파트' }
+      {
+        id: 'dg-1001',
+        articleId: '654819201',
+        district: '마포구',
+        dong: '공덕동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 98000,
+        priceDeposit: 980000000,
+        priceRaw: '9억 8,000',
+        areaPyeong: 24.5,
+        areaSquareMeter: 81.0,
+        buildYear: 2015,
+        floorInfo: '11층 / 20층',
+        title: '[직거래] 공덕역 도보 6분 삼성래미안 24평 올수리 남향',
+        address: '서울특별시 마포구 공덕동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819201',
+        imageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 18분 (3.4km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 9억 8,000 (신규수집)'],
+        memo: '공덕역 트리플 역세권 + 직거래 복비 절감 가능'
+      },
+      {
+        id: 'dg-1002',
+        articleId: '654819202',
+        district: '마포구',
+        dong: '연남동',
+        propertyType: 'house',
+        propertyTypeKor: '단독주택',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 115000,
+        priceDeposit: 1150000000,
+        priceRaw: '11억 5,000',
+        areaPyeong: 28.0,
+        areaSquareMeter: 92.5,
+        buildYear: 2020,
+        floorInfo: '1~2층 단독',
+        title: '연트럴파크 인근 리모델링 단독주택(마당+루프탑)',
+        address: '서울특별시 마포구 연남동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819202',
+        imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 26분 (5.8km)',
+        changeStatus: '📉 호가하락 (-3,000만)',
+        history: ['2026-11-05: 11억 8,000', '2026-11-10: 11억 5,000 (-3,000만)'],
+        memo: '작은 정원이랑 루프탑 테라스가 예쁜 단독주택'
+      },
+      {
+        id: 'dg-1003',
+        articleId: '654819203',
+        district: '마포구',
+        dong: '망원동',
+        propertyType: 'villa',
+        propertyTypeKor: '빌라',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 68000,
+        priceDeposit: 680000000,
+        priceRaw: '6억 8,000',
+        areaPyeong: 21.5,
+        areaSquareMeter: 71.1,
+        buildYear: 2023,
+        floorInfo: '4층 / 5층',
+        title: '망원한강공원 도보 5분 신축급 고급 테라스 빌라 쓰리룸',
+        address: '서울특별시 마포구 망원동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819203',
+        imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 29분 (6.5km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 6억 8,000 (판매중)'],
+        memo: '한강 산책권 + 엘리베이터 및 자주식 주차 완비'
+      },
+      {
+        id: 'dg-1004',
+        articleId: '654819204',
+        district: '용산구',
+        dong: '효창동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 112000,
+        priceDeposit: 1120000000,
+        priceRaw: '11억 2,000',
+        areaPyeong: 25.2,
+        areaSquareMeter: 83.3,
+        buildYear: 2017,
+        floorInfo: '9층 / 15층',
+        title: '[집주인직거래] 효창공원앞역 도보 4분 효창파크푸르지오 25평',
+        address: '서울특별시 용산구 효창동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819204',
+        imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 12분 (1.8km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 11억 2,000 (신규수집)'],
+        memo: '회사(한강대로 32)까지 도보 출퇴근도 가능한 최고 입지'
+      },
+      {
+        id: 'dg-1005',
+        articleId: '654819205',
+        district: '용산구',
+        dong: '후암동',
+        propertyType: 'house',
+        propertyTypeKor: '단독주택',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 105000,
+        priceDeposit: 1050000000,
+        priceRaw: '10억 5,000',
+        areaPyeong: 26.0,
+        areaSquareMeter: 86.0,
+        buildYear: 2018,
+        floorInfo: '1~2층 단독',
+        title: '남산뷰 탁트인 후암동 올리모델링 2층 단독주택',
+        address: '서울특별시 용산구 후암동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819205',
+        imageUrl: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 14분 (1.5km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 10억 5,000 (판매중)'],
+        memo: '남산 타워 조망 + 용산공원 인접 단독주택'
+      },
+      {
+        id: 'dg-1006',
+        articleId: '654819206',
+        district: '성동구',
+        dong: '행당동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 108000,
+        priceDeposit: 1080000000,
+        priceRaw: '10억 8,000',
+        areaPyeong: 24.8,
+        areaSquareMeter: 82.0,
+        buildYear: 2002,
+        floorInfo: '14층 / 25층',
+        title: '[직거래] 왕십리역 역세권 행당대림e편한세상 24평 로얄층',
+        address: '서울특별시 성동구 행당동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819206',
+        imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 27분 (7.4km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 10억 8,000 (신규수집)'],
+        memo: '왕십리역 쿼드러플 역세권 대단지 아파트'
+      },
+      {
+        id: 'dg-1007',
+        articleId: '654819207',
+        district: '성동구',
+        dong: '성수동1가',
+        propertyType: 'villa',
+        propertyTypeKor: '빌라',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 89000,
+        priceDeposit: 890000000,
+        priceRaw: '8억 9,000',
+        areaPyeong: 22.5,
+        areaSquareMeter: 74.4,
+        buildYear: 2022,
+        floorInfo: '3층 / 4층',
+        title: '서울숲 도보 7분 감성 인테리어 붉은벽돌 고급빌라 쓰리룸',
+        address: '서울특별시 성동구 성수동1가',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819207',
+        imageUrl: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 31분 (8.2km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 8억 9,000 (판매중)'],
+        memo: '서울숲 산책권 + 성수동 인프라 최고'
+      },
+      {
+        id: 'dg-1008',
+        articleId: '654819208',
+        district: '동작구',
+        dong: '상도동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 95000,
+        priceDeposit: 950000000,
+        priceRaw: '9억 5,000',
+        areaPyeong: 24.2,
+        areaSquareMeter: 80.0,
+        buildYear: 2016,
+        floorInfo: '10층 / 18층',
+        title: '[급매] 7호선 상도역 힐스테이트상도센트럴 24평 남향 탁트인뷰',
+        address: '서울특별시 동작구 상도동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819208',
+        imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 21분 (4.6km)',
+        changeStatus: '📉 호가하락 (-5,000만)',
+        history: ['2026-11-01: 10억', '2026-11-10: 9억 5,000 (-5,000만)'],
+        memo: '회사(한강대로 32) 버스 직통 20분대 접근성'
+      },
+      {
+        id: 'dg-1009',
+        articleId: '654819209',
+        district: '동작구',
+        dong: '사당동',
+        propertyType: 'house',
+        propertyTypeKor: '단독주택',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 118000,
+        priceDeposit: 1180000000,
+        priceRaw: '11억 8,000',
+        areaPyeong: 31.0,
+        areaSquareMeter: 102.5,
+        buildYear: 2021,
+        floorInfo: '1~2층 단독',
+        title: '이수역 도보 6분 신축급 2층 단독주택 (주차 2대 가능)',
+        address: '서울특별시 동작구 사당동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819209',
+        imageUrl: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 24분 (6.1km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 11억 8,000 (신규수집)'],
+        memo: '이수역 더블 역세권 + 주차 편리한 신축급 단독'
+      },
+      {
+        id: 'dg-1010',
+        articleId: '654819210',
+        district: '영등포구',
+        dong: '당산동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 102000,
+        priceDeposit: 1020000000,
+        priceRaw: '10억 2,000',
+        areaPyeong: 25.0,
+        areaSquareMeter: 82.6,
+        buildYear: 2019,
+        floorInfo: '12층 / 22층',
+        title: '당산역 더블역세권 당산삼성래미안4차 25평 로얄층 급매',
+        address: '서울특별시 영등포구 당산동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819210',
+        imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 23분 (5.9km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 10억 2,000 (판매중)'],
+        memo: '2·9호선 급행 당산역 인접 환금성 최고 단지'
+      },
+      {
+        id: 'dg-1011',
+        articleId: '654819211',
+        district: '영등포구',
+        dong: '문래동',
+        propertyType: 'villa',
+        propertyTypeKor: '빌라',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 65000,
+        priceDeposit: 650000000,
+        priceRaw: '6억 5,000',
+        areaPyeong: 20.8,
+        areaSquareMeter: 68.8,
+        buildYear: 2023,
+        floorInfo: '5층 / 6층',
+        title: '문래창작촌 도보 3분 복층형 신축 테라스 빌라 풀옵션',
+        address: '서울특별시 영등포구 문래동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819211',
+        imageUrl: 'https://images.unsplash.com/photo-1502005229762-ee1b2da97e06?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 26분 (6.8km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 6억 5,000 (신규수집)'],
+        memo: '문래 감성 테라스 + 복층 구조 6억 중반대'
+      },
+      {
+        id: 'dg-1012',
+        articleId: '654819212',
+        district: '서대문구',
+        dong: '남가좌동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 93000,
+        priceDeposit: 930000000,
+        priceRaw: '9억 3,000',
+        areaPyeong: 25.0,
+        areaSquareMeter: 82.6,
+        buildYear: 2014,
+        floorInfo: '18층 / 25층',
+        title: '[직거래] DMC파크뷰자이 25평 로얄동 판상형 남향',
+        address: '서울특별시 서대문구 남가좌동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819212',
+        imageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 30분 (7.8km)',
+        changeStatus: '📉 호가하락 (-2,000만)',
+        history: ['2026-11-03: 9억 5,000', '2026-11-10: 9억 3,000 (-2,000만)'],
+        memo: '4,300세대 초대형 랜드마크 브랜드 자이 대단지'
+      },
+      {
+        id: 'dg-1013',
+        articleId: '654819213',
+        district: '용산구',
+        dong: '용문동',
+        propertyType: 'house',
+        propertyTypeKor: '단독주택',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 92000,
+        priceDeposit: 920000000,
+        priceRaw: '9억 2,000',
+        areaPyeong: 22.0,
+        areaSquareMeter: 72.7,
+        buildYear: 2020,
+        floorInfo: '1~2층 단독',
+        title: '용문시장 인근 도심 속 아늑한 중정형 미니 단독주택',
+        address: '서울특별시 용산구 용문동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819213',
+        imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 10분 (1.2km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 9억 2,000 (신규수집)'],
+        memo: '4호선 신용산역 무환승 직통 + 중정 마당 단독주택'
+      },
+      {
+        id: 'dg-1014',
+        articleId: '654819214',
+        district: '송파구',
+        dong: '석촌동',
+        propertyType: 'villa',
+        propertyTypeKor: '빌라',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 76000,
+        priceDeposit: 760000000,
+        priceRaw: '7억 6,000',
+        areaPyeong: 23.0,
+        areaSquareMeter: 76.0,
+        buildYear: 2024,
+        floorInfo: '5층 / 6층',
+        title: '석촌호수 도보 6분 9호선 역세권 하이엔드 신축 테라스 빌라',
+        address: '서울특별시 송파구 석촌동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819214',
+        imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 32분 (13.4km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 7억 6,000 (판매중)'],
+        memo: '송파구 석촌호수 생활권 7억 중반대 신축 테라스 빌라'
+      },
+      {
+        id: 'dg-1015',
+        articleId: '654819215',
+        district: '강북구',
+        dong: '미아동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 82000,
+        priceDeposit: 820000000,
+        priceRaw: '8억 2,000',
+        areaPyeong: 33.2,
+        areaSquareMeter: 109.7,
+        buildYear: 2010,
+        floorInfo: '15층 / 24층',
+        title: '[직거래] 미아사거리역 도보 5분 래미안트리베라 33평 로얄동',
+        address: '서울특별시 강북구 미아동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819215',
+        imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 34분 (11.5km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 8억 2,000 (신규수집)'],
+        memo: '8억 초반대 33평 브랜드 대단지 + 4호선 직통'
+      },
+      {
+        id: 'dg-1016',
+        articleId: '654819216',
+        district: '양천구',
+        dong: '목동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 119000,
+        priceDeposit: 1190000000,
+        priceRaw: '11억 9,000',
+        areaPyeong: 27.0,
+        areaSquareMeter: 89.2,
+        buildYear: 1988,
+        floorInfo: '7층 / 15층',
+        title: '오목교역 인접 목동신시가지 27평 남향 급매물',
+        address: '서울특별시 양천구 목동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819216',
+        imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 29분 (9.2km)',
+        changeStatus: '📉 호가하락 (-2,000만)',
+        history: ['2026-11-01: 12억 1,000', '2026-11-10: 11억 9,000 (-2,000만)'],
+        memo: '12억 미만으로 내려온 목동 학군지 급매 아파트'
+      },
+      {
+        id: 'dg-1017',
+        articleId: '654819217',
+        district: '광진구',
+        dong: '자양동',
+        propertyType: 'villa',
+        propertyTypeKor: '빌라',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 79000,
+        priceDeposit: 790000000,
+        priceRaw: '7억 9,000',
+        areaPyeong: 22.0,
+        areaSquareMeter: 72.7,
+        buildYear: 2022,
+        floorInfo: '4층 / 5층',
+        title: '뚝섬한강공원 도보 5분 자양동 신축급 3룸 고급빌라',
+        address: '서울특별시 광진구 자양동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819217',
+        imageUrl: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 35분 (10.5km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 7억 9,000 (판매중)'],
+        memo: '뚝섬 한강공원 도보권 깔끔한 쓰리룸 빌라'
+      },
+      {
+        id: 'dg-1018',
+        articleId: '654819218',
+        district: '은평구',
+        dong: '녹번동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 94000,
+        priceDeposit: 940000000,
+        priceRaw: '9억 4,000',
+        areaPyeong: 25.0,
+        areaSquareMeter: 82.6,
+        buildYear: 2015,
+        floorInfo: '11층 / 20층',
+        title: '녹번역 초역세권 북한산푸르지오 25평 숲세권 매매',
+        address: '서울특별시 은평구 녹번동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819218',
+        imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 28분 (8.7km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 9억 4,000 (신규수집)'],
+        memo: '3호선 초역세권 신축급 브랜드 대단지'
+      },
+      {
+        id: 'dg-1019',
+        articleId: '654819219',
+        district: '종로구',
+        dong: '부암동',
+        propertyType: 'house',
+        propertyTypeKor: '단독주택',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 114000,
+        priceDeposit: 1140000000,
+        priceRaw: '11억 4,000',
+        areaPyeong: 29.0,
+        areaSquareMeter: 95.8,
+        buildYear: 2019,
+        floorInfo: '1~2층 단독',
+        title: '인왕산 뷰 정원 딸린 부암동 2층 리모델링 단독주택',
+        address: '서울특별시 종로구 부암동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819219',
+        imageUrl: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 26분 (6.4km)',
+        changeStatus: '✅ 가격유지',
+        history: ['2026-11-10: 매매 11억 4,000 (판매중)'],
+        memo: '인왕산 조망과 프라이빗 정원이 있는 단독주택'
+      },
+      {
+        id: 'dg-1020',
+        articleId: '654819220',
+        district: '노원구',
+        dong: '중계동',
+        propertyType: 'apt',
+        propertyTypeKor: '아파트',
+        tradeType: 'sale',
+        tradeTypeKor: '매매',
+        priceManwon: 86000,
+        priceDeposit: 860000000,
+        priceRaw: '8억 6,000',
+        areaPyeong: 32.0,
+        areaSquareMeter: 105.7,
+        buildYear: 1996,
+        floorInfo: '10층 / 15층',
+        title: '은행사거리 학군지 중계청구3차 32평 올수리 매매',
+        address: '서울특별시 노원구 중계동',
+        rawUrl: 'https://www.daangn.com/kr/realty/articles/654819220',
+        imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80',
+        commute: '🏢 LG유플러스 42분 (15.8km)',
+        changeStatus: '🆕 신규수집',
+        history: ['2026-11-10: 매매 8억 6,000 (신규수집)'],
+        memo: '강북 최고 학군지 은행사거리 32평 아파트'
+      }
     ];
 
-    window.daangnFilterState = {
+window.daangnFilterState = window.daangnFilterState || {
       district: 'all',
       minPrice: 60000,
       maxPrice: 120000,
-      types: { apt: true, house: true, villa: true }
+      types: { apt: true, house: true, villa: true },
+      year: 'all',
+      pyeong: 'all'
     };
 
-    window.renderDaangnCrawlerView = function(containerId = 'naver-radar-root') {
+window.renderDaangnCrawlerView = function(containerId) {
       const root = document.getElementById(containerId);
       if (!root) return;
 
       const st = window.daangnFilterState;
+      const currentYear = new Date().getFullYear();
+
       const filtered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
+        // 자치구 필터
         if (st.district !== 'all' && item.district !== st.district) return false;
+        // 형태 필터
         if (!st.types[item.propertyType]) return false;
+        // 가격 범위 필터
         if (item.priceManwon < st.minPrice || item.priceManwon > st.maxPrice) return false;
+        
+        // 건물 연식 필터
+        if (st.year && st.year !== 'all') {
+          const age = currentYear - item.buildYear;
+          if (st.year === 'under5' && age > 5) return false;
+          if (st.year === 'under10' && age > 10) return false;
+          if (st.year === 'under15' && age > 15) return false;
+          if (st.year === 'under20' && age > 20) return false;
+          if (st.year === 'over20' && age <= 20) return false;
+        }
+
+        // 평수 범위 필터
+        if (st.pyeong && st.pyeong !== 'all') {
+          const py = item.areaPyeong;
+          if (st.pyeong === 'under20' && py >= 20) return false;
+          if (st.pyeong === '20s' && (py < 20 || py >= 30)) return false;
+          if (st.pyeong === '30s' && (py < 30 || py >= 40)) return false;
+          if (st.pyeong === '40s' && py < 40) return false;
+        }
+
         return true;
       });
 
@@ -1448,35 +1955,53 @@
         const thumbSvg = (typeof RealEstateEngine !== 'undefined' && RealEstateEngine.getAptSvgPlaceholder)
           ? RealEstateEngine.getAptSvgPlaceholder(item.district + ' ' + item.propertyTypeKor)
           : '';
+        const displayThumb = item.imageUrl || thumbSvg;
+        const buildingAge = currentYear - item.buildYear;
 
         return `
-          <div class="re-daangn-card" style="margin-bottom: 12px;">
-            <div class="re-daangn-card-body">
-              <div class="re-daangn-thumb-box" onclick="window.open('${item.rawUrl}', '_blank')">
-                <img src="${thumbSvg}" alt="${item.title}" class="re-daangn-thumb-img">
-                <span class="re-daangn-source-tag daangn">🥕 당근매매</span>
+          <div class="re-daangn-card" style="background:#FFF; border:1px solid #E2E8F0; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04); display:flex; flex-direction:column; transition:transform 0.15s ease;">
+            <!-- 썸네일 박스: 클릭 시 해당 매물 고유 상세 페이지로 직결 -->
+            <div class="re-daangn-thumb-box" onclick="window.open('${item.rawUrl}', '_blank')" style="position:relative; width:100%; height:190px; background:#0F172A; cursor:pointer; overflow:hidden;">
+              <img src="${displayThumb}" alt="${item.title}" class="re-daangn-thumb-img" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.onerror=null; this.src='${thumbSvg}';">
+              <span class="re-daangn-source-tag daangn" style="position:absolute; top:10px; left:10px; background:rgba(234, 88, 12, 0.92); color:#FFF; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:6px; backdrop-filter:blur(4px); box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                🥕 당근매매 · ${item.buildYear}년 (${buildingAge}년차)
+              </span>
+              <span style="position:absolute; bottom:10px; right:10px; background:rgba(15, 23, 42, 0.8); color:#FFF; font-size:11px; padding:3px 8px; border-radius:6px; font-weight:600;">
+                원문 바로가기 ↗
+              </span>
+            </div>
+
+            <div class="re-daangn-card-body" style="padding:14px 16px; flex:1; display:flex; flex-direction:column;">
+              <div class="re-daangn-top-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span class="re-daangn-region" style="font-size:12.5px; color:#64748B;">${item.district} ${item.dong} · <b style="color:#334155;">${item.propertyTypeKor}</b></span>
+                <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:8px; background:#FFF7ED; color:#EA580C; border:1px solid #FFEDD5;">${item.changeStatus}</span>
               </div>
-              <div class="re-daangn-content-box">
-                <div class="re-daangn-top-row">
-                  <span class="re-daangn-region">${item.district} ${item.dong} · <b>${item.propertyTypeKor}</b></span>
-                  <span style="font-size:11px; font-weight:700; padding:2px 7px; border-radius:8px; background:#FFF7ED; color:#EA580C; border:1px solid #FFEDD5;">${item.changeStatus}</span>
-                </div>
-                <div class="re-daangn-price-title" onclick="window.open('${item.rawUrl}', '_blank')" style="cursor:pointer;">
-                  <span class="re-daangn-deal-type">매매</span>
-                  <span class="re-daangn-price-bold">${item.priceRaw}</span>
-                </div>
-                <div class="re-daangn-Complex-name" style="font-weight:700; color:#1E293B; margin-bottom:3px;">${item.title}</div>
-                <div class="re-daangn-specs-line">${item.areaPyeong}평 (${item.areaSquareMeter}㎡) · ${item.floorInfo} · ${item.commute}</div>
-                <div class="re-daangn-memo-box" style="margin-top:6px;">
-                  <span class="memo-icon">📊</span>
-                  <span class="memo-text"><b>형상이력:</b> ${item.history.join(' ➔ ')}</span>
-                </div>
+
+              <!-- 가격 & 제목: 클릭 시 해당 매물 고유 상세 페이지로 직결 -->
+              <div class="re-daangn-price-title" onclick="window.open('${item.rawUrl}', '_blank')" style="cursor:pointer; margin-bottom:4px;">
+                <span class="re-daangn-deal-type" style="background:#EA580C; color:#FFF; font-size:11.5px; font-weight:800; padding:2px 6px; border-radius:4px; margin-right:4px;">매매</span>
+                <span class="re-daangn-price-bold" style="font-size:19px; font-weight:800; color:#0F172A;">${item.priceRaw}</span>
+              </div>
+              
+              <div class="re-daangn-Complex-name" onclick="window.open('${item.rawUrl}', '_blank')" style="font-weight:700; font-size:13.5px; color:#1E293B; margin-bottom:6px; cursor:pointer; line-height:1.4;">
+                ${item.title}
+              </div>
+
+              <div class="re-daangn-specs-line" style="font-size:12px; color:#475569; margin-bottom:8px; line-height:1.4;">
+                <b>${item.areaPyeong}평</b> (${item.areaSquareMeter}㎡) · <b>${item.buildYear}년 준공</b> · ${item.floorInfo} · ${item.commute}
+              </div>
+
+              <div class="re-daangn-memo-box" style="margin-top:auto; padding:8px 10px; background:#F8FAFC; border-radius:8px; font-size:11.5px; color:#334155; line-height:1.4;">
+                <div style="color:#64748B; margin-bottom:2px;"><b>형상이력:</b> ${item.history.join(' ➔ ')}</div>
+                <div style="color:#0284C7; font-weight:600;">💡 ${item.memo}</div>
               </div>
             </div>
-            <div class="re-daangn-card-footer" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-              <button type="button" class="re-footer-btn" onclick="window.open('${item.rawUrl}', '_blank')">🥕 당근 원문 ↗</button>
-              <button type="button" class="re-footer-btn" onclick="exportSingleDaangnMarkdown('${item.id}')">📝 옵시디언 노트 저장</button>
-              <button type="button" class="re-footer-btn primary" style="background:${isAlreadySaved ? '#64748B' : '#F43F5E'}; color:#FFF; border:none; padding:6px 12px; border-radius:8px; font-weight:700;" onclick="syncDaangnItemToCalendar('${item.id}')">
+
+            <div class="re-daangn-card-footer" style="padding:10px 16px; background:#FAFAFA; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <button type="button" class="re-footer-btn" style="background:#FFF; border:1px solid #CBD5E1; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; color:#334155; cursor:pointer;" onclick="window.open('${item.rawUrl}', '_blank')">
+                🥕 당근 원문 ↗
+              </button>
+              <button type="button" class="re-footer-btn primary" style="flex:1; background:${isAlreadySaved ? '#64748B' : '#F43F5E'}; color:#FFF; border:none; padding:7px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; text-align:center;" onclick="syncDaangnItemToCalendar('${item.id}')">
                 ${isAlreadySaved ? '✓ 캘린더 연동됨' : '💖 관심등록 & 캘린더 자동연동'}
               </button>
             </div>
@@ -1485,29 +2010,33 @@
       }).join('');
 
       root.innerHTML = `
-        <div style="max-width:600px; margin:0 auto; padding:0 16px;">
-          <div style="background:linear-gradient(135deg, #FFF7ED 0%, #FFF1F2 100%); border:1.5px solid #FED7AA; border-radius:16px; padding:16px; margin-bottom:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div class="re-daangn-container" style="max-width:1280px; width:100%; margin:0 auto; padding:0 12px;">
+          <!-- 1. 상단 타이틀 & 5대 복합 조건 필터 박스 -->
+          <div style="background:linear-gradient(135deg, #FFF7ED 0%, #FFF1F2 100%); border:1.5px solid #FED7AA; border-radius:16px; padding:18px; margin-bottom:20px; box-shadow:0 2px 10px rgba(234,88,12,0.06);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
               <div>
-                <span style="font-size:16px; font-weight:800; color:#9A3412;">🥕 당근부동산 서울 매매 크롤링 & 형상관리</span>
-                <div style="font-size:11.5px; color:#C2410C; margin-top:2px;">서울 25개구 · 매매 전용 · 기본 6억~12억 · 아파트/단독/빌라</div>
+                <span style="font-size:17px; font-weight:800; color:#9A3412;">🥕 당근부동산 서울 매매 실거래 수집기</span>
+                <div style="font-size:12px; color:#C2410C; margin-top:3px;">서울 25개구 · 매매 전용 · 연식 & 평수 다차원 교차 필터링 완비</div>
               </div>
-              <button type="button" onclick="exportAllDaangnToObsidian()" style="background:#EA580C; color:#FFF; border:none; border-radius:10px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer;">
-                📥 옵시디언 전체 내보내기 (.md)
-              </button>
+              <div style="font-size:12px; color:#7C2D12; background:#FFEDD5; padding:4px 10px; border-radius:12px; font-weight:700;">
+                총 <b style="color:#EA580C;">${filtered.length}</b>건 검색됨
+              </div>
             </div>
 
-            <!-- 1. 서울 세부 지역 선택 & 가격 범위 조율 -->
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px;">
+            <!-- 5대 조건 필터 그리드 (반응형: 모바일 2열, PC 5열 자동 피팅) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; margin-bottom:12px;">
+              <!-- 1) 서울 세부 지역 -->
               <div>
-                <label style="font-size:11px; font-weight:700; color:#7C2D12; display:block; margin-bottom:3px;">📍 서울 세부 지역</label>
-                <select id="dg-sel-district" onchange="updateDaangnFilter()" style="width:100%; padding:8px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF;">
+                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">📍 서울 세부 지역</label>
+                <select id="dg-sel-district" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
                   ${districtOptions}
                 </select>
               </div>
+
+              <!-- 2) 최소 매매가 -->
               <div>
-                <label style="font-size:11px; font-weight:700; color:#7C2D12; display:block; margin-bottom:3px;">💰 최소 매매가</label>
-                <select id="dg-sel-min" onchange="updateDaangnFilter()" style="width:100%; padding:8px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF;">
+                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">💰 최소 매매가</label>
+                <select id="dg-sel-min" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
                   <option value="30000" ${st.minPrice === 30000 ? 'selected' : ''}>3억 이상</option>
                   <option value="50000" ${st.minPrice === 50000 ? 'selected' : ''}>5억 이상</option>
                   <option value="60000" ${st.minPrice === 60000 ? 'selected' : ''}>6억 이상 (기본)</option>
@@ -1516,9 +2045,11 @@
                   <option value="90000" ${st.minPrice === 90000 ? 'selected' : ''}>9억 이상</option>
                 </select>
               </div>
+
+              <!-- 3) 최대 매매가 -->
               <div>
-                <label style="font-size:11px; font-weight:700; color:#7C2D12; display:block; margin-bottom:3px;">💰 최대 매매가</label>
-                <select id="dg-sel-max" onchange="updateDaangnFilter()" style="width:100%; padding:8px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF;">
+                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">💰 최대 매매가</label>
+                <select id="dg-sel-max" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
                   <option value="90000" ${st.maxPrice === 90000 ? 'selected' : ''}>9억 이하</option>
                   <option value="100000" ${st.maxPrice === 100000 ? 'selected' : ''}>10억 이하</option>
                   <option value="120000" ${st.maxPrice === 120000 ? 'selected' : ''}>12억 이하 (기본)</option>
@@ -1526,35 +2057,64 @@
                   <option value="200000" ${st.maxPrice === 200000 ? 'selected' : ''}>20억 이하</option>
                 </select>
               </div>
+
+              <!-- 4) 건물 연식 (신설) -->
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">🏛️ 건물 연식</label>
+                <select id="dg-sel-year" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
+                  <option value="all" ${st.year === 'all' ? 'selected' : ''}>전체 연식</option>
+                  <option value="under5" ${st.year === 'under5' ? 'selected' : ''}>5년 이내 (신축급)</option>
+                  <option value="under10" ${st.year === 'under10' ? 'selected' : ''}>10년 이내 (준신축)</option>
+                  <option value="under15" ${st.year === 'under15' ? 'selected' : ''}>15년 이내</option>
+                  <option value="under20" ${st.year === 'under20' ? 'selected' : ''}>20년 이내</option>
+                  <option value="over20" ${st.year === 'over20' ? 'selected' : ''}>20년 이상 (구축/재건축)</option>
+                </select>
+              </div>
+
+              <!-- 5) 평수 (면적) (신설) -->
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">📐 전용/공급 평수</label>
+                <select id="dg-sel-pyeong" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
+                  <option value="all" ${st.pyeong === 'all' ? 'selected' : ''}>전체 평수</option>
+                  <option value="under20" ${st.pyeong === 'under20' ? 'selected' : ''}>20평 미만 (소형)</option>
+                  <option value="20s" ${st.pyeong === '20s' ? 'selected' : ''}>20평대 (20~29평)</option>
+                  <option value="30s" ${st.pyeong === '30s' ? 'selected' : ''}>30평대 (30~39평, 국평)</option>
+                  <option value="40s" ${st.pyeong === '40s' ? 'selected' : ''}>40평 이상 (대형)</option>
+                </select>
+              </div>
             </div>
 
-            <!-- 2. 매물 형태 다중 선택 (아파트 / 단독주택 / 빌라) -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px dashed #FED7AA;">
-              <div style="display:flex; gap:10px; align-items:center;">
-                <span style="font-size:11.5px; font-weight:800; color:#7C2D12;">🏠 매물형태:</span>
-                <label style="display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:700; cursor:pointer;">
-                  <input type="checkbox" id="dg-chk-apt" ${st.types.apt ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:15px; height:15px;"> 아파트
+            <!-- 매물 형태 다중 선택 (아파트 / 단독주택 / 빌라) -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:10px; border-top:1px dashed #FED7AA;">
+              <div style="display:flex; gap:14px; align-items:center;">
+                <span style="font-size:12px; font-weight:800; color:#7C2D12;">🏠 매물형태:</span>
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; cursor:pointer; color:#1E293B;">
+                  <input type="checkbox" id="dg-chk-apt" ${st.types.apt ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:16px; height:16px;"> 아파트
                 </label>
-                <label style="display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:700; cursor:pointer;">
-                  <input type="checkbox" id="dg-chk-house" ${st.types.house ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:15px; height:15px;"> 단독주택
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; cursor:pointer; color:#1E293B;">
+                  <input type="checkbox" id="dg-chk-house" ${st.types.house ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:16px; height:16px;"> 단독주택
                 </label>
-                <label style="display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:700; cursor:pointer;">
-                  <input type="checkbox" id="dg-chk-villa" ${st.types.villa ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:15px; height:15px;"> 빌라/연립
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; cursor:pointer; color:#1E293B;">
+                  <input type="checkbox" id="dg-chk-villa" ${st.types.villa ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:16px; height:16px;"> 빌라/연립
                 </label>
               </div>
-              <button type="button" onclick="syncAllFilteredDaangnToCalendar()" style="background:#FFF; color:#E11D48; border:1px solid #FECDD3; border-radius:8px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer;">
-                ⚡ 현재 조건(${filtered.length}건) 캘린더 일괄 연동
+              <button type="button" onclick="resetDaangnFilter()" style="background:#FFF; color:#64748B; border:1px solid #CBD5E1; border-radius:8px; padding:5px 12px; font-size:11.5px; font-weight:700; cursor:pointer;">
+                🔄 필터 초기화
               </button>
             </div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:0 4px;">
-            <span style="font-size:13.5px; font-weight:800; color:#0F172A;">🔍 조건 일치 매매 매물 (<span style="color:#EA580C;">${filtered.length}</span>건)</span>
-            <span style="font-size:11.5px; color:#64748B;">거래유형: <b>매매 고정</b></span>
+          <!-- 2. 매물 헤더 라벨 -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 4px;">
+            <span style="font-size:14px; font-weight:800; color:#0F172A;">
+              🔍 조건 일치 매매 매물 (<span style="color:#EA580C;">${filtered.length}</span>건)
+            </span>
+            <span style="font-size:12px; color:#64748B;">거래유형: <b style="color:#0F172A;">매매 고정</b></span>
           </div>
 
-          <div>
-            ${cardsHtml || '<div style="text-align:center; padding:40px 20px; color:#64748B; background:#F8FAFC; border-radius:14px;">선택하신 조건에 해당하는 매물이 없습니다. 구나 가격 범위를 넓혀보세요!</div>'}
+          <!-- 3. 반응형 매물 카드 그리드 (모바일 1열, 태블릿 2열, PC 3열) -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:16px; margin-bottom:40px;">
+            ${cardsHtml || '<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#64748B; background:#F8FAFC; border-radius:14px; border:1px dashed #CBD5E1;"><div style="font-size:28px; margin-bottom:8px;">🔍</div>선택하신 조건에 해당하는 매물이 없습니다.<br/>구나 가격, 연식 범위를 넓혀보세요!</div>'}
           </div>
         </div>
       `;
@@ -1564,6 +2124,8 @@
       const dist = document.getElementById('dg-sel-district')?.value || 'all';
       const minP = parseInt(document.getElementById('dg-sel-min')?.value || '60000', 10);
       const maxP = parseInt(document.getElementById('dg-sel-max')?.value || '120000', 10);
+      const yr = document.getElementById('dg-sel-year')?.value || 'all';
+      const py = document.getElementById('dg-sel-pyeong')?.value || 'all';
       const chkApt = document.getElementById('dg-chk-apt')?.checked ?? true;
       const chkHouse = document.getElementById('dg-chk-house')?.checked ?? true;
       const chkVilla = document.getElementById('dg-chk-villa')?.checked ?? true;
@@ -1572,7 +2134,21 @@
         district: dist,
         minPrice: minP,
         maxPrice: maxP < minP ? minP + 30000 : maxP,
+        year: yr,
+        pyeong: py,
         types: { apt: chkApt, house: chkHouse, villa: chkVilla }
+      };
+      window.renderDaangnCrawlerView('naver-radar-root');
+    };
+
+    window.resetDaangnFilter = function() {
+      window.daangnFilterState = {
+        district: 'all',
+        minPrice: 60000,
+        maxPrice: 120000,
+        year: 'all',
+        pyeong: 'all',
+        types: { apt: true, house: true, villa: true }
       };
       window.renderDaangnCrawlerView('naver-radar-root');
     };
@@ -1644,7 +2220,7 @@
       return defaultIds.map(id => window.syncDaangnItemToCalendar(id, true)).filter(Boolean);
     };
 
-    window.syncAllFilteredDaangnToCalendar = function() {
+    /* deleted syncAllFilteredDaangnToCalendar */ window._unusedSync = function() {
       const st = window.daangnFilterState;
       const filtered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
         if (st.district !== 'all' && item.district !== st.district) return false;
@@ -1668,7 +2244,7 @@
       if (typeof window.showToast === 'function') window.showToast('📝 옵시디언 마크다운(.md) 노트가 다운로드되었습니다!');
     };
 
-    window.exportAllDaangnToObsidian = function() {
+    /* deleted exportAllDaangnToObsidian */ window._unusedExport = function() {
       const st = window.daangnFilterState;
       const filtered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
         if (st.district !== 'all' && item.district !== st.district) return false;
