@@ -1922,11 +1922,12 @@
 
 window.daangnFilterState = window.daangnFilterState || {
       district: 'all',
-      minPrice: 60000,
-      maxPrice: 120000,
-      types: { apt: true, house: true, villa: true },
-      year: 'all',
-      pyeong: 'all'
+      minPriceWon: 100000000,
+      maxPriceWon: 5000000000,
+      maxAge: 35,
+      minPyeong: 5,
+      maxPyeong: 70,
+      types: { apt: true, house: true, villa: true }
     };
 
 window.renderDaangnCrawlerView = function(containerId) {
@@ -1941,27 +1942,19 @@ window.renderDaangnCrawlerView = function(containerId) {
         if (st.district !== 'all' && item.district !== st.district) return false;
         // 형태 필터
         if (!st.types[item.propertyType]) return false;
-        // 가격 범위 필터
-        if (item.priceManwon < st.minPrice || item.priceManwon > st.maxPrice) return false;
-        
-        // 건물 연식 필터
-        if (st.year && st.year !== 'all') {
-          const age = currentYear - item.buildYear;
-          if (st.year === 'under5' && age > 5) return false;
-          if (st.year === 'under10' && age > 10) return false;
-          if (st.year === 'under15' && age > 15) return false;
-          if (st.year === 'under20' && age > 20) return false;
-          if (st.year === 'over20' && age <= 20) return false;
-        }
+        // 가격 범위 필터 (만원 단위)
+        const priceManwon = item.priceManwon;
+        const minPriceManwon = st.minPriceWon / 10000;
+        const maxPriceManwon = st.maxPriceWon / 10000;
+        if (priceManwon < minPriceManwon || priceManwon > maxPriceManwon) return false;
+
+        // 건물 연식 필터 (최대 연식)
+        const age = currentYear - item.buildYear;
+        if (age > st.maxAge) return false;
 
         // 평수 범위 필터
-        if (st.pyeong && st.pyeong !== 'all') {
-          const py = item.areaPyeong;
-          if (st.pyeong === 'under20' && py >= 20) return false;
-          if (st.pyeong === '20s' && (py < 20 || py >= 30)) return false;
-          if (st.pyeong === '30s' && (py < 30 || py >= 40)) return false;
-          if (st.pyeong === '40s' && py < 40) return false;
-        }
+        const py = item.areaPyeong;
+        if (py < st.minPyeong || py > st.maxPyeong) return false;
 
         return true;
       });
@@ -1969,6 +1962,11 @@ window.renderDaangnCrawlerView = function(containerId) {
       const districtOptions = ['<option value="all"' + (st.district === 'all' ? ' selected' : '') + '>서울 25개구 전체</option>']
         .concat(window.SEOUL_DISTRICTS.map(d => `<option value="${d}" ${st.district === d ? 'selected' : ''}>서울 ${d}</option>`))
         .join('');
+
+      // 실시간 배지 텍스트
+      const minPriceEok = Math.round(st.minPriceWon / 100000000);
+      const maxPriceEok = Math.round(st.maxPriceWon / 100000000);
+      const yearAfter = currentYear - st.maxAge;
 
       const cardsHtml = filtered.map(item => {
         const isAlreadySaved = (window.AppState?.realEstates || []).some(p => p.id === item.id || p.title === item.title);
@@ -2043,8 +2041,8 @@ window.renderDaangnCrawlerView = function(containerId) {
               </div>
             </div>
 
-            <!-- 5대 조건 필터 그리드 (반응형: 모바일 2열, PC 5열 자동 피팅) -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; margin-bottom:12px;">
+            <!-- 선형 구간 필터 그리드 (모바일/PC 모두 직관적 조작) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:12px;">
               <!-- 1) 서울 세부 지역 -->
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">📍 서울 세부 지역</label>
@@ -2053,54 +2051,59 @@ window.renderDaangnCrawlerView = function(containerId) {
                 </select>
               </div>
 
-              <!-- 2) 최소 매매가 -->
-              <div>
-                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">💰 최소 매매가</label>
-                <select id="dg-sel-min" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
-                  <option value="30000" ${st.minPrice === 30000 ? 'selected' : ''}>3억 이상</option>
-                  <option value="50000" ${st.minPrice === 50000 ? 'selected' : ''}>5억 이상</option>
-                  <option value="60000" ${st.minPrice === 60000 ? 'selected' : ''}>6억 이상 (기본)</option>
-                  <option value="70000" ${st.minPrice === 70000 ? 'selected' : ''}>7억 이상</option>
-                  <option value="80000" ${st.minPrice === 80000 ? 'selected' : ''}>8억 이상</option>
-                  <option value="90000" ${st.minPrice === 90000 ? 'selected' : ''}>9억 이상</option>
-                </select>
+              <!-- 2) 매매가 구간 (선형 슬라이더: 1~50억) -->
+              <div style="grid-column:span 2;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <label style="font-size:11.5px; font-weight:700; color:#7C2D12;">💰 매매가 구간</label>
+                  <span id="dg-badge-price" style="font-size:12.5px; font-weight:800; color:#EA580C; background:#FFF7ED; padding:2px 8px; border-radius:6px;">${minPriceEok}억 ~ ${maxPriceEok}억</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <div>
+                    <label style="font-size:10.5px; font-weight:700; color:#9A3412; display:block; margin-bottom:3px;">최소 (억)</label>
+                    <input type="range" id="dg-range-min-price" min="1" max="50" step="1" value="${minPriceEok}"
+                      oninput="updateDaangnPriceBadge(this.value, document.getElementById('dg-range-max-price').value); updateDaangnFilter()"
+                      style="width:100%; accent-color:#EA580C; cursor:pointer;">
+                  </div>
+                  <div>
+                    <label style="font-size:10.5px; font-weight:700; color:#9A3412; display:block; margin-bottom:3px;">최대 (억)</label>
+                    <input type="range" id="dg-range-max-price" min="1" max="50" step="1" value="${maxPriceEok}"
+                      oninput="updateDaangnPriceBadge(document.getElementById('dg-range-min-price').value, this.value); updateDaangnFilter()"
+                      style="width:100%; accent-color:#EA580C; cursor:pointer;">
+                  </div>
+                </div>
               </div>
 
-              <!-- 3) 최대 매매가 -->
+              <!-- 3) 건물 연식 구간 (선형 슬라이더: 1~35년) -->
               <div>
-                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">💰 최대 매매가</label>
-                <select id="dg-sel-max" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
-                  <option value="90000" ${st.maxPrice === 90000 ? 'selected' : ''}>9억 이하</option>
-                  <option value="100000" ${st.maxPrice === 100000 ? 'selected' : ''}>10억 이하</option>
-                  <option value="120000" ${st.maxPrice === 120000 ? 'selected' : ''}>12억 이하 (기본)</option>
-                  <option value="150000" ${st.maxPrice === 150000 ? 'selected' : ''}>15억 이하</option>
-                  <option value="200000" ${st.maxPrice === 200000 ? 'selected' : ''}>20억 이하</option>
-                </select>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <label style="font-size:11.5px; font-weight:700; color:#7C2D12;">🏛️ 최대 건물 연식</label>
+                  <span id="dg-badge-year" style="font-size:11px; font-weight:700; color:#0369A1; background:#E0F2FE; padding:2px 8px; border-radius:6px;">최대 ${st.maxAge}년차 이내 (${yearAfter}년 이후)</span>
+                </div>
+                <input type="range" id="dg-range-year-max" min="1" max="35" step="1" value="${st.maxAge}"
+                  oninput="updateDaangnYearBadge(this.value); updateDaangnFilter()"
+                  style="width:100%; accent-color:#0369A1; cursor:pointer;">
               </div>
 
-              <!-- 4) 건물 연식 (신설) -->
-              <div>
-                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">🏛️ 건물 연식</label>
-                <select id="dg-sel-year" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
-                  <option value="all" ${st.year === 'all' ? 'selected' : ''}>전체 연식</option>
-                  <option value="under5" ${st.year === 'under5' ? 'selected' : ''}>5년 이내 (신축급)</option>
-                  <option value="under10" ${st.year === 'under10' ? 'selected' : ''}>10년 이내 (준신축)</option>
-                  <option value="under15" ${st.year === 'under15' ? 'selected' : ''}>15년 이내</option>
-                  <option value="under20" ${st.year === 'under20' ? 'selected' : ''}>20년 이내</option>
-                  <option value="over20" ${st.year === 'over20' ? 'selected' : ''}>20년 이상 (구축/재건축)</option>
-                </select>
-              </div>
-
-              <!-- 5) 평수 (면적) (신설) -->
-              <div>
-                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">📐 전용/공급 평수</label>
-                <select id="dg-sel-pyeong" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
-                  <option value="all" ${st.pyeong === 'all' ? 'selected' : ''}>전체 평수</option>
-                  <option value="under20" ${st.pyeong === 'under20' ? 'selected' : ''}>20평 미만 (소형)</option>
-                  <option value="20s" ${st.pyeong === '20s' ? 'selected' : ''}>20평대 (20~29평)</option>
-                  <option value="30s" ${st.pyeong === '30s' ? 'selected' : ''}>30평대 (30~39평, 국평)</option>
-                  <option value="40s" ${st.pyeong === '40s' ? 'selected' : ''}>40평 이상 (대형)</option>
-                </select>
+              <!-- 4) 평수 구간 (선형 슬라이더: 5~70평) -->
+              <div style="grid-column:span 2;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <label style="font-size:11.5px; font-weight:700; color:#7C2D12;">📐 평수 구간</label>
+                  <span id="dg-badge-pyeong" style="font-size:12.5px; font-weight:800; color:#047857; background:#ECFDF5; padding:2px 8px; border-radius:6px;">${st.minPyeong}평 ~ ${st.maxPyeong}평</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <div>
+                    <label style="font-size:10.5px; font-weight:700; color:#065F46; display:block; margin-bottom:3px;">최소 (평)</label>
+                    <input type="range" id="dg-range-min-pyeong" min="5" max="70" step="1" value="${st.minPyeong}"
+                      oninput="updateDaangnPyeongBadge(this.value, document.getElementById('dg-range-max-pyeong').value); updateDaangnFilter()"
+                      style="width:100%; accent-color:#047857; cursor:pointer;">
+                  </div>
+                  <div>
+                    <label style="font-size:10.5px; font-weight:700; color:#065F46; display:block; margin-bottom:3px;">최대 (평)</label>
+                    <input type="range" id="dg-range-max-pyeong" min="5" max="70" step="1" value="${st.maxPyeong}"
+                      oninput="updateDaangnPyeongBadge(document.getElementById('dg-range-min-pyeong').value, this.value); updateDaangnFilter()"
+                      style="width:100%; accent-color:#047857; cursor:pointer;">
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2142,32 +2145,69 @@ window.renderDaangnCrawlerView = function(containerId) {
 
     window.updateDaangnFilter = function() {
       const dist = document.getElementById('dg-sel-district')?.value || 'all';
-      const minP = parseInt(document.getElementById('dg-sel-min')?.value || '60000', 10);
-      const maxP = parseInt(document.getElementById('dg-sel-max')?.value || '120000', 10);
-      const yr = document.getElementById('dg-sel-year')?.value || 'all';
-      const py = document.getElementById('dg-sel-pyeong')?.value || 'all';
+      const minPriceEok = parseInt(document.getElementById('dg-range-min-price')?.value || '1', 10);
+      const maxPriceEok = parseInt(document.getElementById('dg-range-max-price')?.value || '50', 10);
+      const maxAge = parseInt(document.getElementById('dg-range-year-max')?.value || '35', 10);
+      const minPyeong = parseInt(document.getElementById('dg-range-min-pyeong')?.value || '5', 10);
+      const maxPyeong = parseInt(document.getElementById('dg-range-max-pyeong')?.value || '70', 10);
       const chkApt = document.getElementById('dg-chk-apt')?.checked ?? true;
       const chkHouse = document.getElementById('dg-chk-house')?.checked ?? true;
       const chkVilla = document.getElementById('dg-chk-villa')?.checked ?? true;
 
+      // 최소값이 최대값을 초과하지 않도록 보정
+      const finalMinPriceEok = Math.min(minPriceEok, maxPriceEok);
+      const finalMaxPriceEok = Math.max(minPriceEok, maxPriceEok);
+      const finalMinPyeong = Math.min(minPyeong, maxPyeong);
+      const finalMaxPyeong = Math.max(minPyeong, maxPyeong);
+
       window.daangnFilterState = {
         district: dist,
-        minPrice: minP,
-        maxPrice: maxP < minP ? minP + 30000 : maxP,
-        year: yr,
-        pyeong: py,
+        minPriceWon: finalMinPriceEok * 100000000,
+        maxPriceWon: finalMaxPriceEok * 100000000,
+        maxAge: maxAge,
+        minPyeong: finalMinPyeong,
+        maxPyeong: finalMaxPyeong,
         types: { apt: chkApt, house: chkHouse, villa: chkVilla }
       };
       window.renderDaangnCrawlerView('naver-radar-root');
     };
 
+    // 실시간 뱃지 업데이트 헬퍼 함수들
+    window.updateDaangnPriceBadge = function(minEok, maxEok) {
+      const badge = document.getElementById('dg-badge-price');
+      if (badge) {
+        const min = Math.min(parseInt(minEok) || 1, parseInt(maxEok) || 50);
+        const max = Math.max(parseInt(minEok) || 1, parseInt(maxEok) || 50);
+        badge.textContent = `${min}억 ~ ${max}억`;
+      }
+    };
+
+    window.updateDaangnYearBadge = function(maxAge) {
+      const badge = document.getElementById('dg-badge-year');
+      const currentYear = new Date().getFullYear();
+      if (badge) {
+        const age = parseInt(maxAge) || 35;
+        badge.textContent = `최대 ${age}년차 이내 (${currentYear - age}년 이후)`;
+      }
+    };
+
+    window.updateDaangnPyeongBadge = function(minPy, maxPy) {
+      const badge = document.getElementById('dg-badge-pyeong');
+      if (badge) {
+        const min = Math.min(parseInt(minPy) || 5, parseInt(maxPy) || 70);
+        const max = Math.max(parseInt(minPy) || 5, parseInt(maxPy) || 70);
+        badge.textContent = `${min}평 ~ ${max}평`;
+      }
+    };
+
     window.resetDaangnFilter = function() {
       window.daangnFilterState = {
         district: 'all',
-        minPrice: 60000,
-        maxPrice: 120000,
-        year: 'all',
-        pyeong: 'all',
+        minPriceWon: 100000000,
+        maxPriceWon: 5000000000,
+        maxAge: 35,
+        minPyeong: 5,
+        maxPyeong: 70,
         types: { apt: true, house: true, villa: true }
       };
       window.renderDaangnCrawlerView('naver-radar-root');

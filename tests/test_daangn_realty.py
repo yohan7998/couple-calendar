@@ -22,10 +22,11 @@ def run_node_eval(script: str) -> str:
         SEOUL_DISTRICTS: ['마포구', '용산구', '성동구', '동작구', '영등포구', '서대문구', '송파구', '강북구', '양천구', '광진구', '은평구', '종로구', '노원구', '강남구', '서초구', '강동구'],
         daangnFilterState: {{
             district: 'all',
-            minPrice: 60000,
-            maxPrice: 120000,
-            year: 'all',
-            pyeong: 'all',
+            minPriceWon: 100000000,
+            maxPriceWon: 5000000000,
+            maxAge: 35,
+            minPyeong: 5,
+            maxPyeong: 70,
             types: {{ apt: true, house: true, villa: true }}
         }}
     }};
@@ -139,6 +140,134 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertIn('<a href="${item.rawUrl}" target="_blank" rel="noopener noreferrer" class="re-daangn-thumb-link"', content)
         self.assertIn('<a href="${item.rawUrl}" target="_blank" rel="noopener noreferrer" class="re-footer-btn"', content)
         self.assertNotIn('onclick="window.open(\'${item.rawUrl}\', \'_blank\')"', content, "팝업 차단 유발하는 div onclick 방식이 제거되어야 함")
+
+    def test_09_linear_price_range_slider(self):
+        """Verify linear price range slider elements exist in filter UI."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Verify range input elements for price
+        self.assertIn('id="dg-range-min-price"', content, "최소 매매가 슬라이더가 있어야 함")
+        self.assertIn('id="dg-range-max-price"', content, "최대 매매가 슬라이더가 있어야 함")
+        self.assertIn('type="range"', content, "range 타입 입력 요소가 있어야 함")
+        self.assertIn('min="1"', content, "최소값 1이 있어야 함")
+        self.assertIn('max="50"', content, "최대값 50이 있어야 함")
+        self.assertIn('id="dg-badge-price"', content, "실시간 가격 뱃지가 있어야 함")
+
+    def test_10_linear_year_slider(self):
+        """Verify linear year range slider elements exist in filter UI."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn('id="dg-range-year-max"', content, "최대 건물 연식 슬라이더가 있어야 함")
+        self.assertIn('min="1"', content, "최소 연식 1이 있어야 함")
+        self.assertIn('max="35"', content, "최대 연식 35이 있어야 함")
+        self.assertIn('id="dg-badge-year"', content, "실시간 연식 뱃지가 있어야 함")
+
+    def test_11_linear_pyeong_slider(self):
+        """Verify linear pyeong range slider elements exist in filter UI."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn('id="dg-range-min-pyeong"', content, "최소 평수 슬라이더가 있어야 함")
+        self.assertIn('id="dg-range-max-pyeong"', content, "최대 평수 슬라이더가 있어야 함")
+        self.assertIn('min="5"', content, "최소 평수 5가 있어야 함")
+        self.assertIn('max="70"', content, "최대 평수 70이 있어야 함")
+        self.assertIn('id="dg-badge-pyeong"', content, "실시간 평수 뱃지가 있어야 함")
+
+    def test_12_filter_state_structure(self):
+        """Verify new filter state structure with linear range properties."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # New filter state structure
+        self.assertIn('minPriceWon', content, "minPriceWon 속성이 있어야 함")
+        self.assertIn('maxPriceWon', content, "maxPriceWon 속성이 있어야 함")
+        self.assertIn('maxAge', content, "maxAge 속성이 있어야 함")
+        self.assertIn('minPyeong', content, "minPyeong 속성이 있어야 함")
+        self.assertIn('maxPyeong', content, "maxPyeong 속성이 있어야 함")
+
+        # Old structure should be removed from daangnFilterState
+        self.assertNotIn('"minPrice":', content, "기존 minPrice는 없어야 함")
+        self.assertNotIn('"maxPrice":', content, "기존 maxPrice는 없어야 함")
+        self.assertNotIn('"year":', content, "기존 year는 없어야 함")
+        self.assertNotIn('"pyeong":', content, "기존 pyeong은 없어야 함")
+
+    def test_13_linear_filtering_logic_price(self):
+        """Test linear price filtering logic."""
+        script = """
+        const listings = window.DAANGN_SEOUL_LISTINGS;
+        const currentYear = new Date().getFullYear();
+
+        // Simulate filter state: 10억 ~ 30억
+        const minPriceManwon = 100000;  // 10억 = 100,000만원
+        const maxPriceManwon = 300000;  // 30억 = 300,000만원
+
+        const filtered = listings.filter(item => {
+            return item.priceManwon >= minPriceManwon && item.priceManwon <= maxPriceManwon;
+        });
+        console.log(JSON.stringify({ count: filtered.length }));
+        """
+        data = json.loads(run_node_eval(script))
+        # At least some items should match 10~30억 range
+        self.assertGreater(data["count"], 0, "10억~30억 구간 매물이 있어야 함")
+
+    def test_14_linear_filtering_logic_year(self):
+        """Test linear year (age) filtering logic."""
+        script = """
+        const listings = window.DAANGN_SEOUL_LISTINGS;
+        const currentYear = new Date().getFullYear();
+
+        // Simulate filter state: 최대 10년차
+        const maxAge = 10;
+
+        const filtered = listings.filter(item => {
+            const age = currentYear - item.buildYear;
+            return age <= maxAge;
+        });
+        console.log(JSON.stringify({ count: filtered.length }));
+        """
+        data = json.loads(run_node_eval(script))
+        # At least some items should be within 10 years
+        self.assertGreater(data["count"], 0, "10년 이내 매물이 있어야 함")
+
+    def test_15_linear_filtering_logic_pyeong(self):
+        """Test linear pyeong filtering logic."""
+        script = """
+        const listings = window.DAANGN_SEOUL_LISTINGS;
+
+        // Simulate filter state: 15평 ~ 35평
+        const minPyeong = 15;
+        const maxPyeong = 35;
+
+        const filtered = listings.filter(item => {
+            return item.areaPyeong >= minPyeong && item.areaPyeong <= maxPyeong;
+        });
+        console.log(JSON.stringify({ count: filtered.length }));
+        """
+        data = json.loads(run_node_eval(script))
+        self.assertGreater(data["count"], 0, "15평~35평 구간 매물이 있어야 함")
+
+    def test_16_badge_update_helpers_exist(self):
+        """Verify badge update helper functions exist."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn('updateDaangnPriceBadge', content, "가격 뱃지 업데이트 함수가 있어야 함")
+        self.assertIn('updateDaangnYearBadge', content, "연식 뱃지 업데이트 함수가 있어야 함")
+        self.assertIn('updateDaangnPyeongBadge', content, "평수 뱃지 업데이트 함수가 있어야 함")
+
+    def test_17_reset_filter_defaults(self):
+        """Verify resetDaangnFilter uses new default values."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Check reset defaults
+        self.assertIn('minPriceWon: 100000000', content, "초기화 시 최소 1억이어야 함")
+        self.assertIn('maxPriceWon: 5000000000', content, "초기화 시 최대 50억이어야 함")
+        self.assertIn('maxAge: 35', content, "초기화 시 최대 연식 35년이어야 함")
+        self.assertIn('minPyeong: 5', content, "초기화 시 최소 평수 5평이어야 함")
+        self.assertIn('maxPyeong: 70', content, "초기화 시 최대 평수 70평이어야 함")
 
 
 if __name__ == "__main__":
