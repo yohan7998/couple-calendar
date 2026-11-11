@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>달콤살벌 캘린더 💖⚔️ (v3.7.0)</title>
-  <meta name="version" content="v3.7.0">
+  <title>달콤살벌 캘린더 💖⚔️ (v3.7.1)</title>
+  <meta name="version" content="v3.7.1">
   <!-- PWA & Mobile Web App Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -2219,8 +2219,8 @@
         <div class="brand-text-block">
           <div class="brand-title-row">
             <span class="app-name">달콤살벌 캘린더</span>
-            <span class="app-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()"
-              style="cursor:pointer;">v3.3.0 🥕</span>
+            <span class="app-version-badge" id="app-header-version-badge" title="최신 버전 강제 업데이트 (캐시 초기화)" onclick="forcePurgeAppCache()"
+              style="cursor:pointer;">v3.7.1 🥕</span>
           </div>
           <div class="couple-avatars" id="couple-avatar-display">
             🐻주니❤️🐰용이
@@ -2796,12 +2796,12 @@
         </div>
       </div>
 
-      <!-- v2.8.6 Force Cache Purge Button -->
+      <!-- Force Cache Purge Button (v3.7.0) -->
       <div
         style="margin-top: 14px; padding: 12px 14px; background: #FFF1F2; border-radius: 12px; border: 1px solid #FECDD3; text-align: center;">
         <div
           style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #BE123C; margin-bottom: 4px;">
-          <span>⚡</span> 최신 버전 강제 업데이트 (v2.8.6)
+          <span>⚡</span> 최신 버전 강제 업데이트 (v3.7.1)
         </div>
         <div style="font-size: 11px; color: #881337; margin-bottom: 8px; line-height: 1.4;">
           모바일 PWA/브라우저의 이전 캐시를 100% 완전 삭제하고 최신 정본을 즉시 로드합니다.
@@ -2944,10 +2944,10 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">
-          달콤살벌 캘린더 정본 <span style="color: var(--primary);">v2.8.6</span>
+          달콤살벌 캘린더 정본 <span id="app-footer-version-text" style="color: var(--primary);">v3.7.1</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
-          최근 갱신: 2026-11-09 (모바일 부동산 매물 관리 및 이사 플래너 통합 개편)
+          최근 갱신: 2026-11-11 (부동산 필터 영속화 및 구글시트 무중단 연동 v3.7.1)
         </div>
       </div>
     </div>
@@ -3639,12 +3639,13 @@
     }
 
 
+    const APP_CURRENT_VERSION = 'v3.7.1';
     const STORAGE_KEY = 'couple_calendar_state_v1';
     const GIST_FILENAME = 'couple_calendar_data.json';
 
     // Global State
     let AppState = {
-      version: '2.0.0',
+      version: '3.7.1',
       lastUpdated: new Date().toISOString(),
       couple: {
         user1: { name: '주니', nickname: '주니', avatar: '🐻' },
@@ -3727,10 +3728,10 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    // v2.8.6 Force Cache Purge & App Update
+    // Force Cache Purge & App Update (Dynamic SSOT Version)
     async function forcePurgeAppCache() {
       try {
-        showToast('🚀 최신 버전(v2.8.6)으로 캐시를 완전 초기화하는 중입니다...');
+        showToast(`🚀 최신 버전(${APP_CURRENT_VERSION})으로 캐시를 완전 초기화하는 중입니다...`);
         if ('caches' in window) {
           const keys = await caches.keys();
           await Promise.all(keys.map(k => caches.delete(k)));
@@ -3741,13 +3742,13 @@
             await reg.unregister();
           }
         }
-        localStorage.setItem('couple_app_build_v', 'v2.8.6');
+        localStorage.setItem('couple_app_build_v', APP_CURRENT_VERSION);
         try {
           await fetch('./emergency-update?t=' + Date.now(), { cache: 'no-store' });
         } catch (e) { }
         setTimeout(() => {
           const cleanUrl = window.location.origin + window.location.pathname;
-          window.location.href = cleanUrl + '?v=2.7.0&t=' + Date.now();
+          window.location.href = cleanUrl + '?v=3.7.1&t=' + Date.now();
         }, 400);
       } catch (err) {
         console.error('Failed to purge cache:', err);
@@ -3881,14 +3882,19 @@
 
     // INIT
     window.addEventListener('DOMContentLoaded', () => {
-      // Auto cache-busting check for v3.1.0
-      const currentBuild = 'v3.5.1';
+      // Auto cache-busting check (SSOT APP_CURRENT_VERSION)
+      const currentBuild = APP_CURRENT_VERSION;
       if (localStorage.getItem('couple_app_build_v') !== currentBuild) {
         localStorage.setItem('couple_app_build_v', currentBuild);
         if ('caches' in window) {
           caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
         }
       }
+      // Ensure header version badge and footer text reflect SSOT
+      const headerBadge = document.getElementById('app-header-version-badge');
+      if (headerBadge) headerBadge.textContent = `${APP_CURRENT_VERSION} 🥕`;
+      const footerVersion = document.getElementById('app-footer-version-text');
+      if (footerVersion) footerVersion.textContent = APP_CURRENT_VERSION;
       applyModernIconsToDOM();
       loadStateFromLocal();
       checkKakaoBrowser();
@@ -5617,7 +5623,7 @@
       const mergedRealEstates = Array.from(estateMap.values());
 
       return {
-        version: '2.0.0',
+        version: APP_CURRENT_VERSION,
         lastUpdated: new Date().toISOString(),
         couple: mergedCouple,
         drinks: mergedDrinks,
