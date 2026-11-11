@@ -722,6 +722,52 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertIn('match.imageUrl', content, "매칭된 item의 imageUrl을 사용해야 함")
         self.assertIn('match.imageUrl && match.imageUrl.startsWith', content, "유효한 HTTPS 이미지 URL 검증이 있어야 함")
 
+    def test_40_daangn_import_button_and_modal(self):
+        """Verify Daangn Import button and modal markup exist."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Import button
+        self.assertIn('id="btn-import-daangn-favs"', content, "당근 즐겨찾기 가져오기 버튼이 있어야 함")
+        # openDaangnImportModal method
+        self.assertIn("openDaangnImportModal", content, "openDaangnImportModal 메서드가 있어야 함")
+        # _processDaangnImport method
+        self.assertIn("_processDaangnImport", content, "_processDaangnImport 메서드가 있어야 함")
+        # Modal markup - modal is created dynamically, check for ID assignment in JS
+        self.assertIn("'daangn-import-modal'", content, "가져오기 모달 ID가 있어야 함")
+        self.assertIn('id="daangn-import-urls"', content, "URL 입력 textarea가 있어야 함")
+        self.assertIn('id="btn-submit-daangn-import"', content, "가져오기 제출 버튼이 있어야 함")
+
+    def test_41_source_filter_tabs(self):
+        """Verify source filter tabs (all/daangn/naver) and selectedSource handling exist."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Source filter tabs container
+        self.assertIn('id="re-source-filter-tabs"', content, "출처 필터 탭 컨테이너가 있어야 함")
+        # Individual tabs
+        self.assertIn('data-source="all"', content, "전체 탭이 있어야 함")
+        self.assertIn('data-source="daangn"', content, "당근 탭이 있어야 함")
+        self.assertIn('data-source="naver"', content, "네이버 탭이 있어야 함")
+        # this.selectedSource initialization
+        self.assertIn("this.selectedSource", content, "selectedSource 속성이 있어야 함")
+        # _countSource method
+        self.assertIn("_countSource", content, "_countSource 메서드가 있어야 함")
+        # refreshList called with source option
+        self.assertIn("source: this.selectedSource", content, "refreshList 호출 시 source 옵션이 전달되어야 함")
+
+    def test_42_article_id_extraction_and_hydration(self):
+        """Verify article ID extraction regex and hydration integration in _processDaangnImport."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Article ID extraction regex pattern
+        self.assertIn(r"(?:articles\/|articles%2F|articles:)(\d+)", content, "URL에서 articleId 추출 정규식이 있어야 함")
+        # syncDaangnItemToCalendar integration
+        self.assertIn("syncDaangnItemToCalendar", content, "syncDaangnItemToCalendar 연동이 있어야 함")
+        # fallback RealEstateEngine.createUnifiedProperty creation
+        self.assertIn("RealEstateEngine.createUnifiedProperty", content, "fallback용 RealEstateEngine.createUnifiedProperty 생성이 있어야 함")
+
 
 if __name__ == "__main__":
     unittest.main()

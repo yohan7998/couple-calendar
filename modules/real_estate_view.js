@@ -1,6 +1,6 @@
 /**
  * real_estate_view.js - Mobile-first UI Component for Real Estate & Moving Planner
- * Couple-Calendar v3.8.0
+ * Couple-Calendar v3.9.0
  */
 
 (function (root, factory) {
@@ -40,6 +40,7 @@
       this.selectedRegion = 'all';
       this.selectedStatus = 'all';
       this.selectedDealType = 'all';
+      this.selectedSource = 'all';
       this.sortBy = 'created_desc';
       this.searchQuery = '';
     }
@@ -75,6 +76,9 @@
               </svg>
               <span>직접 등록</span>
             </button>
+            <button class="re-btn re-btn-daangn-import" id="btn-import-daangn-favs" style="background:#ea580c; color:#fff; border:none; font-weight:700; padding:6px 10px;">
+              <span>🥕 당근 찜 가져오기</span>
+            </button>
           </div>
 
           <!-- Dual View Toggle Bar -->
@@ -99,6 +103,13 @@
             <button class="re-pipe-tab ${this.selectedStatus === 'visit_scheduled' ? 'active' : ''}" data-status="visit_scheduled">🚗 임장예정</button>
             <button class="re-pipe-tab ${this.selectedStatus === 'visited' ? 'active' : ''}" data-status="visited">📝 방문완료</button>
             <button class="re-pipe-tab ${this.selectedStatus === 'favorite' ? 'active' : ''}" data-status="favorite">🏆 최종후보</button>
+          </div>
+
+          <!-- Source Filter Tabs (출처별 독립 관리) -->
+          <div class="re-source-filter-tabs" id="re-source-filter-tabs">
+            <button class="re-source-tab ${this.selectedSource === 'all' ? 'active' : ''}" data-source="all">전체 <span class="re-source-count" data-count-for="all">(${this._countSource('all')})</span></button>
+            <button class="re-source-tab ${this.selectedSource === 'daangn' ? 'active' : ''}" data-source="daangn">🥕 당근 찜만 <span class="re-source-count" data-count-for="daangn">(${this._countSource('daangn')})</span></button>
+            <button class="re-source-tab ${this.selectedSource === 'naver' ? 'active' : ''}" data-source="naver">🟢 네이버 관심만 <span class="re-source-count" data-count-for="naver">(${this._countSource('naver')})</span></button>
           </div>
 
           <!-- Summary & Filter Controls -->
@@ -175,6 +186,23 @@
           this.refreshList();
         });
       }
+
+      // Source Filter Tabs
+      const sourceTabs = this.container.querySelectorAll('.re-source-tab');
+      sourceTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          sourceTabs.forEach(t => t.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          this.selectedSource = e.currentTarget.getAttribute('data-source');
+          this.refreshList();
+        });
+      });
+
+      // Daangn Import Button
+      const daangnImportBtn = this.container.querySelector('#btn-import-daangn-favs');
+      if (daangnImportBtn) {
+        daangnImportBtn.addEventListener('click', () => this.openDaangnImportModal());
+      }
     }
 
     refreshList() {
@@ -188,6 +216,7 @@
         region: this.selectedRegion,
         status: this.selectedStatus,
         dealType: this.selectedDealType,
+        source: this.selectedSource,
         sortBy: this.sortBy,
         query: this.searchQuery
       });
@@ -220,6 +249,135 @@
       if (this.currentView === 'map') {
         this.refreshMap();
       }
+    }
+
+    _countSource(source) {
+      if (!this.store) return 0;
+      const all = this.store.getAll();
+      if (source === 'all') return all.length;
+      return all.filter(p => p.source === source).length;
+    }
+
+    openDaangnImportModal() {
+      // Create modal if not exists
+      let modalRoot = document.getElementById('daangn-import-modal');
+      if (!modalRoot) {
+        modalRoot = document.createElement('div');
+        modalRoot.id = 'daangn-import-modal';
+        modalRoot.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;';
+        modalRoot.innerHTML = `
+          <div style="background:#FFF; border-radius:16px; padding:24px; width:90%; max-width:480px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+            <h3 style="margin:0 0 8px 0; font-size:18px; font-weight:700; color:#0F172A;">🥕 당근 찜 매물 일괄 가져오기</h3>
+            <p style="margin:0 0 16px 0; font-size:12px; color:#64748B;">당근 앱에서 찜한 매물의 [공유하기] ➔ [링크 복사] URL을 한 줄에 하나씩 입력하세요.</p>
+            <textarea id="daangn-import-urls" rows="6" style="width:100%; box-sizing:border-box; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-size:12px; resize:vertical;" placeholder="https://realty.daangn.com/articles/4508864&#10;https://realty.daangn.com/articles/4508946"></textarea>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+              <button id="btn-close-daangn-modal" style="padding:8px 16px; border:1px solid #CBD5E1; background:#FFF; border-radius:6px; cursor:pointer;">취소</button>
+              <button id="btn-submit-daangn-import" style="padding:8px 16px; border:none; background:#EA580C; color:#FFF; font-weight:700; border-radius:6px; cursor:pointer;">📥 찜 목록에 추가</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modalRoot);
+      }
+
+      modalRoot.style.display = 'flex';
+
+      // Bind events
+      const closeBtn = modalRoot.querySelector('#btn-close-daangn-modal');
+      const submitBtn = modalRoot.querySelector('#btn-submit-daangn-import');
+      const textarea = modalRoot.querySelector('#daangn-import-urls');
+
+      const closeModal = () => {
+        modalRoot.style.display = 'none';
+        textarea.value = '';
+      };
+
+      closeBtn.onclick = closeModal;
+      modalRoot.onclick = (e) => { if (e.target === modalRoot) closeModal(); };
+
+      submitBtn.onclick = () => this._processDaangnImport(textarea.value, closeModal);
+    }
+
+    _processDaangnImport(text, closeModal) {
+      const lines = text.trim().split('\n').filter(l => l.trim());
+      if (lines.length === 0) {
+        if (typeof window.showToast === 'function') window.showToast('⚠️ URL을 입력해주세요.');
+        return;
+      }
+
+      const added = [];
+      lines.forEach(line => {
+        const match = line.trim().match(/(?:articles\/|articles%2F|articles:)(\d+)/);
+        if (match) {
+          const articleId = match[1];
+          const existing = window.DAANGN_SEOUL_LISTINGS?.find(i => i.articleId === articleId);
+          if (existing) {
+            const unified = window.syncDaangnItemToCalendar(existing.id, true);
+            if (unified) added.push(unified);
+          } else {
+            // 기본 당근 매물 객체 생성
+            const baseObj = {
+              id: 'dg-' + articleId,
+              source: 'daangn',
+              rawUrl: 'https://realty.daangn.com/articles/' + articleId,
+              sourceUrl: 'https://realty.daangn.com/articles/' + articleId,
+              url: 'https://realty.daangn.com/articles/' + articleId,
+              title: '당근 매물 #' + articleId,
+              complexName: '당근 매물 #' + articleId,
+              region: '서울',
+              propertyType: 'apt',
+              tradeType: 'sale',
+              dealType: '매매',
+              price: 0,
+              priceManwon: 0,
+              priceRaw: '시세 확인 필요',
+              priceDeposit: 0,
+              priceMonthly: 0,
+              area: '평수 미상',
+              areaPyeong: 0,
+              areaSquareMeter: 0,
+              address: '',
+              floor: '',
+              floorInfo: '',
+              status: 'favorite',
+              likes: ['주니', '용이'],
+              favorite: { user1: true, user2: true, together: true },
+              visitDate: '2026-11-21',
+              coupleMemo: '당근 찜에서 추가됨',
+              notes: '',
+              imageUrl: '',
+              thumbnailUrl: '',
+              coupleNotes: [{ id: 'cn-' + Date.now(), author: 'user1', text: '당근 찜에서 추가됨', createdAt: new Date().toISOString() }]
+            };
+            const unified = (typeof RealEstateEngine !== 'undefined' && RealEstateEngine.createUnifiedProperty)
+              ? Object.assign(RealEstateEngine.createUnifiedProperty(baseObj), baseObj)
+              : baseObj;
+
+            if (!window.AppState) window.AppState = { realEstates: [] };
+            if (!Array.isArray(window.AppState.realEstates)) window.AppState.realEstates = [];
+            const existingIdx = window.AppState.realEstates.findIndex(p => p.id === unified.id);
+            if (existingIdx === -1) {
+              window.AppState.realEstates.unshift(unified);
+            } else {
+              window.AppState.realEstates[existingIdx] = unified;
+            }
+
+            if (window.realEstateStore) {
+              window.realEstateStore.properties = window.AppState.realEstates;
+            }
+            added.push(unified);
+          }
+        }
+      });
+
+      if (added.length > 0) {
+        if (typeof window.saveStateLocal === 'function') window.saveStateLocal();
+        if (typeof window.showToast === 'function') window.showToast(`🎉 당근 찜 매물 ${added.length}건이 등록되었습니다!`);
+        this.refreshList();
+      } else {
+        if (typeof window.showToast === 'function') window.showToast('⚠️ 유효한 당근 매물 URL이 없습니다.');
+      }
+
+      closeModal();
     }
 
     updateViewMode() {
