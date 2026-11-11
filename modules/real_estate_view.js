@@ -1,6 +1,6 @@
 /**
  * real_estate_view.js - Mobile-first UI Component for Real Estate & Moving Planner
- * Couple-Calendar v3.9.0
+ * Couple-Calendar v3.9.1
  */
 
 (function (root, factory) {
@@ -2221,6 +2221,20 @@ window.renderDaangnCrawlerView = function(containerId) {
         return true;
       });
 
+      // baseFiltered: 비지역 조건(형태, 가격, 연식, 평수)을 만족하는 기본 매물군 계산
+      const baseFiltered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
+        if (!st.types[item.propertyType]) return false;
+        const priceManwon = item.priceManwon;
+        const minPriceManwon = st.minPriceWon / 10000;
+        const maxPriceManwon = st.maxPriceWon / 10000;
+        if (priceManwon < minPriceManwon || priceManwon > maxPriceManwon) return false;
+        const age = currentYear - item.buildYear;
+        if (age < (st.minAge || 0) || age > st.maxAge) return false;
+        const py = item.areaPyeong;
+        if (py < st.minPyeong || py > st.maxPyeong) return false;
+        return true;
+      });
+
       // 서울 10대 핵심 구 + 전체 (칩 UI용)
       const TOP_10_DISTRICTS = ['전체', '마포구', '용산구', '성동구', '강남구', '서초구', '송파구', '영등포구', '강동구', '동작구', '광진구'];
       const selectedDistricts = Array.isArray(st.districts) ? st.districts : [st.district || 'all'];
@@ -2228,7 +2242,9 @@ window.renderDaangnCrawlerView = function(containerId) {
 
       const districtChipsHtml = TOP_10_DISTRICTS.map(d => {
         const isSelected = isAllSelected ? (d === '전체') : selectedDistricts.includes(d);
-        const count = window.DAANGN_SEOUL_LISTINGS.filter(item => item.district === d).length;
+        const count = (d === '전체')
+          ? baseFiltered.length
+          : baseFiltered.filter(item => item.district === d).length;
         const activeCls = isSelected ? 'active' : '';
         const bg = isSelected ? '#EA580C' : '#F1F5F9';
         const color = isSelected ? '#FFF' : '#475569';
@@ -2554,6 +2570,36 @@ window.renderDaangnCrawlerView = function(containerId) {
       const btn = document.getElementById('dg-btn-search');
       const originalText = btn.innerHTML;
 
+      // DOM에서 슬라이더/체크박스 값을 명시적으로 읽어서 daangnFilterState에 즉시 반영
+      const minPriceEok = parseInt(document.getElementById('dg-slider-price-min')?.getAttribute('aria-valuenow') || '1', 10);
+      const maxPriceEok = parseInt(document.getElementById('dg-slider-price-max')?.getAttribute('aria-valuenow') || '50', 10);
+      const minAge = parseInt(document.getElementById('dg-slider-year-min')?.getAttribute('aria-valuenow') || '0', 10);
+      const maxAge = parseInt(document.getElementById('dg-slider-year-max')?.getAttribute('aria-valuenow') || '35', 10);
+      const minPyeong = parseInt(document.getElementById('dg-slider-pyeong-min')?.getAttribute('aria-valuenow') || '5', 10);
+      const maxPyeong = parseInt(document.getElementById('dg-slider-pyeong-max')?.getAttribute('aria-valuenow') || '70', 10);
+      const chkApt = document.getElementById('dg-chk-apt')?.checked ?? true;
+      const chkHouse = document.getElementById('dg-chk-house')?.checked ?? true;
+      const chkVilla = document.getElementById('dg-chk-villa')?.checked ?? true;
+
+      // 최소값이 최대값을 초과하지 않도록 보정
+      const finalMinPriceEok = Math.min(minPriceEok, maxPriceEok);
+      const finalMaxPriceEok = Math.max(minPriceEok, maxPriceEok);
+      const finalMinAge = Math.min(minAge, maxAge);
+      const finalMaxAge = Math.max(minAge, maxAge);
+      const finalMinPyeong = Math.min(minPyeong, maxPyeong);
+      const finalMaxPyeong = Math.max(minPyeong, maxPyeong);
+
+      window.daangnFilterState = {
+        districts: window.daangnFilterState.districts || ['all'],
+        minPriceWon: finalMinPriceEok * 100000000,
+        maxPriceWon: finalMaxPriceEok * 100000000,
+        minAge: finalMinAge,
+        maxAge: finalMaxAge,
+        minPyeong: finalMinPyeong,
+        maxPyeong: finalMaxPyeong,
+        types: { apt: chkApt, house: chkHouse, villa: chkVilla }
+      };
+
       // 로딩 피드백
       btn.innerHTML = '⏳ 매물 불러오는 중...';
       btn.style.opacity = '0.85';
@@ -2675,7 +2721,7 @@ window.renderDaangnCrawlerView = function(containerId) {
     };
 
     window.getDefaultSeedRealEstates = function() {
-      const defaultIds = ['dg-1001', 'dg-1004', 'dg-1002', 'dg-1009', 'dg-1003', 'dg-1006'];
+      const defaultIds = ['dg-4508864', 'dg-4508946', 'dg-4756337', 'dg-4687508', 'dg-4581290', 'dg-4753066'];
       return defaultIds.map(id => window.syncDaangnItemToCalendar(id, true)).filter(Boolean);
     };
 

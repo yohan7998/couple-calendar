@@ -1,6 +1,6 @@
 ---
 title: 달콤살벌 캘린더 전체 버전 이력 및 변경 정본 기록 (CHANGELOG)
-version: v3.9.0
+version: v3.9.1
 status: active
 created: 2026-11-02
 updated: 2026-11-11
@@ -23,7 +23,8 @@ tags:
 
 | 버전 | 배포 일자 | 핵심 변경 영역 | 주요 내용 요약 | 상태 |
 | :---: | :---: | :--- | :--- | :---: |
-| **v3.9.0** | 2026-11-11 | **당근 찜 일괄 가져오기(모달·URL 파싱·자동 등록) & 출처별 독립 관리 탭(전체/당근/네이버) & v3.9.0 버전 통일** | • **당근 찜 일괄 가져오기 모달 신설**: 헤더 `[🥕 당근 찜 가져오기]` 버튼 클릭 시 모달(`#daangn-import-modal`) 오픈, 당근 앱 [공유하기]→[링크 복사] URL을 줄별로 입력<br/>• **URL 자동 파싱 및 ID 추출**: 정규식 `/(?:articles\/|articles%2F|articles:)(\d+)/`로 기사 ID(`articleId`) 추출<br/>• **기존 매물 매칭 자동 등록**: `DAANGN_SEOUL_LISTINGS`에서 `articleId` 매칭 시 실사 이미지(`imageUrl`), 매매가, 단지명 등 완전 매칭하여 `syncDaangnItemToCalendar`로 등록<br/>• **신규 매물 기본 객체 생성**: 미등록 ID는 기본 당근 매물 객체(`dg-{articleId}`) 생성 후 `AppState.realEstates` 및 `realEstateStore.properties`에 `unshift` 등록<br/>• **중복 제외·로컬스토리지 영속화·토스트 알림**: 중복 ID 제외, `saveStateLocal()` 호출, `showToast`로 등록 건수 알림, 모달 닫기 후 `refreshList()` 갱신<br/>• **출처별 독립 관리 탭(Source Filter Tabs)**: 찜 목록 상단에 `[전체 (${total})]`, `[🥕 당근 찜만 (${daangnCount})]`, `[🟢 네이버 관심만 (${naverCount})]` 칩 탭 추가, 클릭 시 `this.currentSourceFilter = 'all'|'daangn'|'naver'` 필터링<br/>• **PWA 서비스 워커 캐시 버전 `couple-calendar-v3.9.0` 갱신**: `sw.js`, `index.html` 타이틀·meta·CSS/JS 쿼리스트링 전면 `v3.9.0` 일치 | `ACTIVE` |
+| **v3.9.1** | 2026-11-11 | **서울 지역 칩 '전체 (0)' 버그 수정 & 당근 찜 실매물 시딩 복원 & 검색 버튼 DOM 동기화** | • **서울 지역별 칩 '전체 (0)' 버그 완전 수정**: `item.district === '전체'` 필터링 오류 제거, `baseFiltered` 선계산으로 전체/각 구별 조건 일치 개수 실시간 정확 연동<br/>• **기본 당근 찜 매물 6선 실매물 시딩 복원**: 구형 더미 ID(`dg-1001` 등)를 서울 10대 핵심 구 대표 라이브 실매물 6선으로 전면 교체<br/>• **`[🔍 조건으로 매물 검색]` 클릭 시 DOM 조건값 실시간 동기화**: 슬라이더 `aria-valuenow`와 체크박스 상태를 즉시 재수집하여 `window.daangnFilterState` 확정 반영 후 재조회 | `ACTIVE` |
+| **v3.9.0** | 2026-11-11 | **당근 찜 일괄 가져오기(모달·URL 파싱·자동 등록) & 출처별 독립 관리 탭(전체/당근/네이버) & v3.9.0 버전 통일** | • **당근 찜 일괄 가져오기 모달 신설**: 헤더 `[🥕 당근 찜 가져오기]` 버튼 클릭 시 모달(`#daangn-import-modal`) 오픈, 당근 앱 [공유하기]→[링크 복사] URL을 줄별로 입력<br/>• **URL 자동 파싱 및 ID 추출**: 정규식 `/(?:articles\/|articles%2F|articles:)(\d+)/`로 기사 ID(`articleId`) 추출<br/>• **기존 매물 매칭 자동 등록**: `DAANGN_SEOUL_LISTINGS`에서 `articleId` 매칭 시 실사 이미지(`imageUrl`), 매매가, 단지명 등 완전 매칭하여 `syncDaangnItemToCalendar`로 등록<br/>• **신규 매물 기본 객체 생성**: 미등록 ID는 기본 당근 매물 객체(`dg-{articleId}`) 생성 후 `AppState.realEstates` 및 `realEstateStore.properties`에 `unshift` 등록<br/>• **중복 제외·로컬스토리지 영속화·토스트 알림**: 중복 ID 제외, `saveStateLocal()` 호출, `showToast`로 등록 건수 알림, 모달 닫기 후 `refreshList()` 갱신<br/>• **출처별 독립 관리 탭(Source Filter Tabs)**: 찜 목록 상단에 `[전체 (${total})]`, `[🥕 당근 찜만 (${daangnCount})]`, `[🟢 네이버 관심만 (${naverCount})]` 칩 탭 추가, 클릭 시 `this.currentSourceFilter = 'all'|'daangn'|'naver'` 필터링<br/>• **PWA 서비스 워커 캐시 버전 `couple-calendar-v3.9.0` 갱신**: `sw.js`, `index.html` 타이틀·meta·CSS/JS 쿼리스트링 전면 `v3.9.0` 일치 | `SUPERSEDED` |
 | **v3.8.0** | 2026-11-11 | **D-Day 뱃지 완전 삭제 & 내 찜 매물 원문 딥링크 전면 적용 & 기존 매물 실사 이미지 자동 복원(Hydration) & 단위 테스트 39개 ALL PASS** | • **D-Day(D-10 등) 뱃지 완전 삭제**: 사용자 요청("D-10 이런건 무슨 의미야? 필요없으면 삭제해줘") 반영하여 `re-daangn-dday` 요소 및 `dDayDisplay` 로직 흔적 없이 제거<br/>• **내 찜 매물 원문 `<a>` 딥링크 전면 적용**: 썸네일 이미지·단지명·가격 영역을 `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer">`로 감싸 클릭 시 당근/네이버 매물 원문 새 창 직결, 카드 하단에 `[🥕 당근 원문 바로가기 ↗]` / `[🟢 네이버 원문 ↗]` 표준 버튼 신설<br/>• **기존 저장 매물 실사 이미지 자동 복원(Hydration)**: `renderPropertyCardHtml` 및 `renderDaangnCrawlerView`에서 `DAANGN_SEOUL_LISTINGS` 매칭으로 `imageUrl`/`thumbnailUrl`이 없거나 SVG인 경우 당근 CDN 실사 사진(`img.kr.gcp-karroter.net/...`) 자동 복원, 새로고침 시 기존 매물도 실사 사진 즉시 표출<br/>• **`createUnifiedProperty` 및 `syncDaangnItemToCalendar`에 `imageUrl`/`thumbnailUrl` 전달 보강**: 엔진/뷰 양단에서 실사 이미지 속성 보존 및 전달 로직 강화<br/>• **단위 테스트 4종 신규 추가(`test_36~test_39`)**: D-Day 뱃지 제거 검증, 앵커 딥링크 검증, sync 이미지 URL 검증, Hydration 검증 — 전체 39개 테스트 100% ALL PASS<br/>• **PWA 서비스 워커 캐시 버전 `couple-calendar-v3.8.0` 갱신**: `sw.js`, `index.html` 타이틀·meta·CSS/JS 쿼리스트링 전면 `v3.8.0` 일치 | `SUPERSEDED` |
 | **v3.7.0** | 2026-11-11 | **localStorage 필터 상태 영속화 & v3.7.0 갱신** | • **localStorage 기반 필터 상태 영속화**: `daangn_filter_state` 저장 헬퍼 `saveDaangnFilterToStorage()`, 불러오기 헬퍼 `loadDaangnFilterFromStorage()` 신설, 저장 시점(toggle, slider, reset, search), 복원 시점(renderDaangnCrawlerView 첫 실행), 초기화 시(localStorage 제거)<br/>• **듀얼 슬라이더 연동 유지**: slider 변경 시에도 필터 상태가 localStorage에 자동 저장되어 페이지 재로드 후에도 필터가 유지<br/>• **초기화 시 스토리지 정리**: `resetDaangnFilter()`가 localStorage에서 `daangn_filter_state` 제거 후 기본값으로 뷰 갱신<br/>• **단위 테스트 35개 추가**: `test_29~test_35번: localStorage 저장/로드 로직, roundtrip, defaults merge, corrupt fallback, reset storage, event handler coverage, render-on-load` 35/35 ALL PASS<br/>• **전체 단위 테스트 188개 100% ALL PASS** (신규 29~35번: localStorage 필터 영속화)<br/>| `SUPERSEDED` |
 | **v3.6.0** | 2026-11-11 | **서울 세부지역 다중선택 칩 UI & 선형 듀얼 슬라이더 썸(Thumb) 컴팩트 축소 & PWA 캐시 v3.6.0 (v3.6.0)** | • **서울 25개 자치구 다중선택 칩 UI 전면 개편**: 단일 드롭다운(`<select>`) → 5열 반응형 칩 그리드(`.dg-district-chip`) 전환, `all(전체)` ↔ 특정 구(`강남구`~`중구`) 토글 논리, 선택 즉시 `#dg-filter-chips` 뱃지 실시간 반영 및 `[🔍 조건으로 매물 검색]` 버튼 신설로 재조회 트리거 분리<br/>• **선형 듀얼 슬라이더(매매가/평수) 썸(Thumb) 사이즈 14px 고정**: 기존 22px/24px → 14px로 36% 축소, 단일 트랙(`.dual-slider`) 40px 유지하며 포인터 캡처(`setPointerCapture`)로 터치 영역 실질 44px 보장, 모바일(`≤480px`) 트랙 10px/썸 12px 추가 컴팩트화<br/>• **단일 트랙 1포인트 트랙 패딩 12px → 10px 슬림화**: 위/아래 여백 최소화로 수직 밀도 ↑, `::-webkit-slider-runnable-track` 기본 2px 유지<br/>• **PWA 서비스 워커 캐시 버전 `couple-calendar-v3.6.0` 갱신**: `sw.js` `CACHE_NAME` 동기화, `index.html` 타이틀·meta·CSS/JS 쿼리스트링 전면 `v3.6.0` 일치<br/>• **전체 단위 테스트 153개 100% ALL PASS** (신규 24~28번: 썸 CSS 검증, 다중선택 칩 토글/뱃지/초기화 로직) | `ACTIVE` |
@@ -72,6 +73,14 @@ tags:
 ---
 
 ## 2. 상세 버전별 변경 내역 (Detailed Changelog)
+
+### [v3.9.1] 2026-11-11 — 서울 지역 칩 '전체 (0)' 버그 수정 & 당근 찜 실매물 시딩 복원 & 검색 버튼 DOM 동기화
+- **서울 지역별 칩 '전체 (0)' 버그 완전 수정**:
+  - `real_estate_view.js` 내 지역 칩 생성 시 `item.district === '전체'` 필터링 오류를 제거하고, 비-지역 조건(형태·가격·연식·평수)을 만족하는 `baseFiltered`를 선계산하여 `전체 (20)` 및 각 구별 조건 일치 개수가 실시간 정확히 연동되도록 전면 개편.
+- **기본 당근 찜 매물 6선 실매물 시딩 복원**:
+  - `getDefaultSeedRealEstates()` 내 구형 더미 ID(`dg-1001` 등)를 서울 10대 핵심 구의 대표 라이브 실매물 6선(`dg-4508864`, `dg-4508946`, `dg-4756337`, `dg-4687508`, `dg-4581290`, `dg-4753066`)으로 전면 교체하여 초기 찜 목록에 고화질 실사 매물이 정상 탑재되도록 복구.
+- **`[🔍 조건으로 매물 검색]` 클릭 시 DOM 조건값 실시간 동기화**:
+  - 검색 버튼 클릭 시 현재 슬라이더의 `aria-valuenow`와 체크박스 상태를 강제로 즉시 재수집하여 `window.daangnFilterState`에 확정 반영한 후 재조회하도록 보강.
 
 ### [v3.3.1] 2026-11-11 — 구글 시트 GViz JSONP 무중단 연동(CORS/400에러 원천 차단) & 1,186건 실데이터 내장 시딩 & 가계부 상단 월 이동(◀/▶) 및 최근월(9월) 퀵 점프 UI 완성
 - **추진 배경**:

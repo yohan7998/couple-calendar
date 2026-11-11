@@ -768,6 +768,37 @@ class TestDaangnRealtySuite(unittest.TestCase):
         # fallback RealEstateEngine.createUnifiedProperty creation
         self.assertIn("RealEstateEngine.createUnifiedProperty", content, "fallback용 RealEstateEngine.createUnifiedProperty 생성이 있어야 함")
 
+    def test_43_district_chips_count_calculation(self):
+        """Verify district chips count calculation uses baseFiltered and '전체' is not 0."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("baseFiltered", content, "baseFiltered 계산 로직이 있어야 함")
+        self.assertIn("(d === '전체')", content, "전체 칩에 대한 분기 처리가 있어야 함")
+        self.assertIn("baseFiltered.length", content, "전체 칩의 count 로 baseFiltered.length 가 사용되어야 함")
+        self.assertIn("baseFiltered.filter(item => item.district === d).length", content, "각 구별 count 로 baseFiltered.filter 가 사용되어야 함")
+
+    def test_44_default_seed_real_estates_live_ids(self):
+        """Verify getDefaultSeedRealEstates uses actual live IDs from DAANGN_SEOUL_LISTINGS."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("dg-4508864", content, "실매물 ID dg-4508864 가 기본 시드에 포함되어야 함")
+        self.assertIn("dg-4508946", content, "실매물 ID dg-4508946 가 기본 시드에 포함되어야 함")
+        self.assertNotIn("dg-1001", content, "구형 더미 ID dg-1001 이 기본 시드에서 제거되어야 함")
+
+    def test_45_execute_daangn_search_dom_sync(self):
+        """Verify executeDaangnSearch reads slider and checkbox values from DOM to update filter state."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("dg-slider-price-min", content, "가격 슬라이더 최소값 DOM 조회가 있어야 함")
+        self.assertIn("dg-slider-price-max", content, "가격 슬라이더 최대값 DOM 조회가 있어야 함")
+        self.assertIn("dg-chk-apt", content, "아파트 체크박스 DOM 조회가 있어야 함")
+        self.assertIn("aria-valuenow", content, "aria-valuenow 속성 조회가 있어야 함")
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
