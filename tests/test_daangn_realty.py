@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 test_daangn_realty.py - TDD Unit and Integration Tests for Daangn Real Estate Enhancement
-Couple-Calendar v3.4.0
+Couple-Calendar v3.6.0
 """
 
 import json
@@ -21,9 +21,10 @@ def run_node_eval(script: str) -> str:
         AppState: {{ realEstates: [] }},
         SEOUL_DISTRICTS: ['마포구', '용산구', '성동구', '동작구', '영등포구', '서대문구', '송파구', '강북구', '양천구', '광진구', '은평구', '종로구', '노원구', '강남구', '서초구', '강동구'],
         daangnFilterState: {{
-            district: 'all',
+            districts: ['all'],
             minPriceWon: 100000000,
             maxPriceWon: 5000000000,
+            minAge: 0,
             maxAge: 35,
             minPyeong: 5,
             maxPyeong: 70,
@@ -371,6 +372,140 @@ class TestDaangnRealtySuite(unittest.TestCase):
         data = json.loads(run_node_eval(script))
         # Filter may return 0 or more - just verify logic runs
         self.assertIsInstance(data["count"], int, "필터링 결과 카운트가 정수여야 함")
+
+    def test_24_thumb_size_compact_reduction(self):
+        """Verify dual-thumb slider thumb sizes are compact (22px desktop, 24px mobile)."""
+        css_path = os.path.join(REPO_ROOT, "modules", "real_estate.css")
+        with open(css_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Desktop thumb size (22px)
+        self.assertIn('width: 22px;', content, "데스크톱 썸 너비 22px여야 함")
+        self.assertIn('height: 22px;', content, "데스크톱 썸 높이 22px여야 함")
+        self.assertIn('border: 2.5px solid', content, "데스크톱 썸 테두리 2.5px여야 함")
+
+        # Mobile thumb size (24px)
+        self.assertIn('@media (max-width: 480px)', content, "모바일 미디어 쿼리가 있어야 함")
+        self.assertIn('width: 24px;', content, "모바일 썸 너비 24px여야 함")
+        self.assertIn('height: 24px;', content, "모바일 썸 높이 24px여야 함")
+
+        # Track padding (12px)
+        self.assertIn('left: 12px;', content, "트랙 좌측 패딩 12px여야 함")
+        self.assertIn('right: 12px;', content, "트랙 우측 패딩 12px여야 함")
+
+        # Container height (40px)
+        self.assertIn('height: 40px;', content, "슬라이더 컨테이너 높이 40px여야 함")
+
+        # Box shadow (clean)
+        self.assertIn('box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15)', content, "깔끔한 박스 섀도우여야 함")
+
+    def test_25_district_multi_select_state_array(self):
+        """Verify district filter uses array for multi-select (districts)."""
+        script = """
+        const st = window.daangnFilterState;
+        console.log(JSON.stringify({ isArray: Array.isArray(st.districts), value: st.districts }));
+        """
+        output = run_node_eval(script)
+        data = json.loads(output)
+        self.assertTrue(data["isArray"], "districts는 배열이어야 함")
+        self.assertEqual(data["value"], ["all"], "초기값은 ['all']이어야 함")
+
+    def test_26_district_multi_select_two_districts_filtering(self):
+        """Test multi-district filtering with 2+ districts selected."""
+        script = """
+        const listings = window.DAANGN_SEOUL_LISTINGS;
+        const currentYear = new Date().getFullYear();
+
+        // Simulate: 마포구 + 용산구 선택
+        window.daangnFilterState = {
+            districts: ['마포구', '용산구'],
+            minPriceWon: 100000000,
+            maxPriceWon: 5000000000,
+            minAge: 0,
+            maxAge: 35,
+            minPyeong: 5,
+            maxPyeong: 70,
+            types: { apt: true, house: true, villa: true }
+        };
+
+        const filtered = listings.filter(item => {
+            const selectedDistricts = window.daangnFilterState.districts;
+            const districtMatch = selectedDistricts.includes('all') || selectedDistricts.includes(item.district);
+            if (!districtMatch) return false;
+            if (!window.daangnFilterState.types[item.propertyType]) return false;
+            const priceManwon = item.priceManwon;
+            const minPriceManwon = window.daangnFilterState.minPriceWon / 10000;
+            const maxPriceManwon = window.daangnFilterState.maxPriceWon / 10000;
+            if (priceManwon < minPriceManwon || priceManwon > maxPriceManwon) return false;
+            const age = currentYear - item.buildYear;
+            if (age < window.daangnFilterState.minAge || age > window.daangnFilterState.maxAge) return false;
+            const py = item.areaPyeong;
+            if (py < window.daangnFilterState.minPyeong || py > window.daangnFilterState.maxPyeong) return false;
+            return true;
+        });
+
+        const mapoCount = filtered.filter(i => i.district === '마포구').length;
+        const yongsanCount = filtered.filter(i => i.district === '용산구').length;
+        const otherCount = filtered.filter(i => i.district !== '마포구' && i.district !== '용산구').length;
+
+        console.log(JSON.stringify({
+            total: filtered.length,
+            mapo: mapoCount,
+            yongsan: yongsanCount,
+            other: otherCount
+        }));
+        """
+        data = json.loads(run_node_eval(script))
+        self.assertGreater(data["total"], 0, "마포구+용산구 필터 시 결과가 있어야 함")
+        self.assertGreater(data["mapo"], 0, "마포구 매물이 있어야 함")
+        self.assertGreater(data["yongsan"], 0, "용산구 매물이 있어야 함")
+        self.assertEqual(data["other"], 0, "선택되지 않은 구는 포함되지 않아야 함")
+
+    def test_27_district_all_includes_all(self):
+        """Test 'all' district selection includes all districts."""
+        script = """
+        const listings = window.DAANGN_SEOUL_LISTINGS;
+        const currentYear = new Date().getFullYear();
+
+        window.daangnFilterState = {
+            districts: ['all'],
+            minPriceWon: 100000000,
+            maxPriceWon: 5000000000,
+            minAge: 0,
+            maxAge: 35,
+            minPyeong: 5,
+            maxPyeong: 70,
+            types: { apt: true, house: true, villa: true }
+        };
+
+        const filtered = listings.filter(item => {
+            const selectedDistricts = window.daangnFilterState.districts;
+            const districtMatch = selectedDistricts.includes('all') || selectedDistricts.includes(item.district);
+            if (!districtMatch) return false;
+            if (!window.daangnFilterState.types[item.propertyType]) return false;
+            const priceManwon = item.priceManwon;
+            const minPriceManwon = window.daangnFilterState.minPriceWon / 10000;
+            const maxPriceManwon = window.daangnFilterState.maxPriceWon / 10000;
+            if (priceManwon < minPriceManwon || priceManwon > maxPriceManwon) return false;
+            const age = currentYear - item.buildYear;
+            if (age < window.daangnFilterState.minAge || age > window.daangnFilterState.maxAge) return false;
+            const py = item.areaPyeong;
+            if (py < window.daangnFilterState.minPyeong || py > window.daangnFilterState.maxPyeong) return false;
+            return true;
+        });
+
+        const uniqueDistricts = [...new Set(filtered.map(i => i.district))];
+        console.log(JSON.stringify({ count: filtered.length, districts: uniqueDistricts }));
+        """
+        data = json.loads(run_node_eval(script))
+        self.assertGreaterEqual(len(data["districts"]), 10, "전체 선택 시 10개 이상 구가 포함되어야 함")
+
+    def test_28_district_reset_restores_all(self):
+        """Test resetDaangnFilter restores districts to ['all']."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("districts: ['all']", content, "초기화 시 districts가 ['all']로 복원되어야 함")
 
 
 if __name__ == "__main__":

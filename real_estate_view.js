@@ -1921,7 +1921,7 @@
 ];
 
 window.daangnFilterState = window.daangnFilterState || {
-      district: 'all',
+      districts: ['all'],  // 다중 선택 지원: ['all'] 또는 ['마포구', '용산구', ...]
       minPriceWon: 100000000,
       maxPriceWon: 5000000000,
       minAge: 0,
@@ -1939,8 +1939,11 @@ window.renderDaangnCrawlerView = function(containerId) {
       const currentYear = new Date().getFullYear();
 
       const filtered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
-        // 자치구 필터
-        if (st.district !== 'all' && item.district !== st.district) return false;
+        // 자치구 필터 (다중 선택 지원)
+        const selectedDistricts = Array.isArray(st.districts) ? st.districts : [st.district || 'all'];
+        const districtMatch = selectedDistricts.includes('all') || selectedDistricts.includes(item.district);
+        if (!districtMatch) return false;
+
         // 형태 필터
         if (!st.types[item.propertyType]) return false;
         // 가격 범위 필터 (만원 단위)
@@ -1960,9 +1963,20 @@ window.renderDaangnCrawlerView = function(containerId) {
         return true;
       });
 
-      const districtOptions = ['<option value="all"' + (st.district === 'all' ? ' selected' : '') + '>서울 25개구 전체</option>']
-        .concat(window.SEOUL_DISTRICTS.map(d => `<option value="${d}" ${st.district === d ? 'selected' : ''}>서울 ${d}</option>`))
-        .join('');
+      // 서울 10대 핵심 구 + 전체 (칩 UI용)
+      const TOP_10_DISTRICTS = ['전체', '마포구', '용산구', '성동구', '강남구', '서초구', '송파구', '영등포구', '강동구', '동작구', '광진구'];
+      const selectedDistricts = Array.isArray(st.districts) ? st.districts : [st.district || 'all'];
+      const isAllSelected = selectedDistricts.includes('all') || selectedDistricts.length === 0;
+
+      const districtChipsHtml = TOP_10_DISTRICTS.map(d => {
+        const isSelected = isAllSelected ? (d === '전체') : selectedDistricts.includes(d);
+        const count = window.DAANGN_SEOUL_LISTINGS.filter(item => item.district === d).length;
+        const activeCls = isSelected ? 'active' : '';
+        const bg = isSelected ? '#EA580C' : '#F1F5F9';
+        const color = isSelected ? '#FFF' : '#475569';
+        const border = isSelected ? '#C2410C' : '#CBD5E1';
+        return `<button type="button" class="dg-district-chip ${activeCls}" data-district="${d}" style="background:${bg}; color:${color}; border:1px solid ${border}; border-radius:16px; padding:6px 12px; font-size:12.5px; font-weight:${isSelected ? '700' : '600'}; cursor:pointer; transition:all 0.15s ease; white-space:nowrap;" onclick="toggleDaangnDistrict('${d}')">${d} <span style="font-size:11px; font-weight:600; opacity:0.8;">(${count})</span></button>`;
+      }).join('');
 
       // 실시간 배지 텍스트
       const minPriceEok = Math.round(st.minPriceWon / 100000000);
@@ -2044,12 +2058,12 @@ window.renderDaangnCrawlerView = function(containerId) {
 
             <!-- v3.4.0: Dual-Thumb Single-Track Range Sliders -->
             <div class="filter-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:12px;">
-              <!-- 1) 서울 세부 지역 -->
-              <div class="filter-item">
-                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">📍 서울 세부 지역</label>
-                <select id="dg-sel-district" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
-                  ${districtOptions}
-                </select>
+              <!-- 1) 서울 세부 지역 (다중 선택 칩 UI) -->
+              <div class="filter-item filter-item--full">
+                <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:8px;">📍 서울 세부 지역 (다중 선택 가능)</label>
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                  ${districtChipsHtml}
+                </div>
               </div>
 
               <!-- 2) 매매가 구간 (Dual-Thumb Slider: 1~50억) -->
@@ -2170,7 +2184,6 @@ window.renderDaangnCrawlerView = function(containerId) {
     };
 
     window.updateDaangnFilter = function() {
-      const dist = document.getElementById('dg-sel-district')?.value || 'all';
       // 듀얼 썸 슬라이더에서 값 읽기
       const minPriceEok = parseInt(document.getElementById('dg-slider-price-min')?.getAttribute('aria-valuenow') || '1', 10);
       const maxPriceEok = parseInt(document.getElementById('dg-slider-price-max')?.getAttribute('aria-valuenow') || '50', 10);
@@ -2191,7 +2204,7 @@ window.renderDaangnCrawlerView = function(containerId) {
       const finalMaxPyeong = Math.max(minPyeong, maxPyeong);
 
       window.daangnFilterState = {
-        district: dist,
+        districts: window.daangnFilterState.districts || ['all'],
         minPriceWon: finalMinPriceEok * 100000000,
         maxPriceWon: finalMaxPriceEok * 100000000,
         minAge: finalMinAge,
@@ -2200,6 +2213,36 @@ window.renderDaangnCrawlerView = function(containerId) {
         maxPyeong: finalMaxPyeong,
         types: { apt: chkApt, house: chkHouse, villa: chkVilla }
       };
+      window.renderDaangnCrawlerView('naver-radar-root');
+    };
+
+    // 서울 세부 지역 다중 선택 토글 함수
+    window.toggleDaangnDistrict = function(district) {
+      const st = window.daangnFilterState;
+      let current = Array.isArray(st.districts) ? [...st.districts] : (st.district ? [st.district] : ['all']);
+
+      // '전체' 클릭 시
+      if (district === '전체') {
+        current = ['all'];
+      } else {
+        // 특정 구 클릭 시 '전체' 제거
+        current = current.filter(d => d !== 'all' && d !== '전체');
+
+        // 이미 선택된 구면 제거, 아니면 추가
+        const idx = current.indexOf(district);
+        if (idx >= 0) {
+          current.splice(idx, 1);
+        } else {
+          current.push(district);
+        }
+
+        // 모든 구가 해제되면 '전체'로 복원
+        if (current.length === 0) {
+          current = ['all'];
+        }
+      }
+
+      window.daangnFilterState.districts = current;
       window.renderDaangnCrawlerView('naver-radar-root');
     };
 
@@ -2233,7 +2276,7 @@ window.renderDaangnCrawlerView = function(containerId) {
 
     window.resetDaangnFilter = function() {
       window.daangnFilterState = {
-        district: 'all',
+        districts: ['all'],
         minPriceWon: 100000000,
         maxPriceWon: 5000000000,
         minAge: 0,
@@ -2248,26 +2291,30 @@ window.renderDaangnCrawlerView = function(containerId) {
     // 🔍 명시적 검색 버튼 클릭 시 실행되는 재조회 함수
     window.executeDaangnSearch = function() {
       const btn = document.getElementById('dg-btn-search');
-      const originalText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '⏳ 매물 불러오는 중...';
-        btn.style.opacity = '0.85';
-        btn.disabled = true;
-      }
+      const originalText = btn.innerHTML;
+
+      // 로딩 피드백
+      btn.innerHTML = '⏳ 매물 불러오는 중...';
+      btn.style.opacity = '0.85';
+      btn.disabled = true;
 
       setTimeout(() => {
+        // 현재 필터 상태로 다시 렌더링
         window.renderDaangnCrawlerView('naver-radar-root');
 
-        if (btn) {
-          btn.innerHTML = originalText;
-          btn.style.opacity = '1';
-          btn.disabled = false;
-        }
+        // 버튼 원상복구
+        btn.innerHTML = originalText;
+        btn.style.opacity = '1';
+        btn.disabled = false;
 
+        // 현재 필터 상태 읽기
         const st = window.daangnFilterState;
-        const currentYear = new Date().getFullYear();
         const filtered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
-          if (st.district !== 'all' && item.district !== st.district) return false;
+          const currentYear = new Date().getFullYear();
+          // 자치구 필터 (다중 선택 지원)
+          const selectedDistricts = Array.isArray(st.districts) ? st.districts : [st.district || 'all'];
+          const districtMatch = selectedDistricts.includes('all') || selectedDistricts.includes(item.district);
+          if (!districtMatch) return false;
           if (!st.types[item.propertyType]) return false;
           const priceManwon = item.priceManwon;
           const minPriceManwon = st.minPriceWon / 10000;
@@ -2280,8 +2327,23 @@ window.renderDaangnCrawlerView = function(containerId) {
           return true;
         });
 
+        // 결과 헤더 업데이트
+        const headerEl = document.querySelector('.re-daangn-container .re-daangn-header-label');
+        if (headerEl) {
+          headerEl.innerHTML = `🔍 조건 일치 매매 매물 (<span style="color:#EA580C;">${filtered.length}</span>건)`;
+        }
+
+        // 토스트 피드백
         if (typeof window.showToast === 'function') {
-          window.showToast(`🎉 조건에 맞는 매물 ${filtered.length}건을 새로 불러왔습니다!`);
+          window.showToast(`🎯 조건에 맞는 매물 ${filtered.length}건을 새로 불러왔습니다!`);
+        }
+
+        // 0 건일 경우 친절한 안내
+        if (filtered.length === 0) {
+          const gridEl = document.querySelector('.re-daangn-container .re-daangn-grid');
+          if (gridEl) {
+            gridEl.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#64748B; background:#F8FAFC; border-radius:14px; border:1px dashed #CBD5E1;"><div style="font-size:28px; margin-bottom:8px;">🔍</div>선택하신 조건에 해당하는 매물이 없습니다.<br/><b style="color:#EA580C;">조건 범위를 넓겨보세요!</b><br/><small>가격 구간 확대, 연식 범위 확장, 평수 범위 조정 등을 시도해보세요.</small></div>';
+          }
         }
       }, 150);
     };
