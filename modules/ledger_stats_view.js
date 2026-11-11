@@ -3,15 +3,16 @@
  * 모바일(터치 친화 게이지, 부부 분담률, 카테고리 랭킹, 미니 바) vs 웹(대화면 피벗 매트릭스, 일별 추이) 듀얼 통계 엔진
  * UMD / IIFE 패턴
  */
-(function(root, factory) {
+(function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     define([], factory);
   } else if (typeof module === 'object' && module.exports) {
     module.exports = factory();
   } else {
     root.LedgerStatsEngine = factory();
+    if (typeof window !== 'undefined') window.LedgerStatsEngine = root.LedgerStatsEngine;
   }
-}(typeof self !== 'undefined' ? self : this, function() {
+}(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
   /**
@@ -368,6 +369,77 @@
     `;
   }
 
+  function getChartConfigForDoughnut(categorySummary) {
+    return {
+      type: 'doughnut',
+      data: {
+        labels: (categorySummary || []).map(c => c.category),
+        datasets: [{
+          data: (categorySummary || []).map(c => c.amount),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+          borderColor: '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true },
+          tooltip: { enabled: true }
+        }
+      }
+    };
+  }
+
+  function getChartConfigForMonthlyTrend(trends) {
+    return {
+      type: 'bar',
+      data: {
+        labels: (trends || []).map(t => t.month),
+        datasets: [
+          { label: '지출', data: (trends || []).map(t => t.expense), backgroundColor: 'rgba(255, 107, 107, 0.8)' },
+          { label: '수입', data: (trends || []).map(t => t.income), backgroundColor: 'rgba(74, 206, 196, 0.8)' }
+        ]
+      },
+      options: {
+        animation: { duration: 500 },
+        plugins: { legend: { display: true } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true }
+        }
+      }
+    };
+  }
+
+  function renderWebDataGridHtml(transactions) {
+    return `
+      <style>
+        .ledger-data-grid { width: 100%; overflow-x: auto; }
+        .ledger-data-grid table { border-collapse: collapse; width: 100%; }
+        .ledger-data-grid th { position: sticky; top: 0; }
+        @media (max-width: 768px) { .ledger-data-grid { display: none; } }
+      </style>
+      <div class="ledger-data-grid">
+        <table>
+          <thead>
+            <tr>
+              <th>날짜</th><th>항목</th><th>카테고리</th><th>결제자</th><th>금액</th><th>유형</th><th>메모</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(transactions || []).map(t => `
+              <tr>
+                <td>${t.date}</td><td>${t.category}</td><td>${t.category}</td><td>${t.payer}</td><td>${t.amount}</td><td>${t.type}</td><td>${t.memo || ''}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
   return {
     calculateMonthlySummary,
     calculatePayerDistribution,
@@ -376,6 +448,9 @@
     calculatePivotMatrix,
     renderMiniBarChartSvg,
     renderMobileStatsHtml,
-    renderWebPivotTableHtml
+    renderWebPivotTableHtml,
+    getChartConfigForDoughnut,
+    getChartConfigForMonthlyTrend,
+    renderWebDataGridHtml
   };
 }));

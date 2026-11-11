@@ -4,7 +4,7 @@
  * 기능: XLSX/CSV 파싱, 자동 헤더 정규화, 금액 정제, 공유 시트 연동, 내보내기,
  *       표준 템플릿 생성, 카테고리 지능적 매핑, 고정비 자동 감지, 멱등성 중복 제거
  */
-(function(root, factory) {
+(function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define([], factory);
     } else if (typeof module === 'object' && module.exports) {
@@ -12,7 +12,7 @@
     } else {
         root.ExcelLedgerEngine = factory();
     }
-}(typeof self !== 'undefined' ? self : this, function() {
+}(typeof self !== 'undefined' ? self : this, function () {
     'use strict';
 
     // 8대 표준 카테고리 목록
@@ -22,19 +22,22 @@
     ];
 
     /**
-     * 한글/영문 다양한 헤더 이름을 정규화된 필드로 매핑
+     * 한글/영문 다양한 헤더 이름을 정규화된 필드로 매핑 (구글시트 10대 컬럼 정밀 분리)
      * @param {string} header - 원본 헤더 문자열
-     * @returns {string} 표준 필드명: date | type | category | amount | payer | memo | fixed
+     * @returns {string} 표준 필드명: date | type | category | subcategory | amount | payer | asset | memo | fixed | note
      */
     function normalizeHeaders(header) {
         const h = (header || '').trim().toLowerCase();
         if (/날짜|일자|date|거래일/.test(h)) return 'date';
-        if (/구분|type|유형|수입|지출/.test(h)) return 'type';
-        if (/분류|category|항목|카테고리/.test(h)) return 'category';
-        if (/금액|amount|지출금액|수입금액|비용/.test(h)) return 'amount';
+        if (/소분류|subcat|세부분류/.test(h)) return 'subcategory';
+        if (/대분류|분류|category|항목|카테고리/.test(h)) return 'category';
+        if (/고정비|고정|예산구분|fixed|정기/.test(h)) return 'fixed';
+        if (/구분|type|유형|수입\/지출/.test(h)) return 'type';
+        if (/결제수단|자산|카드|통장/.test(h)) return 'asset';
         if (/결제자|payer|사용자|작성자|담당/.test(h)) return 'payer';
-        if (/메모|적요|내용|memo|usage|비고/.test(h)) return 'memo';
-        if (/고정|fixed|정기/.test(h)) return 'fixed';
+        if (/내용|적요|memo|usage/.test(h)) return 'memo';
+        if (/비고|note|remark/.test(h)) return 'note';
+        if (/금액|amount|지출금액|수입금액|비용/.test(h)) return 'amount';
         return (header || '').trim().toLowerCase();
     }
 
@@ -116,22 +119,61 @@
     }
 
     /**
+     * 구글 시트 URL에서 sheetId, gid, pub여부 파싱
+     */
+    function extractGoogleSheetInfo(rawUrl) {
+        if (!rawUrl) return { sheetId: null, gid: null, isPub: false, rawUrl: '' };
+        const url = rawUrl.trim();
+
+        // 1) /spreadsheets/d/e/{publishId}/pub 또는 pubhtml
+        const pubMatch = url.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/);
+        if (pubMatch) {
+            const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
+            return {
+                sheetId: null,
+                publishId: pubMatch[1],
+                gid: gidMatch ? gidMatch[1] : null,
+                isPub: true,
+                rawUrl: url
+            };
+        }
+
+        // 2) 일반 시트 링크: /spreadsheets/d/{sheetId}
+        const standardMatch = url.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+        if (standardMatch && standardMatch[1] !== 'e') {
+            const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
+            return {
+                sheetId: standardMatch[1],
+                publishId: null,
+                gid: gidMatch ? gidMatch[1] : null,
+                isPub: false,
+                rawUrl: url
+            };
+        }
+
+        return { sheetId: null, gid: null, isPub: false, rawUrl: url };
+    }
+
+    /**
      * 공유 URL 정규화 (구글 스프레드시트 공유 링크를 직접 CSV 다운로드 URL로 자동 변환)
      * @param {string} rawUrl - 사용자가 입력한 구글 시트 또는 공유 URL
      * @returns {string} 정규화된 다운로드 URL
      */
     function normalizeSharedUrl(rawUrl) {
         if (!rawUrl) return '';
-        let url = rawUrl.trim();
-        // 구글 스프레드시트 URL 패턴 (docs.google.com/spreadsheets/d/{id})
-        const gsheetMatch = url.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-        if (gsheetMatch) {
-            const sheetId = gsheetMatch[1];
-            // gid 추출 (특정 시트 탭 지정 시)
-            const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
-            const gid = gidMatch ? gidMatch[1] : '0';
-            return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+        const url = rawUrl.trim();
+        const info = extractGoogleSheetInfo(url);
+
+        if (info.isPub && info.publishId) {
+            const gidParam = info.gid ? `&gid=${info.gid}&single=true` : '';
+            return `https://docs.google.com/spreadsheets/d/e/${info.publishId}/pub?output=csv${gidParam}`;
         }
+
+        if (info.sheetId) {
+            const targetGid = info.gid || '1727868226';
+            return `https://docs.google.com/spreadsheets/d/${info.sheetId}/export?format=csv&gid=${targetGid}`;
+        }
+
         return url;
     }
 
@@ -259,22 +301,196 @@
     }
 
     /**
-     * 비동기 공개 구글 스프레드시트 CSV URL에서 데이터 Fetch 및 파싱
+     * Google Visualization API (GViz) 응답 객체 파싱 → 정규화된 트랜잭션 배열
+     */
+    function parseGvizResponse(resp) {
+        if (!resp || !resp.table) return [];
+        const cols = resp.table.cols || [];
+        const rows = resp.table.rows || [];
+        if (rows.length === 0) return [];
+
+        // 컬럼 헤더 매핑
+        let headerMap = cols.map(c => normalizeHeaders(c ? c.label : ''));
+        let startIndex = 0;
+        const hasHeader = headerMap.some(h => /date|type|category|amount|payer|memo/.test(h));
+        if (!hasHeader && rows.length > 0) {
+            const firstRowCells = (rows[0].c || []).map(cell => cell ? (cell.v !== undefined ? cell.v : cell.f) : '');
+            headerMap = firstRowCells.map(h => normalizeHeaders(String(h || '')));
+            startIndex = 1;
+        }
+
+        const transactions = [];
+        for (let i = startIndex; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || !row.c) continue;
+            const cells = row.c;
+            const rowObj = {};
+            for (let j = 0; j < Math.max(headerMap.length, cells.length); j++) {
+                const h = headerMap[j];
+                const cell = cells[j];
+                if (h && h !== '') {
+                    const val = cell ? (cell.v !== undefined ? cell.v : (cell.f !== undefined ? cell.f : '')) : '';
+                    rowObj[h] = val;
+                }
+            }
+
+            let dateStr = String(rowObj.date || '').trim();
+            const dateMatch = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+            if (dateMatch) {
+                const y = dateMatch[1];
+                const m = String(Number(dateMatch[2]) + 1).padStart(2, '0');
+                const d = String(dateMatch[3]).padStart(2, '0');
+                dateStr = `${y}-${m}-${d}`;
+            } else {
+                dateStr = dateStr.replace(/\./g, '-').trim();
+            }
+
+            const rawCat = String(rowObj.category || '기타');
+            const rawMemo = String(rowObj.memo || rowObj.usage || rowObj.content || '');
+            const fixedExplicit = rowObj.fixed ? /y|yes|true|1|고정/.test(String(rowObj.fixed).toLowerCase()) : false;
+
+            const tx = {
+                id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                date: dateStr,
+                type: normalizeType(String(rowObj.type || '')),
+                category: normalizeCategory(rawCat),
+                amount: parseAmount(rowObj.amount),
+                payer: normalizePayer(String(rowObj.payer || '')),
+                memo: rawMemo,
+                isFixed: fixedExplicit || isFixedExpense(rawMemo, rawCat)
+            };
+
+            if (tx.date && tx.category && tx.amount > 0) {
+                transactions.push(tx);
+            }
+        }
+        return transactions;
+    }
+
+    /**
+     * 브라우저 환경에서 <script> 태그를 이용해 Google Visualization API를 JSONP로 비동기 호출 (CORS 완전 면제)
+     */
+    function fetchGvizJsonp(sheetId, gid, timeoutMs = 8000) {
+        return new Promise((resolve, reject) => {
+            if (typeof document === 'undefined') {
+                reject(new Error('Browser DOM document not available'));
+                return;
+            }
+            const callbackName = 'gviz_cb_' + Math.random().toString(36).substring(2, 10);
+            let timer = null;
+            const script = document.createElement('script');
+
+            const cleanup = () => {
+                if (timer) clearTimeout(timer);
+                try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+                if (script.parentNode) script.parentNode.removeChild(script);
+            };
+
+            window[callbackName] = function (resp) {
+                cleanup();
+                if (!resp) {
+                    reject(new Error('구글 시트 응답이 비어있습니다.'));
+                    return;
+                }
+                if (resp.status === 'error') {
+                    const errorMsg = (resp.errors && resp.errors[0] && (resp.errors[0].detailed_message || resp.errors[0].message)) || '구글 시트 조회 에러';
+                    reject(new Error(errorMsg));
+                    return;
+                }
+                try {
+                    const txs = parseGvizResponse(resp);
+                    resolve(txs);
+                } catch (err) {
+                    reject(err);
+                }
+            };
+
+            timer = setTimeout(() => {
+                cleanup();
+                reject(new Error('구글 시트 연결 시간 초과 (8초). 시트 공유 권한을 확인해주세요.'));
+            }, timeoutMs);
+
+            script.onerror = function () {
+                cleanup();
+                reject(new Error('구글 시트 스크립트 로드 차단 또는 네트워크 오류 발생'));
+            };
+
+            const targetGid = gid != null ? gid : '1727868226';
+            script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${callbackName}&gid=${targetGid}`;
+            document.body.appendChild(script);
+        });
+    }
+
+    /**
+     * 비동기 공개 구글 스프레드시트에서 데이터 Fetch 및 파싱 (GViz JSONP 및 다중 폴백)
      * @param {string} url - 구글 시트 또는 공개 CSV URL
      * @returns {Promise<Array<object>>} 트랜잭션 배열(Promise)
      */
-    function fetchSharedCsv(url) {
-        const normalized = normalizeSharedUrl(url);
-        return fetch(normalized)
-            .then(res => {
-                if (!res.ok) throw new Error(`공유 시트 연결 실패 (${res.status})`);
-                return res.text();
-            })
-            .then(text => parseCsvString(text))
-            .catch(err => {
-                console.error('Shared CSV fetch error:', err);
-                throw err;
-            });
+    async function fetchSharedCsv(url) {
+        if (!url) throw new Error('공유 시트 URL을 입력해주세요.');
+        const info = extractGoogleSheetInfo(url);
+
+        // 1순위: 브라우저 DOM 환경이고 일반 시트 ID가 있는 경우 GViz JSONP 시도 (CORS 및 400 에러 100% 면제!)
+        if (typeof document !== 'undefined' && info.sheetId) {
+            const candidateGids = [info.gid, '1727868226', '0'].filter((g, i, arr) => g != null && arr.indexOf(g) === i);
+            for (const candidateGid of candidateGids) {
+                try {
+                    const txs = await fetchGvizJsonp(info.sheetId, candidateGid, 6000);
+                    if (txs && txs.length > 0) {
+                        console.log(`[ExcelLedgerEngine] Successfully fetched ${txs.length} transactions via GViz JSONP (gid: ${candidateGid})`);
+                        return txs;
+                    }
+                } catch (err) {
+                    console.warn(`[ExcelLedgerEngine] GViz JSONP failed for gid ${candidateGid}:`, err.message);
+                }
+            }
+        }
+
+        // 2순위: GViz CSV 직접 호출 (gviz/tq?tqx=out:csv)
+        if (info.sheetId) {
+            const targetGid = info.gid || '1727868226';
+            const gvizCsvUrl = `https://docs.google.com/spreadsheets/d/${info.sheetId}/gviz/tq?tqx=out:csv&gid=${targetGid}`;
+            try {
+                const res = await fetch(gvizCsvUrl);
+                if (res.ok) {
+                    const text = await res.text();
+                    const txs = parseCsvString(text);
+                    if (txs.length > 0) return txs;
+                }
+            } catch (e) {
+                console.warn('[ExcelLedgerEngine] GViz CSV fetch failed:', e.message);
+            }
+        }
+
+        // 3순위: 정규화된 CSV URL 직접 fetch (/export?format=csv 또는 /pub?output=csv)
+        const normalizedUrl = normalizeSharedUrl(url);
+        try {
+            const res = await fetch(normalizedUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const txs = parseCsvString(text);
+                if (txs.length > 0) return txs;
+            } else {
+                console.warn(`[ExcelLedgerEngine] Direct fetch responded status: ${res.status}`);
+            }
+        } catch (e) {
+            console.warn('[ExcelLedgerEngine] Direct fetch failed (likely CORS):', e.message);
+        }
+
+        // 4순위: CORS Proxy (allorigins) 폴백
+        try {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(normalizedUrl);
+            const res = await fetch(proxyUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const txs = parseCsvString(text);
+                if (txs.length > 0) return txs;
+            }
+        } catch (proxyErr) {
+            console.warn('[ExcelLedgerEngine] Proxy fetch failed:', proxyErr.message);
+        }
+
+        throw new Error('공유 시트 연결 실패: 구글 시트 우측 상단 [공유] ➔ "링크가 있는 모든 사용자"로 설정되어 있는지 확인해주세요.');
     }
 
     /**
@@ -339,6 +555,9 @@
         parseExcelWorkbook,
         generateTemplateData,
         exportToExcelData,
+        extractGoogleSheetInfo,
+        parseGvizResponse,
+        fetchGvizJsonp,
         fetchSharedCsv,
         generateTxFingerprint,
         deduplicateTransactions

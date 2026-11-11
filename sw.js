@@ -1,5 +1,5 @@
-// SweetSync Couple Calendar - PWA Service Worker v3.5.0
-const CACHE_NAME = 'couple-calendar-v3.5.0';
+// SweetSync Couple Calendar - PWA Service Worker v3.5.1
+const CACHE_NAME = 'couple-calendar-v3.5.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ASSETS_TO_CACHE = [
   './modules/realtime_sync.css',
   './modules/realtime_sync_engine.js',
   './modules/ledger_stats.css',
+  './modules/ledger_seed_2026.js',
   './modules/excel_ledger_engine.js',
   './modules/ledger_stats_view.js',
   './modules/real_estate.css',

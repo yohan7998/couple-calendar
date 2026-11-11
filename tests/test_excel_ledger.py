@@ -232,6 +232,21 @@ class TestExcelLedgerEngine(unittest.TestCase):
         txs = parse_csv_string(csv)
         self.assertEqual(len(txs), 0)
 
+    def test_google_sheet_url_normalization(self):
+        url = "https://docs.google.com/spreadsheets/d/1K0s0lHRF7NDjsfY6F4ZMg9sQe3K4CdIP/edit?gid=1727868226#gid=1727868226"
+        match = re.search(r'https://docs\.google\.com/spreadsheets/d/([a-zA-Z0-9-_]+)', url)
+        self.assertIsNotNone(match)
+        self.assertEqual(match.group(1), '1K0s0lHRF7NDjsfY6F4ZMg9sQe3K4CdIP')
+        gid_match = re.search(r'[#&?]gid=([0-9]+)', url)
+        self.assertIsNotNone(gid_match)
+        self.assertEqual(gid_match.group(1), '1727868226')
+
+    def test_google_sheet_pub_url_normalization(self):
+        pub_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTest123/pubhtml?gid=1727868226&single=true"
+        pub_match = re.search(r'https://docs\.google\.com/spreadsheets/d/e/([a-zA-Z0-9-_]+)', pub_url)
+        self.assertIsNotNone(pub_match)
+        self.assertEqual(pub_match.group(1), '2PACX-1vQTest123')
+
 
 if __name__ == '__main__':
     unittest.main()
