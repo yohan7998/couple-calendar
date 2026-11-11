@@ -2125,7 +2125,7 @@ window.renderDaangnCrawlerView = function(containerId) {
               </div>
             </div>
 
-            <!-- 매물 형태 다중 선택 (아파트 / 단독주택 / 빌라) -->
+            <!-- 매물 형태 다중 선택 (아파트 / 단독주택 / 빌라) + 검색/초기화 버튼 -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:10px; border-top:1px dashed #FED7AA;">
               <div style="display:flex; gap:14px; align-items:center;">
                 <span style="font-size:12px; font-weight:800; color:#7C2D12;">🏠 매물형태:</span>
@@ -2139,9 +2139,14 @@ window.renderDaangnCrawlerView = function(containerId) {
                   <input type="checkbox" id="dg-chk-villa" ${st.types.villa ? 'checked' : ''} onchange="updateDaangnFilter()" style="accent-color:#EA580C; width:16px; height:16px;"> 빌라/연립
                 </label>
               </div>
-              <button type="button" onclick="resetDaangnFilter()" style="background:#FFF; color:#64748B; border:1px solid #CBD5E1; border-radius:8px; padding:5px 12px; font-size:11.5px; font-weight:700; cursor:pointer;">
-                🔄 필터 초기화
-              </button>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button type="button" id="dg-btn-reset" onclick="resetDaangnFilter()" style="background:#FFF; color:#64748B; border:1px solid #CBD5E1; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s ease;">
+                  🔄 초기화
+                </button>
+                <button type="button" id="dg-btn-search" onclick="executeDaangnSearch()" style="background:linear-gradient(135deg, #F97316 0%, #EA580C 100%); color:#FFF; border:none; border-radius:10px; padding:10px 20px; font-size:13.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 12px rgba(234,88,12,0.3); transition:all 0.2s ease; min-height:44px;">
+                  🔍 조건으로 매물 검색 / 다시 조회
+                </button>
+              </div>
             </div>
           </div>
 
@@ -2238,6 +2243,47 @@ window.renderDaangnCrawlerView = function(containerId) {
         types: { apt: true, house: true, villa: true }
       };
       window.renderDaangnCrawlerView('naver-radar-root');
+    };
+
+    // 🔍 명시적 검색 버튼 클릭 시 실행되는 재조회 함수
+    window.executeDaangnSearch = function() {
+      const btn = document.getElementById('dg-btn-search');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '⏳ 매물 불러오는 중...';
+        btn.style.opacity = '0.85';
+        btn.disabled = true;
+      }
+
+      setTimeout(() => {
+        window.renderDaangnCrawlerView('naver-radar-root');
+
+        if (btn) {
+          btn.innerHTML = originalText;
+          btn.style.opacity = '1';
+          btn.disabled = false;
+        }
+
+        const st = window.daangnFilterState;
+        const currentYear = new Date().getFullYear();
+        const filtered = window.DAANGN_SEOUL_LISTINGS.filter(item => {
+          if (st.district !== 'all' && item.district !== st.district) return false;
+          if (!st.types[item.propertyType]) return false;
+          const priceManwon = item.priceManwon;
+          const minPriceManwon = st.minPriceWon / 10000;
+          const maxPriceManwon = st.maxPriceWon / 10000;
+          if (priceManwon < minPriceManwon || priceManwon > maxPriceManwon) return false;
+          const age = currentYear - item.buildYear;
+          if (age < st.minAge || age > st.maxAge) return false;
+          const py = item.areaPyeong;
+          if (py < st.minPyeong || py > st.maxPyeong) return false;
+          return true;
+        });
+
+        if (typeof window.showToast === 'function') {
+          window.showToast(`🎉 조건에 맞는 매물 ${filtered.length}건을 새로 불러왔습니다!`);
+        }
+      }, 150);
     };
 
     window.syncDaangnItemToCalendar = function(itemId, silent = false) {
