@@ -1,6 +1,6 @@
 /**
  * real_estate.css - Mobile-First Stylesheet for Real Estate Property Manager
- * Couple-Calendar v2.7.0
+ * Couple-Calendar v3.4.0
  */
 
 .re-view-container {
@@ -1627,4 +1627,272 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+/* ========================================================================
+   v3.4.0: Dual-Thumb Single-Track Range Slider (모바일/데스크톱 완벽 지원)
+   ======================================================================== */
+
+/* 슬라이더 컨테이너 */
+.dual-slider {
+  position: relative;
+  width: 100%;
+  height: 48px; /* 터치 영역 확보 */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* 기본 트랙 (배경) */
+.dual-slider__track {
+  position: absolute;
+  top: 50%;
+  left: 16px; /* 썸 반지름만큼 패딩 */
+  right: 16px;
+  height: 6px;
+  transform: translateY(-50%);
+  background: #E2E8F0;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* 활성 구간 하이라이트 (두 썸 사이) */
+.dual-slider__range {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, #F97316 0%, #EA580C 100%);
+  border-radius: 3px;
+  pointer-events: none;
+  transition: left 0.05s ease-out, right 0.05s ease-out, width 0.05s ease-out;
+  will-change: left, right, width;
+}
+
+/* 썸 공통 스타일 */
+.dual-slider__thumb {
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 3px solid #F97316;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3), 0 0 0 4px rgba(249, 115, 22, 0.1);
+  cursor: grab;
+  z-index: 10;
+  transition: box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.dual-slider__thumb:active,
+.dual-slider__thumb.dragging {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.4), 0 0 0 6px rgba(249, 115, 22, 0.2);
+  border-color: #C2410C;
+  z-index: 20; /* 드래그 중 최상위 */
+}
+
+/* 포커스 상태 (접근성) */
+.dual-slider__thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px #FED7AA, 0 2px 8px rgba(234, 88, 12, 0.3);
+}
+
+/* 최소값 썸 (왼쪽) */
+.dual-slider__thumb--min {
+  border-color: #F97316;
+}
+
+/* 최대값 썸 (오른쪽) */
+.dual-slider__thumb--max {
+  border-color: #F97316;
+}
+
+/* 툴팁 (값 표시) */
+.dual-slider__tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1E293B;
+  background: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+  border: 1px solid #E2E8F0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dual-slider__thumb:hover .dual-slider__tooltip,
+.dual-slider__thumb.dragging .dual-slider__tooltip,
+.dual-slider__thumb:focus-visible .dual-slider__tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* 툴팁 화살표 */
+.dual-slider__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: #FFFFFF transparent transparent transparent;
+}
+
+/* 라벨 영역 */
+.dual-slider__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748B;
+  pointer-events: none;
+}
+
+/* 뱃지 스타일 (필터 헤더용) */
+.dg-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.dg-badge--price {
+  color: #EA580C;
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+}
+
+.dg-badge--year {
+  color: #0369A1;
+  background: #E0F2FE;
+  border: 1px solid #BAE6FD;
+}
+
+.dg-badge--pyeong {
+  color: #047857;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+}
+
+/* 필터 그리드 레이아웃 */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-item--full {
+  grid-column: 1 / -1;
+}
+
+.filter-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #7C2D12;
+}
+
+.filter-slider-wrapper {
+  position: relative;
+}
+
+/* 슬라이더별 색상 테마 */
+.dual-slider--price .dual-slider__range { background: linear-gradient(90deg, #F97316, #EA580C); }
+.dual-slider--price .dual-slider__thumb { border-color: #F97316; }
+.dual-slider--price .dual-slider__thumb:hover,
+.dual-slider--price .dual-slider__thumb.dragging { border-color: #C2410C; box-shadow: 0 4px 16px rgba(234, 88, 12, 0.4), 0 0 0 6px rgba(249, 115, 22, 0.2); }
+
+.dual-slider--year .dual-slider__range { background: linear-gradient(90deg, #38BDF8, #0EA5E9); }
+.dual-slider--year .dual-slider__thumb { border-color: #38BDF8; }
+.dual-slider--year .dual-slider__thumb:hover,
+.dual-slider--year .dual-slider__thumb.dragging { border-color: #0284C7; box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4), 0 0 0 6px rgba(56, 189, 248, 0.2); }
+
+.dual-slider--pyeong .dual-slider__range { background: linear-gradient(90deg, #34D399, #10B981); }
+.dual-slider--pyeong .dual-slider__thumb { border-color: #34D399; }
+.dual-slider--pyeong .dual-slider__thumb:hover,
+.dual-slider--pyeong .dual-slider__thumb.dragging { border-color: #059669; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4), 0 0 0 6px rgba(52, 211, 153, 0.2); }
+
+/* 반응형 조정 */
+@media (max-width: 480px) {
+  .dual-slider {
+    height: 56px;
+  }
+  .dual-slider__thumb {
+    width: 36px;
+    height: 36px;
+  }
+  .dual-slider__track {
+    left: 18px;
+    right: 18px;
+    height: 8px;
+  }
+  .dual-slider__range {
+    height: 8px;
+  }
+  .dual-slider__tooltip {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}
+
+/* 다크 모드 대응 */
+@media (prefers-color-scheme: dark) {
+  .dual-slider__track {
+    background: #334155;
+  }
+  .dual-slider__thumb {
+    background: #1E293B;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(249, 115, 22, 0.15);
+  }
+  .dual-slider__tooltip {
+    background: #1E293B;
+    color: #F1F5F9;
+    border-color: #334155;
+  }
+  .dual-slider__tooltip::after {
+    border-color: #1E293B transparent transparent transparent;
+  }
+  .dual-slider__labels {
+    color: #94A3B8;
+  }
+  .dg-badge--price {
+    background: #7C2D12;
+    color: #FED7AA;
+    border-color: #9A3412;
+  }
+  .dg-badge--year {
+    background: #075985;
+    color: #BAE6FD;
+    border-color: #0369A1;
+  }
+  .dg-badge--pyeong {
+    background: #064E3B;
+    color: #A7F3D0;
+    border-color: #047857;
+  }
 }

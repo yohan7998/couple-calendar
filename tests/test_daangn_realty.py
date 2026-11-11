@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 test_daangn_realty.py - TDD Unit and Integration Tests for Daangn Real Estate Enhancement
-Couple-Calendar v3.2.0
+Couple-Calendar v3.4.0
 """
 
 import json
@@ -141,48 +141,61 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertIn('<a href="${item.rawUrl}" target="_blank" rel="noopener noreferrer" class="re-footer-btn"', content)
         self.assertNotIn('onclick="window.open(\'${item.rawUrl}\', \'_blank\')"', content, "팝업 차단 유발하는 div onclick 방식이 제거되어야 함")
 
-    def test_09_linear_price_range_slider(self):
-        """Verify linear price range slider elements exist in filter UI."""
+    def test_09_dual_thumb_price_slider_structure(self):
+        """Verify dual-thumb single-track price slider elements exist in filter UI."""
         with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Verify range input elements for price
-        self.assertIn('id="dg-range-min-price"', content, "최소 매매가 슬라이더가 있어야 함")
-        self.assertIn('id="dg-range-max-price"', content, "최대 매매가 슬라이더가 있어야 함")
-        self.assertIn('type="range"', content, "range 타입 입력 요소가 있어야 함")
-        self.assertIn('min="1"', content, "최소값 1이 있어야 함")
-        self.assertIn('max="50"', content, "최대값 50이 있어야 함")
+        # Verify dual-thumb slider structure for price
+        self.assertIn('id="dg-slider-price"', content, "매매가 듀얼 썸 슬라이더 컨테이너가 있어야 함")
+        self.assertIn('id="dg-slider-price-min"', content, "최소 매매가 썸이 있어야 함")
+        self.assertIn('id="dg-slider-price-max"', content, "최대 매매가 썸이 있어야 함")
+        self.assertIn('id="dg-slider-price-range"', content, "활성 구간 하이라이트 바가 있어야 함")
         self.assertIn('id="dg-badge-price"', content, "실시간 가격 뱃지가 있어야 함")
+        self.assertIn('class="dual-slider dual-slider--price"', content, "가격 슬라이더 CSS 클래스가 있어야 함")
+        self.assertIn('role="slider"', content, "접근성을 위한 role=slider가 있어야 함")
+        self.assertIn('aria-valuemin="1"', content, "최소값 1이 있어야 함")
+        self.assertIn('aria-valuemax="50"', content, "최대값 50이 있어야 함")
 
-    def test_10_linear_year_slider(self):
-        """Verify linear year range slider elements exist in filter UI."""
+    def test_10_dual_thumb_year_slider_structure(self):
+        """Verify dual-thumb single-track year slider elements exist in filter UI."""
         with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
             content = f.read()
 
-        self.assertIn('id="dg-range-year-max"', content, "최대 건물 연식 슬라이더가 있어야 함")
-        self.assertIn('min="1"', content, "최소 연식 1이 있어야 함")
-        self.assertIn('max="35"', content, "최대 연식 35이 있어야 함")
+        # Verify dual-thumb slider structure for year
+        self.assertIn('id="dg-slider-year"', content, "건물 연식 듀얼 썸 슬라이더 컨테이너가 있어야 함")
+        self.assertIn('id="dg-slider-year-min"', content, "최소 건물 연식 썸이 있어야 함")
+        self.assertIn('id="dg-slider-year-max"', content, "최대 건물 연식 썸이 있어야 함")
+        self.assertIn('id="dg-slider-year-range"', content, "활성 구간 하이라이트 바가 있어야 함")
         self.assertIn('id="dg-badge-year"', content, "실시간 연식 뱃지가 있어야 함")
+        self.assertIn('class="dual-slider dual-slider--year"', content, "연식 슬라이더 CSS 클래스가 있어야 함")
+        self.assertIn('aria-valuemin="0"', content, "최소 연식 0(신축)이 있어야 함")
+        self.assertIn('aria-valuemax="35"', content, "최대 연식 35이 있어야 함")
 
-    def test_11_linear_pyeong_slider(self):
-        """Verify linear pyeong range slider elements exist in filter UI."""
+    def test_11_dual_thumb_pyeong_slider_structure(self):
+        """Verify dual-thumb single-track pyeong slider elements exist in filter UI."""
         with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
             content = f.read()
 
-        self.assertIn('id="dg-range-min-pyeong"', content, "최소 평수 슬라이더가 있어야 함")
-        self.assertIn('id="dg-range-max-pyeong"', content, "최대 평수 슬라이더가 있어야 함")
-        self.assertIn('min="5"', content, "최소 평수 5가 있어야 함")
-        self.assertIn('max="70"', content, "최대 평수 70이 있어야 함")
+        # Verify dual-thumb slider structure for pyeong
+        self.assertIn('id="dg-slider-pyeong"', content, "평수 듀얼 썸 슬라이더 컨테이너가 있어야 함")
+        self.assertIn('id="dg-slider-pyeong-min"', content, "최소 평수 썸이 있어야 함")
+        self.assertIn('id="dg-slider-pyeong-max"', content, "최대 평수 썸이 있어야 함")
+        self.assertIn('id="dg-slider-pyeong-range"', content, "활성 구간 하이라이트 바가 있어야 함")
         self.assertIn('id="dg-badge-pyeong"', content, "실시간 평수 뱃지가 있어야 함")
+        self.assertIn('class="dual-slider dual-slider--pyeong"', content, "평수 슬라이더 CSS 클래스가 있어야 함")
+        self.assertIn('aria-valuemin="5"', content, "최소 평수 5가 있어야 함")
+        self.assertIn('aria-valuemax="70"', content, "최대 평수 70이 있어야 함")
 
     def test_12_filter_state_structure(self):
-        """Verify new filter state structure with linear range properties."""
+        """Verify new filter state structure with dual-thumb range properties."""
         with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # New filter state structure
+        # New filter state structure (min/max for all 3 criteria)
         self.assertIn('minPriceWon', content, "minPriceWon 속성이 있어야 함")
         self.assertIn('maxPriceWon', content, "maxPriceWon 속성이 있어야 함")
+        self.assertIn('minAge', content, "minAge 속성이 있어야 함 (신축~최대 연식)")
         self.assertIn('maxAge', content, "maxAge 속성이 있어야 함")
         self.assertIn('minPyeong', content, "minPyeong 속성이 있어야 함")
         self.assertIn('maxPyeong', content, "maxPyeong 속성이 있어야 함")
@@ -194,7 +207,7 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertNotIn('"pyeong":', content, "기존 pyeong은 없어야 함")
 
     def test_13_linear_filtering_logic_price(self):
-        """Test linear price filtering logic."""
+        """Test dual-thumb price filtering logic (min~max range)."""
         script = """
         const listings = window.DAANGN_SEOUL_LISTINGS;
         const currentYear = new Date().getFullYear();
@@ -213,26 +226,27 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertGreater(data["count"], 0, "10억~30억 구간 매물이 있어야 함")
 
     def test_14_linear_filtering_logic_year(self):
-        """Test linear year (age) filtering logic."""
+        """Test dual-thumb year (age) filtering logic (min~max range)."""
         script = """
         const listings = window.DAANGN_SEOUL_LISTINGS;
         const currentYear = new Date().getFullYear();
 
-        // Simulate filter state: 최대 10년차
+        // Simulate filter state: 0년차(신축) ~ 10년차
+        const minAge = 0;
         const maxAge = 10;
 
         const filtered = listings.filter(item => {
             const age = currentYear - item.buildYear;
-            return age <= maxAge;
+            return age >= minAge && age <= maxAge;
         });
         console.log(JSON.stringify({ count: filtered.length }));
         """
         data = json.loads(run_node_eval(script))
-        # At least some items should be within 10 years
-        self.assertGreater(data["count"], 0, "10년 이내 매물이 있어야 함")
+        # At least some items should be within 0~10 years
+        self.assertGreater(data["count"], 0, "0년차~10년차 구간 매물이 있어야 함")
 
     def test_15_linear_filtering_logic_pyeong(self):
-        """Test linear pyeong filtering logic."""
+        """Test dual-thumb pyeong filtering logic (min~max range)."""
         script = """
         const listings = window.DAANGN_SEOUL_LISTINGS;
 
@@ -249,25 +263,53 @@ class TestDaangnRealtySuite(unittest.TestCase):
         self.assertGreater(data["count"], 0, "15평~35평 구간 매물이 있어야 함")
 
     def test_16_badge_update_helpers_exist(self):
-        """Verify badge update helper functions exist."""
+        """Verify badge update helper functions exist for dual-thumb sliders."""
         with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
             content = f.read()
 
         self.assertIn('updateDaangnPriceBadge', content, "가격 뱃지 업데이트 함수가 있어야 함")
         self.assertIn('updateDaangnYearBadge', content, "연식 뱃지 업데이트 함수가 있어야 함")
         self.assertIn('updateDaangnPyeongBadge', content, "평수 뱃지 업데이트 함수가 있어야 함")
+        # Verify they accept min/max parameters
+        self.assertIn('function(minAge, maxAge)', content, "연식 뱃지 함수가 minAge, maxAge를 받아야 함")
 
     def test_17_reset_filter_defaults(self):
-        """Verify resetDaangnFilter uses new default values."""
+        """Verify resetDaangnFilter uses new default values with minAge."""
         with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Check reset defaults
         self.assertIn('minPriceWon: 100000000', content, "초기화 시 최소 1억이어야 함")
         self.assertIn('maxPriceWon: 5000000000', content, "초기화 시 최대 50억이어야 함")
+        self.assertIn('minAge: 0', content, "초기화 시 최소 연식 0년차(신축)이어야 함")
         self.assertIn('maxAge: 35', content, "초기화 시 최대 연식 35년이어야 함")
         self.assertIn('minPyeong: 5', content, "초기화 시 최소 평수 5평이어야 함")
         self.assertIn('maxPyeong: 70', content, "초기화 시 최대 평수 70평이어야 함")
+
+    def test_18_dual_thumb_slider_logic_initialization(self):
+        """Verify initDualSliders and initSingleDualSlider functions exist."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn('initDualSliders', content, "듀얼 슬라이더 초기화 함수가 있어야 함")
+        self.assertIn('initSingleDualSlider', content, "개별 듀얼 슬라이더 초기화 함수가 있어야 함")
+        self.assertIn('setPointerCapture', content, "포인터 캡처로 부드러운 드래그 구현이 있어야 함")
+        self.assertIn('pointerdown', content, "포인터 다운 이벤트 핸들러가 있어야 함")
+        self.assertIn('pointermove', content, "포인터 무브 이벤트 핸들러가 있어야 함")
+        self.assertIn('pointerup', content, "포인터 업 이벤트 핸들러가 있어야 함")
+
+    def test_19_dual_thumb_keyboard_accessibility(self):
+        """Verify keyboard navigation support for dual-thumb sliders."""
+        with open(REAL_ESTATE_VIEW_JS, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn('keydown', content, "키보드 네비게이션을 위한 keydown 핸들러가 있어야 함")
+        self.assertIn('ArrowRight', content, "우측 화살표 키 지원")
+        self.assertIn('ArrowLeft', content, "좌측 화살표 키 지원")
+        self.assertIn('ArrowUp', content, "상단 화살표 키 지원")
+        self.assertIn('ArrowDown', content, "하단 화살표 키 지원")
+        self.assertIn('Home', content, "Home 키 지원 (최소값)")
+        self.assertIn('End', content, "End 키 지원 (최대값)")
 
 
 if __name__ == "__main__":

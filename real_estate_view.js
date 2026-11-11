@@ -1924,6 +1924,7 @@ window.daangnFilterState = window.daangnFilterState || {
       district: 'all',
       minPriceWon: 100000000,
       maxPriceWon: 5000000000,
+      minAge: 0,
       maxAge: 35,
       minPyeong: 5,
       maxPyeong: 70,
@@ -1948,9 +1949,9 @@ window.renderDaangnCrawlerView = function(containerId) {
         const maxPriceManwon = st.maxPriceWon / 10000;
         if (priceManwon < minPriceManwon || priceManwon > maxPriceManwon) return false;
 
-        // 건물 연식 필터 (최대 연식)
+        // 건물 연식 필터 (최소/최대 연식)
         const age = currentYear - item.buildYear;
-        if (age > st.maxAge) return false;
+        if (age < (st.minAge || 0) || age > st.maxAge) return false;
 
         // 평수 범위 필터
         const py = item.areaPyeong;
@@ -2041,67 +2042,84 @@ window.renderDaangnCrawlerView = function(containerId) {
               </div>
             </div>
 
-            <!-- 선형 구간 필터 그리드 (모바일/PC 모두 직관적 조작) -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:12px;">
+            <!-- v3.4.0: Dual-Thumb Single-Track Range Sliders -->
+            <div class="filter-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:12px;">
               <!-- 1) 서울 세부 지역 -->
-              <div>
+              <div class="filter-item">
                 <label style="font-size:11.5px; font-weight:700; color:#7C2D12; display:block; margin-bottom:4px;">📍 서울 세부 지역</label>
                 <select id="dg-sel-district" onchange="updateDaangnFilter()" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid #FDBA74; font-size:12.5px; font-weight:700; background:#FFF; color:#1E293B;">
                   ${districtOptions}
                 </select>
               </div>
 
-              <!-- 2) 매매가 구간 (선형 슬라이더: 1~50억) -->
-              <div style="grid-column:span 2;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                  <label style="font-size:11.5px; font-weight:700; color:#7C2D12;">💰 매매가 구간</label>
-                  <span id="dg-badge-price" style="font-size:12.5px; font-weight:800; color:#EA580C; background:#FFF7ED; padding:2px 8px; border-radius:6px;">${minPriceEok}억 ~ ${maxPriceEok}억</span>
+              <!-- 2) 매매가 구간 (Dual-Thumb Slider: 1~50억) -->
+              <div class="filter-item filter-item--full">
+                <div class="filter-label">
+                  <span>💰 매매가 구간</span>
+                  <span id="dg-badge-price" class="dg-badge dg-badge--price">${minPriceEok}억 ~ ${maxPriceEok}억</span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                  <div>
-                    <label style="font-size:10.5px; font-weight:700; color:#9A3412; display:block; margin-bottom:3px;">최소 (억)</label>
-                    <input type="range" id="dg-range-min-price" min="1" max="50" step="1" value="${minPriceEok}"
-                      oninput="updateDaangnPriceBadge(this.value, document.getElementById('dg-range-max-price').value); updateDaangnFilter()"
-                      style="width:100%; accent-color:#EA580C; cursor:pointer;">
+                <div class="filter-slider-wrapper">
+                  <div class="dual-slider dual-slider--price" id="dg-slider-price" data-min="1" data-max="50" data-step="1" data-unit="억">
+                    <div class="dual-slider__track"></div>
+                    <div class="dual-slider__range" id="dg-slider-price-range"></div>
+                    <div class="dual-slider__thumb dual-slider__thumb--min" id="dg-slider-price-min" role="slider" aria-label="최소 매매가" aria-valuemin="1" aria-valuemax="50" aria-valuenow="${minPriceEok}" tabindex="0">
+                      <span class="dual-slider__tooltip" id="dg-slider-price-min-tooltip">${minPriceEok}억</span>
+                    </div>
+                    <div class="dual-slider__thumb dual-slider__thumb--max" id="dg-slider-price-max" role="slider" aria-label="최대 매매가" aria-valuemin="1" aria-valuemax="50" aria-valuenow="${maxPriceEok}" tabindex="0">
+                      <span class="dual-slider__tooltip" id="dg-slider-price-max-tooltip">${maxPriceEok}억</span>
+                    </div>
                   </div>
-                  <div>
-                    <label style="font-size:10.5px; font-weight:700; color:#9A3412; display:block; margin-bottom:3px;">최대 (억)</label>
-                    <input type="range" id="dg-range-max-price" min="1" max="50" step="1" value="${maxPriceEok}"
-                      oninput="updateDaangnPriceBadge(document.getElementById('dg-range-min-price').value, this.value); updateDaangnFilter()"
-                      style="width:100%; accent-color:#EA580C; cursor:pointer;">
+                  <div class="dual-slider__labels">
+                    <span>1억</span>
+                    <span>50억</span>
                   </div>
                 </div>
               </div>
 
-              <!-- 3) 건물 연식 구간 (선형 슬라이더: 1~35년) -->
-              <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                  <label style="font-size:11.5px; font-weight:700; color:#7C2D12;">🏛️ 최대 건물 연식</label>
-                  <span id="dg-badge-year" style="font-size:11px; font-weight:700; color:#0369A1; background:#E0F2FE; padding:2px 8px; border-radius:6px;">최대 ${st.maxAge}년차 이내 (${yearAfter}년 이후)</span>
+              <!-- 3) 건물 연식 구간 (Dual-Thumb Slider: 0~35년) -->
+              <div class="filter-item filter-item--full">
+                <div class="filter-label">
+                  <span>🏛️ 건물 연식 구간</span>
+                  <span id="dg-badge-year" class="dg-badge dg-badge--year">${st.minAge === 0 ? '신축' : st.minAge + '년차'} ~ ${st.maxAge}년차</span>
                 </div>
-                <input type="range" id="dg-range-year-max" min="1" max="35" step="1" value="${st.maxAge}"
-                  oninput="updateDaangnYearBadge(this.value); updateDaangnFilter()"
-                  style="width:100%; accent-color:#0369A1; cursor:pointer;">
+                <div class="filter-slider-wrapper">
+                  <div class="dual-slider dual-slider--year" id="dg-slider-year" data-min="0" data-max="35" data-step="1" data-unit="년차">
+                    <div class="dual-slider__track"></div>
+                    <div class="dual-slider__range" id="dg-slider-year-range"></div>
+                    <div class="dual-slider__thumb dual-slider__thumb--min" id="dg-slider-year-min" role="slider" aria-label="최소 건물 연식" aria-valuemin="0" aria-valuemax="35" aria-valuenow="${st.minAge}" tabindex="0">
+                      <span class="dual-slider__tooltip" id="dg-slider-year-min-tooltip">${st.minAge === 0 ? '신축' : st.minAge + '년차'}</span>
+                    </div>
+                    <div class="dual-slider__thumb dual-slider__thumb--max" id="dg-slider-year-max" role="slider" aria-label="최대 건물 연식" aria-valuemin="0" aria-valuemax="35" aria-valuenow="${st.maxAge}" tabindex="0">
+                      <span class="dual-slider__tooltip" id="dg-slider-year-max-tooltip">${st.maxAge}년차</span>
+                    </div>
+                  </div>
+                  <div class="dual-slider__labels">
+                    <span>신축(0)</span>
+                    <span>35년차</span>
+                  </div>
+                </div>
               </div>
 
-              <!-- 4) 평수 구간 (선형 슬라이더: 5~70평) -->
-              <div style="grid-column:span 2;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                  <label style="font-size:11.5px; font-weight:700; color:#7C2D12;">📐 평수 구간</label>
-                  <span id="dg-badge-pyeong" style="font-size:12.5px; font-weight:800; color:#047857; background:#ECFDF5; padding:2px 8px; border-radius:6px;">${st.minPyeong}평 ~ ${st.maxPyeong}평</span>
+              <!-- 4) 평수 구간 (Dual-Thumb Slider: 5~70평) -->
+              <div class="filter-item filter-item--full">
+                <div class="filter-label">
+                  <span>📐 평수 구간</span>
+                  <span id="dg-badge-pyeong" class="dg-badge dg-badge--pyeong">${st.minPyeong}평 ~ ${st.maxPyeong}평</span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                  <div>
-                    <label style="font-size:10.5px; font-weight:700; color:#065F46; display:block; margin-bottom:3px;">최소 (평)</label>
-                    <input type="range" id="dg-range-min-pyeong" min="5" max="70" step="1" value="${st.minPyeong}"
-                      oninput="updateDaangnPyeongBadge(this.value, document.getElementById('dg-range-max-pyeong').value); updateDaangnFilter()"
-                      style="width:100%; accent-color:#047857; cursor:pointer;">
+                <div class="filter-slider-wrapper">
+                  <div class="dual-slider dual-slider--pyeong" id="dg-slider-pyeong" data-min="5" data-max="70" data-step="1" data-unit="평">
+                    <div class="dual-slider__track"></div>
+                    <div class="dual-slider__range" id="dg-slider-pyeong-range"></div>
+                    <div class="dual-slider__thumb dual-slider__thumb--min" id="dg-slider-pyeong-min" role="slider" aria-label="최소 평수" aria-valuemin="5" aria-valuemax="70" aria-valuenow="${st.minPyeong}" tabindex="0">
+                      <span class="dual-slider__tooltip" id="dg-slider-pyeong-min-tooltip">${st.minPyeong}평</span>
+                    </div>
+                    <div class="dual-slider__thumb dual-slider__thumb--max" id="dg-slider-pyeong-max" role="slider" aria-label="최대 평수" aria-valuemin="5" aria-valuemax="70" aria-valuenow="${st.maxPyeong}" tabindex="0">
+                      <span class="dual-slider__tooltip" id="dg-slider-pyeong-max-tooltip">${st.maxPyeong}평</span>
+                    </div>
                   </div>
-                  <div>
-                    <label style="font-size:10.5px; font-weight:700; color:#065F46; display:block; margin-bottom:3px;">최대 (평)</label>
-                    <input type="range" id="dg-range-max-pyeong" min="5" max="70" step="1" value="${st.maxPyeong}"
-                      oninput="updateDaangnPyeongBadge(document.getElementById('dg-range-min-pyeong').value, this.value); updateDaangnFilter()"
-                      style="width:100%; accent-color:#047857; cursor:pointer;">
+                  <div class="dual-slider__labels">
+                    <span>5평</span>
+                    <span>70평</span>
                   </div>
                 </div>
               </div>
@@ -2141,15 +2159,20 @@ window.renderDaangnCrawlerView = function(containerId) {
           </div>
         </div>
       `;
+
+      // v3.4.0: 듀얼 썸 슬라이더 초기화 (DOM 렌더링 후 실행)
+      setTimeout(() => initDualSliders(st), 0);
     };
 
     window.updateDaangnFilter = function() {
       const dist = document.getElementById('dg-sel-district')?.value || 'all';
-      const minPriceEok = parseInt(document.getElementById('dg-range-min-price')?.value || '1', 10);
-      const maxPriceEok = parseInt(document.getElementById('dg-range-max-price')?.value || '50', 10);
-      const maxAge = parseInt(document.getElementById('dg-range-year-max')?.value || '35', 10);
-      const minPyeong = parseInt(document.getElementById('dg-range-min-pyeong')?.value || '5', 10);
-      const maxPyeong = parseInt(document.getElementById('dg-range-max-pyeong')?.value || '70', 10);
+      // 듀얼 썸 슬라이더에서 값 읽기
+      const minPriceEok = parseInt(document.getElementById('dg-slider-price-min')?.getAttribute('aria-valuenow') || '1', 10);
+      const maxPriceEok = parseInt(document.getElementById('dg-slider-price-max')?.getAttribute('aria-valuenow') || '50', 10);
+      const minAge = parseInt(document.getElementById('dg-slider-year-min')?.getAttribute('aria-valuenow') || '0', 10);
+      const maxAge = parseInt(document.getElementById('dg-slider-year-max')?.getAttribute('aria-valuenow') || '35', 10);
+      const minPyeong = parseInt(document.getElementById('dg-slider-pyeong-min')?.getAttribute('aria-valuenow') || '5', 10);
+      const maxPyeong = parseInt(document.getElementById('dg-slider-pyeong-max')?.getAttribute('aria-valuenow') || '70', 10);
       const chkApt = document.getElementById('dg-chk-apt')?.checked ?? true;
       const chkHouse = document.getElementById('dg-chk-house')?.checked ?? true;
       const chkVilla = document.getElementById('dg-chk-villa')?.checked ?? true;
@@ -2157,6 +2180,8 @@ window.renderDaangnCrawlerView = function(containerId) {
       // 최소값이 최대값을 초과하지 않도록 보정
       const finalMinPriceEok = Math.min(minPriceEok, maxPriceEok);
       const finalMaxPriceEok = Math.max(minPriceEok, maxPriceEok);
+      const finalMinAge = Math.min(minAge, maxAge);
+      const finalMaxAge = Math.max(minAge, maxAge);
       const finalMinPyeong = Math.min(minPyeong, maxPyeong);
       const finalMaxPyeong = Math.max(minPyeong, maxPyeong);
 
@@ -2164,7 +2189,8 @@ window.renderDaangnCrawlerView = function(containerId) {
         district: dist,
         minPriceWon: finalMinPriceEok * 100000000,
         maxPriceWon: finalMaxPriceEok * 100000000,
-        maxAge: maxAge,
+        minAge: finalMinAge,
+        maxAge: finalMaxAge,
         minPyeong: finalMinPyeong,
         maxPyeong: finalMaxPyeong,
         types: { apt: chkApt, house: chkHouse, villa: chkVilla }
@@ -2182,12 +2208,12 @@ window.renderDaangnCrawlerView = function(containerId) {
       }
     };
 
-    window.updateDaangnYearBadge = function(maxAge) {
+    window.updateDaangnYearBadge = function(minAge, maxAge) {
       const badge = document.getElementById('dg-badge-year');
-      const currentYear = new Date().getFullYear();
       if (badge) {
-        const age = parseInt(maxAge) || 35;
-        badge.textContent = `최대 ${age}년차 이내 (${currentYear - age}년 이후)`;
+        const min = parseInt(minAge) || 0;
+        const max = parseInt(maxAge) || 35;
+        badge.textContent = `${min === 0 ? '신축' : min + '년차'} ~ ${max}년차`;
       }
     };
 
@@ -2205,6 +2231,7 @@ window.renderDaangnCrawlerView = function(containerId) {
         district: 'all',
         minPriceWon: 100000000,
         maxPriceWon: 5000000000,
+        minAge: 0,
         maxAge: 35,
         minPyeong: 5,
         maxPyeong: 70,
@@ -2323,6 +2350,267 @@ window.renderDaangnCrawlerView = function(containerId) {
       a.click();
       if (typeof window.showToast === 'function') window.showToast('📥 옵시디언 통합 대시보드 마크다운(.md) 파일이 생성되었습니다!');
     };
+
+    // =========================================================================
+    // v3.4.0: Dual-Thumb Single-Track Slider Logic (Pointer Events API)
+    // =========================================================================
+    function initDualSliders(filterState) {
+      // Price slider (1~50억)
+      initSingleDualSlider({
+        sliderId: 'dg-slider-price',
+        minThumbId: 'dg-slider-price-min',
+        maxThumbId: 'dg-slider-price-max',
+        rangeId: 'dg-slider-price-range',
+        minTooltipId: 'dg-slider-price-min-tooltip',
+        maxTooltipId: 'dg-slider-price-max-tooltip',
+        badgeId: 'dg-badge-price',
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: '억',
+        formatTooltip: (v) => v + '억',
+        formatBadge: (min, max) => min + '억 ~ ' + max + '억',
+        initialMin: filterState.minPriceWon / 100000000,
+        initialMax: filterState.maxPriceWon / 100000000,
+        onChange: (min, max) => {
+          updateDaangnPriceBadge(min, max);
+          updateDaangnFilter();
+        }
+      });
+
+      // Year slider (0~35년차)
+      initSingleDualSlider({
+        sliderId: 'dg-slider-year',
+        minThumbId: 'dg-slider-year-min',
+        maxThumbId: 'dg-slider-year-max',
+        rangeId: 'dg-slider-year-range',
+        minTooltipId: 'dg-slider-year-min-tooltip',
+        maxTooltipId: 'dg-slider-year-max-tooltip',
+        badgeId: 'dg-badge-year',
+        min: 0,
+        max: 35,
+        step: 1,
+        unit: '년차',
+        formatTooltip: (v) => (v === 0 ? '신축' : v + '년차'),
+        formatBadge: (min, max) => (min === 0 ? '신축' : min + '년차') + ' ~ ' + max + '년차',
+        initialMin: filterState.minAge || 0,
+        initialMax: filterState.maxAge || 35,
+        onChange: (min, max) => {
+          updateDaangnYearBadge(min, max);
+          updateDaangnFilter();
+        }
+      });
+
+      // Pyeong slider (5~70평)
+      initSingleDualSlider({
+        sliderId: 'dg-slider-pyeong',
+        minThumbId: 'dg-slider-pyeong-min',
+        maxThumbId: 'dg-slider-pyeong-max',
+        rangeId: 'dg-slider-pyeong-range',
+        minTooltipId: 'dg-slider-pyeong-min-tooltip',
+        maxTooltipId: 'dg-slider-pyeong-max-tooltip',
+        badgeId: 'dg-badge-pyeong',
+        min: 5,
+        max: 70,
+        step: 1,
+        unit: '평',
+        formatTooltip: (v) => v + '평',
+        formatBadge: (min, max) => min + '평 ~ ' + max + '평',
+        initialMin: filterState.minPyeong || 5,
+        initialMax: filterState.maxPyeong || 70,
+        onChange: (min, max) => {
+          updateDaangnPyeongBadge(min, max);
+          updateDaangnFilter();
+        }
+      });
+    }
+
+    function initSingleDualSlider(config) {
+      const slider = document.getElementById(config.sliderId);
+      const minThumb = document.getElementById(config.minThumbId);
+      const maxThumb = document.getElementById(config.maxThumbId);
+      const rangeEl = document.getElementById(config.rangeId);
+      const minTooltip = document.getElementById(config.minTooltipId);
+      const maxTooltip = document.getElementById(config.maxTooltipId);
+      const badge = document.getElementById(config.badgeId);
+
+      if (!slider || !minThumb || !maxThumb || !rangeEl) return;
+
+      const min = config.min;
+      const max = config.max;
+      const step = config.step;
+      const trackPadding = 16; // CSS .dual-slider__track left/right
+
+      // 초기 위치 설정
+      let minVal = config.initialMin;
+      let maxVal = config.initialMax;
+      updatePositions(minVal, maxVal);
+
+      let activeThumb = null;
+      let startX = 0;
+      let startMinVal = minVal;
+      let startMaxVal = maxVal;
+
+      function valueToPercent(val) {
+        return ((val - min) / (max - min)) * 100;
+      }
+
+      function percentToValue(pct) {
+        const rawVal = min + (pct / 100) * (max - min);
+        return Math.round(rawVal / step) * step;
+      }
+
+      function clamp(val, minVal, maxVal) {
+        return Math.max(minVal, Math.min(maxVal, val));
+      }
+
+      function updatePositions(minV, maxV) {
+        const minPct = valueToPercent(minV);
+        const maxPct = valueToPercent(maxV);
+
+        minThumb.style.left = minPct + '%';
+        maxThumb.style.left = maxPct + '%';
+        rangeEl.style.left = minPct + '%';
+        rangeEl.style.right = (100 - maxPct) + '%';
+
+        minThumb.setAttribute('aria-valuenow', minV);
+        maxThumb.setAttribute('aria-valuenow', maxV);
+
+        if (minTooltip) minTooltip.textContent = config.formatTooltip(minV);
+        if (maxTooltip) maxTooltip.textContent = config.formatTooltip(maxV);
+        if (badge) badge.textContent = config.formatBadge(minV, maxV);
+      }
+
+      function onPointerDown(e, thumbType) {
+        e.preventDefault();
+        activeThumb = thumbType;
+        startX = e.clientX || (e.touches && e.touches[0].clientX);
+        startMinVal = minVal;
+        startMaxVal = maxVal;
+
+        minThumb.classList.add('dragging');
+        maxThumb.classList.add('dragging');
+
+        // 포인터 캡처로 부드러운 드래그 보장 (모바일 터치 포함)
+        if (e.target.setPointerCapture) {
+          try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
+        }
+
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+        document.addEventListener('pointercancel', onPointerUp);
+      }
+
+      function onPointerMove(e) {
+        if (!activeThumb) return;
+        e.preventDefault();
+
+        const currentX = e.clientX || (e.touches && e.touches[0].clientX);
+        const sliderRect = slider.getBoundingClientRect();
+        const trackWidth = sliderRect.width - trackPadding * 2;
+        const dx = currentX - startX;
+        const pctDelta = (dx / trackWidth) * 100;
+
+        if (activeThumb === 'min') {
+          const newMinPct = clamp(valueToPercent(startMinVal) + pctDelta, 0, valueToPercent(maxVal));
+          minVal = percentToValue(newMinPct);
+          minVal = clamp(minVal, min, maxVal);
+        } else {
+          const newMaxPct = clamp(valueToPercent(startMaxVal) + pctDelta, valueToPercent(minVal), 100);
+          maxVal = percentToValue(newMaxPct);
+          maxVal = clamp(maxVal, minVal, max);
+        }
+
+        updatePositions(minVal, maxVal);
+      }
+
+      function onPointerUp(e) {
+        if (!activeThumb) return;
+
+        minThumb.classList.remove('dragging');
+        maxThumb.classList.remove('dragging');
+
+        if (e.target.releasePointerCapture) {
+          try { e.target.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+        document.removeEventListener('pointercancel', onPointerUp);
+
+        if (config.onChange) config.onChange(minVal, maxVal);
+        activeThumb = null;
+      }
+
+      function onKeyDown(e) {
+        const key = e.key;
+        let changed = false;
+
+        if (e.target === minThumb) {
+          if (key === 'ArrowRight' || key === 'ArrowUp') {
+            minVal = clamp(minVal + step, min, maxVal);
+            changed = true;
+          } else if (key === 'ArrowLeft' || key === 'ArrowDown') {
+            minVal = clamp(minVal - step, min, maxVal);
+            changed = true;
+          } else if (key === 'Home') {
+            minVal = min;
+            changed = true;
+          } else if (key === 'End') {
+            minVal = maxVal;
+            changed = true;
+          }
+        } else if (e.target === maxThumb) {
+          if (key === 'ArrowRight' || key === 'ArrowUp') {
+            maxVal = clamp(maxVal + step, minVal, max);
+            changed = true;
+          } else if (key === 'ArrowLeft' || key === 'ArrowDown') {
+            maxVal = clamp(maxVal - step, minVal, max);
+            changed = true;
+          } else if (key === 'Home') {
+            maxVal = minVal;
+            changed = true;
+          } else if (key === 'End') {
+            maxVal = max;
+            changed = true;
+          }
+        }
+
+        if (changed) {
+          e.preventDefault();
+          updatePositions(minVal, maxVal);
+          if (config.onChange) config.onChange(minVal, maxVal);
+        }
+      }
+
+      // 이벤트 바인딩
+      minThumb.addEventListener('pointerdown', (e) => onPointerDown(e, 'min'));
+      maxThumb.addEventListener('pointerdown', (e) => onPointerDown(e, 'max'));
+      minThumb.addEventListener('keydown', onKeyDown);
+      maxThumb.addEventListener('keydown', onKeyDown);
+
+      // 클릭으로 트랙에서 이동 (선택적)
+      slider.addEventListener('click', (e) => {
+        if (e.target === slider || e.target === rangeEl || e.target === slider.querySelector('.dual-slider__track')) {
+          const rect = slider.getBoundingClientRect();
+          const clickPct = ((e.clientX - rect.left - trackPadding) / (rect.width - trackPadding * 2)) * 100;
+          const clickVal = percentToValue(clamp(clickPct, 0, 100));
+
+          // 더 가까운 썸 이동
+          const distMin = Math.abs(clickVal - minVal);
+          const distMax = Math.abs(clickVal - maxVal);
+
+          if (distMin <= distMax) {
+            minVal = clamp(clickVal, min, maxVal);
+          } else {
+            maxVal = clamp(clickVal, minVal, max);
+          }
+
+          updatePositions(minVal, maxVal);
+          if (config.onChange) config.onChange(minVal, maxVal);
+        }
+      });
+    }
   }
 
   return RealEstateView;
