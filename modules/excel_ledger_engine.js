@@ -139,7 +139,7 @@
         }
 
         // 2) 일반 시트 링크: /spreadsheets/d/{sheetId}
-        const standardMatch = url.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+        const standardMatch = url.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([^\/?#]+)/);
         if (standardMatch && standardMatch[1] !== 'e') {
             const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
             return {
@@ -228,13 +228,19 @@
             const rawMemo = rowObj.memo || rowObj.usage || rowObj.content || '';
             const fixedExplicit = rowObj.fixed ? /y|yes|true|1|고정/.test(String(rowObj.fixed).toLowerCase()) : false;
 
+            // 날짜 정규화: "2026.10.24" / "2026-10-24 12:26:53" → "2026-10-24"
+            const rawDate = String(rowObj.date || '').trim();
+            const datePart = (rawDate.split(' ')[0] || '').replace(/\./g, '-').trim();
+            // 결제자: payer 컬럼이 없으면 asset(결제수단/자산) 컬럼에서 추론
+            const payerSource = rowObj.payer || rowObj.asset || '';
+
             const tx = {
                 id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                date: (rowObj.date || '').replace(/\./g, '-').trim(),
+                date: datePart,
                 type: normalizeType(rowObj.type),
                 category: normalizeCategory(rawCat),
                 amount: parseAmount(rowObj.amount),
-                payer: normalizePayer(rowObj.payer),
+                payer: normalizePayer(payerSource),
                 memo: rawMemo,
                 isFixed: fixedExplicit || isFixedExpense(rawMemo, rawCat)
             };
@@ -446,19 +452,24 @@
             }
         }
 
-        // 2순위: GViz CSV 직접 호출 (gviz/tq?tqx=out:csv)
+        // 2순위: GViz CSV 직접 호출 (gviz/tq?tqx=out:csv) — 멀티 gid 순회
         if (info.sheetId) {
-            const targetGid = info.gid || '1727868226';
-            const gvizCsvUrl = `https://docs.google.com/spreadsheets/d/${info.sheetId}/gviz/tq?tqx=out:csv&gid=${targetGid}`;
-            try {
-                const res = await fetch(gvizCsvUrl);
-                if (res.ok) {
-                    const text = await res.text();
-                    const txs = parseCsvString(text);
-                    if (txs.length > 0) return txs;
+            const candidateGids = [info.gid, '1727868226', '0'].filter((g, i, arr) => g != null && arr.indexOf(g) === i);
+            for (const candidateGid of candidateGids) {
+                const gvizCsvUrl = `https://docs.google.com/spreadsheets/d/${info.sheetId}/gviz/tq?tqx=out:csv&gid=${candidateGid}`;
+                try {
+                    const res = await fetch(gvizCsvUrl);
+                    if (res.ok) {
+                        const text = await res.text();
+                        const txs = parseCsvString(text);
+                        if (txs.length > 0) {
+                            console.log(`[ExcelLedgerEngine] Fetched ${txs.length} transactions via GViz CSV (gid: ${candidateGid})`);
+                            return txs;
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`[ExcelLedgerEngine] GViz CSV fetch failed for gid ${candidateGid}:`, e.message);
                 }
-            } catch (e) {
-                console.warn('[ExcelLedgerEngine] GViz CSV fetch failed:', e.message);
             }
         }
 
@@ -490,7 +501,7 @@
             console.warn('[ExcelLedgerEngine] Proxy fetch failed:', proxyErr.message);
         }
 
-        throw new Error('공유 시트 연결 실패: 구글 시트 우측 상단 [공유] ➔ "링크가 있는 모든 사용자"로 설정되어 있는지 확인해주세요.');
+        throw new Error('공유 시트 연결 실패: 구글 시트 우측 상단 [공유] ➔ 일반 액세스를 \'링크가 있는 모든 사용자\'로 설정해주세요. (일일가계부 탭 gid=1727868226)');
     }
 
     /**

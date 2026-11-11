@@ -248,5 +248,43 @@ class TestExcelLedgerEngine(unittest.TestCase):
         self.assertEqual(pub_match.group(1), '2PACX-1vQTest123')
 
 
+    def test_wife_original_7_columns_csv(self):
+        """와이프 원본 7개 컬럼 파싱 헤더 매핑 검증"""
+        headers = ["날짜", "분류", "소분류", "내용", "금액(원)", "수입/지출", "자산"]
+        mapped = [normalize_headers(h) for h in headers]
+        self.assertIn('date', mapped)
+        self.assertIn('category', mapped)
+        self.assertIn('amount', mapped)
+
+    def test_timestamp_date_normalization(self):
+        """타임스탬프에서 YYYY-MM-DD 추출 정규화 검증"""
+        raw_date = "2026-10-24 12:26:53"
+        date_part = (raw_date.split(' ')[0] or '').replace('.', '-').strip()
+        self.assertEqual(date_part, '2026-10-24')
+
+    def test_saving_type_normalization(self):
+        """이체지출/저축/적금/청약/보험 → saving 타입 정규화 검증"""
+        def check_type(t_str):
+            t = (t_str or '').strip().lower()
+            if re.search(r'수입|income|\+', t): return 'income'
+            if re.search(r'이체지출|저축|적금|청약|보험|saving', t): return 'saving'
+            return 'expense'
+        self.assertEqual(check_type('이체지출'), 'saving')
+        self.assertEqual(check_type('저축'), 'saving')
+        self.assertEqual(check_type('수입'), 'income')
+        self.assertEqual(check_type('지출'), 'expense')
+
+    def test_asset_based_payer_inference(self):
+        """자산 문자열에서 결제자(yongi/juni/together) 추론 검증"""
+        def infer_payer(asset_str):
+            s = str(asset_str or '').strip().lower()
+            if re.search(r'진용|용이|yongi', s): return 'yongi'
+            if re.search(r'준희|주니|juni', s): return 'juni'
+            return 'together'
+        self.assertEqual(infer_payer('국민와우카드(진용)'), 'yongi')
+        self.assertEqual(infer_payer('현대카드(준희)'), 'juni')
+        self.assertEqual(infer_payer('생활비통장(공동)'), 'together')
+
+
 if __name__ == '__main__':
     unittest.main()

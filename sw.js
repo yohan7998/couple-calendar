@@ -1,5 +1,5 @@
-// SweetSync Couple Calendar - PWA Service Worker v3.9.1
-const CACHE_NAME = 'couple-calendar-v3.9.1';
+// SweetSync Couple Calendar - PWA Service Worker v3.9.2
+const CACHE_NAME = 'couple-calendar-v3.9.2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
